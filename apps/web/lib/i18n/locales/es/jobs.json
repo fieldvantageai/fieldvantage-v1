@@ -1,0 +1,81 @@
+{
+  "title": "Trabajos",
+  "subtitle": "Gestiona trabajos y asigna equipos.",
+  "actions": {
+    "new": "Nuevo trabajo"
+  },
+  "new": {
+    "title": "Nuevo trabajo",
+    "subtitle": "Crea un nuevo trabajo y asigna un cliente."
+  },
+  "edit": {
+    "title": "Editar trabajo",
+    "subtitle": "Actualiza datos, estado y programacion."
+  },
+  "list": {
+    "title": "Trabajos activos",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Aun no hay trabajos",
+    "subtitle": "Comienza creando el primer trabajo."
+  },
+  "detail": {
+    "customerFallback": "Cliente no informado",
+    "edit": "Editar trabajo",
+    "summary": {
+      "title": "Resumen del trabajo",
+      "subtitle": "Datos simulados",
+      "scheduled": "Programacion",
+      "expectedCompletion": "Prevision de finalizacion",
+      "notDefined": "No definida"
+    },
+    "team": {
+      "title": "Equipo en el trabajo",
+      "subtitle": "Personas actualmente asignadas",
+      "empty": "No hay empleados asignados.",
+      "unknown": "Empleado no encontrado",
+      "unknownEmail": "Email no informado"
+    },
+    "history": {
+      "title": "Historial",
+      "subtitle": "Sin registros aun",
+      "empty": "No hay actualizaciones registradas."
+    }
+  },
+  "status": {
+    "scheduled": "Programado",
+    "in_progress": "En progreso",
+    "completed": "Completado"
+  },
+  "fields": {
+    "title": "Titulo del trabajo",
+    "customer": "Cliente",
+    "scheduledFor": "Fecha programada",
+    "expectedCompletion": "Prevision de finalizacion",
+    "status": "Estado"
+  },
+  "assignment": {
+    "title": "Empleados asignados",
+    "subtitle": "Selecciona quien trabajara en este trabajo.",
+    "add": "Agregar empleado",
+    "hideSelector": "Ocultar seleccion",
+    "empty": "No hay empleados asignados.",
+    "filterLabel": "Filtrar por nombre",
+    "filterPlaceholder": "Escribe para buscar",
+    "filterEmpty": "No se encontraron empleados.",
+    "selected": "Seleccionado"
+  },
+  "messages": {
+    "created": "Trabajo creado.",
+    "createError": "No se pudo crear el trabajo.",
+    "createFallback": "Error inesperado al crear el trabajo.",
+    "updated": "Trabajo actualizado.",
+    "updateError": "No se pudo actualizar el trabajo.",
+    "updateFallback": "Error inesperado al actualizar el trabajo.",
+    "deleteConfirm": "Desea eliminar este trabajo?",
+    "deleteError": "No se pudo eliminar el trabajo.",
+    "deleteFallback": "Error inesperado al eliminar el trabajo.",
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+  }
+}

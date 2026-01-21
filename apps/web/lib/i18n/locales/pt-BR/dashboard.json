@@ -1,0 +1,34 @@
+{
+  "title": "Painel",
+  "subtitle": "Visao rapida das operacoes do dia.",
+  "cards": {
+    "jobsToday": "Ordens de hoje",
+    "jobsWeek": "Ordens na semana",
+    "inProgress": "Em andamento",
+    "completedToday": "Concluidas hoje"
+  },
+  "today": {
+    "title": "Ordens de hoje",
+    "subtitle": "O que esta agendado para hoje.",
+    "timeLabel": "Horario",
+    "noAssignees": "Sem colaboradores atribuidos",
+    "viewAll": "Ver todas as ordens",
+    "emptyTitle": "Nenhuma ordem para hoje",
+    "emptySubtitle": "Crie a primeira ordem do dia para sua equipe.",
+    "createJob": "Criar ordem"
+  },
+  "attention": {
+    "title": "Atencao necessaria",
+    "subtitle": "Ordens que precisam de acao.",
+    "overdue": "Atrasada",
+    "unassigned": "Sem colaborador",
+    "shouldStart": "Deveria ter iniciado"
+  },
+  "quick": {
+    "title": "Acoes rapidas",
+    "subtitle": "Atalhos para operacoes frequentes.",
+    "createJob": "Criar ordem",
+    "inviteEmployee": "Convidar colaborador",
+    "addCustomer": "Adicionar cliente"
+  }
+}

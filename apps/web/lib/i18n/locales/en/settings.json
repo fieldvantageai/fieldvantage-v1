@@ -1,0 +1,32 @@
+{
+  "title": "Settings",
+  "subtitle": "Adjust app and company preferences.",
+  "tabs": {
+    "app": "App",
+    "company": "Company"
+  },
+  "locale": {
+    "title": "System language",
+    "subtitle": "Define the language displayed in the app.",
+    "label": "Language",
+    "helper": "Your choice is saved for this device."
+  },
+  "roles": {
+    "title": "Role maintenance",
+    "subtitle": "Add or remove roles available for employees.",
+    "newLabel": "New role",
+    "add": "Add role",
+    "empty": "No roles configured. Use the field above to add."
+  },
+  "localePrompt": {
+    "title": "Choose the system language",
+    "subtitle": "You can change it anytime in Settings.",
+    "selected": "Selected",
+    "confirm": "Confirm language"
+  },
+  "locales": {
+    "pt-BR": "Portuguese (Brazil)",
+    "en": "English",
+    "es": "Spanish"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "title": "Jobs",
+  "subtitle": "Manage jobs and assign teams.",
+  "actions": {
+    "new": "New job"
+  },
+  "new": {
+    "title": "New job",
+    "subtitle": "Create a new job and assign a customer."
+  },
+  "edit": {
+    "title": "Edit job",
+    "subtitle": "Update data, status, and schedule."
+  },
+  "list": {
+    "title": "Active jobs",
+    "description": "Mock list"
+  },
+  "empty": {
+    "title": "No jobs yet",
+    "subtitle": "Start by creating the first job."
+  },
+  "detail": {
+    "customerFallback": "Customer not informed",
+    "edit": "Edit job",
+    "summary": {
+      "title": "Job summary",
+      "subtitle": "Mock data",
+      "scheduled": "Schedule",
+      "expectedCompletion": "Expected completion",
+      "notDefined": "Not defined"
+    },
+    "team": {
+      "title": "Team on this job",
+      "subtitle": "People currently assigned",
+      "empty": "No employees assigned.",
+      "unknown": "Employee not found",
+      "unknownEmail": "Email not informed"
+    },
+    "history": {
+      "title": "History",
+      "subtitle": "No records yet",
+      "empty": "No updates recorded."
+    }
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "in_progress": "In progress",
+    "completed": "Completed"
+  },
+  "fields": {
+    "title": "Job title",
+    "customer": "Customer",
+    "scheduledFor": "Scheduled date",
+    "expectedCompletion": "Expected completion",
+    "status": "Status"
+  },
+  "assignment": {
+    "title": "Assigned employees",
+    "subtitle": "Select who will work on this job.",
+    "add": "Add employee",
+    "hideSelector": "Hide selection",
+    "empty": "No employees assigned.",
+    "filterLabel": "Filter by name",
+    "filterPlaceholder": "Type to search",
+    "filterEmpty": "No employees found.",
+    "selected": "Selected"
+  },
+  "messages": {
+    "created": "Job created.",
+    "createError": "Failed to create job.",
+    "createFallback": "Unexpected error while creating job.",
+    "updated": "Job updated.",
+    "updateError": "Failed to update job.",
+    "updateFallback": "Unexpected error while updating job.",
+    "deleteConfirm": "Do you want to remove this job?",
+    "deleteError": "Failed to remove job.",
+    "deleteFallback": "Unexpected error while removing job.",
+    "cancelConfirm": "There is filled data. Do you want to cancel?"
+  }
+}

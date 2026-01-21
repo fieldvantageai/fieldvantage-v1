@@ -1,0 +1,59 @@
+{
+  "appName": "FieldVantage",
+  "workspace": "Ambiente",
+  "actions": {
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "login": "Entrar",
+    "register": "Criar empresa",
+    "newCustomer": "Novo cliente",
+    "remove": "Remover",
+    "back": "Voltar",
+    "close": "Fechar",
+    "apply": "Aplicar"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Senha"
+  },
+  "labels": {
+    "status": "Status"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "jobs": "Ordens",
+    "customers": "Clientes",
+    "employees": "Colaboradores",
+    "teams": "Times",
+    "settings": "Configuracoes"
+  },
+  "status": {
+    "loading": "Carregando...",
+    "empty": "Nada por aqui ainda.",
+    "active": "Ativo",
+    "inactive": "Inativo"
+  },
+  "landing": {
+    "title": "Operacoes de campo com visao clara e execucao simples.",
+    "subtitle": "Centralize equipes, clientes e ordens de servico em uma experiencia limpa e rapida para o dia a dia.",
+    "features": {
+      "title": "Fluxo enxuto para equipes em campo",
+      "subtitle": "Concentre o trabalho do time e acompanhe os resultados.",
+      "cards": [
+        {
+          "title": "Ordens em andamento",
+          "text": "Visualize o que esta em execucao e o que vem a seguir."
+        },
+        {
+          "title": "Clientes centralizados",
+          "text": "Dados essenciais com contexto para atendimento."
+        },
+        {
+          "title": "Times alinhados",
+          "text": "Distribua tarefas com clareza e responsaveis definidos."
+        }
+      ]
+    }
+  }
+}

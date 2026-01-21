@@ -1,0 +1,69 @@
+{
+  "title": "Clientes",
+  "subtitle": "Liste, pesquise e acesse detalhes dos clientes.",
+  "actions": {
+    "newJob": "Criar ordem"
+  },
+  "new": {
+    "title": "Novo cliente",
+    "subtitle": "Cadastre informacoes basicas do cliente."
+  },
+  "edit": {
+    "title": "Editar cliente",
+    "subtitle": "Atualize os dados principais do cliente."
+  },
+  "detail": {
+    "title": "Detalhes do cliente",
+    "subtitle": "Detalhes do cliente",
+    "edit": "Editar cliente",
+    "summary": {
+      "title": "Resumo",
+      "subtitle": "Dados simulados",
+      "contact": "Contato",
+      "address": "Endereco"
+    },
+    "history": {
+      "title": "Historico recente",
+      "subtitle": "Sem registros ainda",
+      "empty": "Nenhuma ordem vinculada ate o momento."
+    }
+  },
+  "search": {
+    "title": "Busca rapida",
+    "description": "Encontre clientes por nome.",
+    "label": "Pesquisar",
+    "placeholder": "Buscar clientes"
+  },
+  "list": {
+    "title": "Clientes",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Nenhum cliente ainda",
+    "subtitle": "Adicione seu primeiro cliente para acompanhar ordens."
+  },
+  "fields": {
+    "name": "Nome do cliente",
+    "email": "Email",
+    "phone": "Telefone",
+    "address": "Endereco"
+  },
+  "placeholders": {
+    "name": "Cliente Exemplo",
+    "email": "cliente@empresa.com",
+    "phone": "+55 11 90000-0000",
+    "address": "Rua, numero, cidade"
+  },
+  "messages": {
+    "created": "Cliente salvo com sucesso.",
+    "createError": "Falha ao salvar cliente.",
+    "createFallback": "Erro inesperado ao salvar cliente.",
+    "updated": "Cliente atualizado.",
+    "updateError": "Falha ao atualizar cliente.",
+    "updateFallback": "Erro inesperado ao atualizar.",
+    "deleteConfirm": "Deseja remover este cliente?",
+    "deleteError": "Falha ao remover cliente.",
+    "deleteFallback": "Erro inesperado ao remover.",
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
+  }
+}

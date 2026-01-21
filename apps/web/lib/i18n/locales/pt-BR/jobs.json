@@ -1,0 +1,81 @@
+{
+  "title": "Ordens",
+  "subtitle": "Gerencie ordens e atribua equipes.",
+  "actions": {
+    "new": "Nova ordem"
+  },
+  "new": {
+    "title": "Nova ordem",
+    "subtitle": "Crie uma nova ordem e atribua um cliente."
+  },
+  "edit": {
+    "title": "Editar ordem",
+    "subtitle": "Atualize dados, status e agendamento."
+  },
+  "list": {
+    "title": "Ordens em andamento",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Nenhuma ordem ainda",
+    "subtitle": "Comece criando a primeira ordem de servico."
+  },
+  "detail": {
+    "customerFallback": "Cliente nao informado",
+    "edit": "Editar ordem",
+    "summary": {
+      "title": "Resumo da ordem",
+      "subtitle": "Dados simulados",
+      "scheduled": "Agendamento",
+      "expectedCompletion": "Previsao de termino",
+      "notDefined": "Nao definida"
+    },
+    "team": {
+      "title": "Equipe na ordem",
+      "subtitle": "Pessoas atualmente alocadas",
+      "empty": "Nenhum colaborador atribuido.",
+      "unknown": "Colaborador nao encontrado",
+      "unknownEmail": "Email nao informado"
+    },
+    "history": {
+      "title": "Historico",
+      "subtitle": "Sem registros ainda",
+      "empty": "Nenhuma atualizacao registrada."
+    }
+  },
+  "status": {
+    "scheduled": "Agendada",
+    "in_progress": "Em andamento",
+    "completed": "Concluida"
+  },
+  "fields": {
+    "title": "Titulo da ordem",
+    "customer": "Cliente",
+    "scheduledFor": "Data agendada",
+    "expectedCompletion": "Previsao de termino",
+    "status": "Status"
+  },
+  "assignment": {
+    "title": "Colaboradores atribuidos",
+    "subtitle": "Selecione quem vai atuar nesta ordem.",
+    "add": "Adicionar colaborador",
+    "hideSelector": "Fechar selecao",
+    "empty": "Nenhum colaborador atribuido.",
+    "filterLabel": "Filtrar por nome",
+    "filterPlaceholder": "Digite para buscar",
+    "filterEmpty": "Nenhum colaborador encontrado.",
+    "selected": "Selecionado"
+  },
+  "messages": {
+    "created": "Ordem criada.",
+    "createError": "Falha ao criar ordem.",
+    "createFallback": "Erro inesperado ao criar ordem.",
+    "updated": "Ordem atualizada.",
+    "updateError": "Falha ao atualizar ordem.",
+    "updateFallback": "Erro inesperado ao atualizar ordem.",
+    "deleteConfirm": "Deseja remover esta ordem?",
+    "deleteError": "Falha ao remover ordem.",
+    "deleteFallback": "Erro inesperado ao remover ordem.",
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
+  }
+}

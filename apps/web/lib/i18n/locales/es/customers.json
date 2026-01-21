@@ -1,0 +1,69 @@
+{
+  "title": "Clientes",
+  "subtitle": "Lista, busca y accede a detalles de clientes.",
+  "actions": {
+    "newJob": "Crear trabajo"
+  },
+  "new": {
+    "title": "Nuevo cliente",
+    "subtitle": "Registra la informacion basica del cliente."
+  },
+  "edit": {
+    "title": "Editar cliente",
+    "subtitle": "Actualiza los datos principales del cliente."
+  },
+  "detail": {
+    "title": "Detalles del cliente",
+    "subtitle": "Detalles del cliente",
+    "edit": "Editar cliente",
+    "summary": {
+      "title": "Resumen",
+      "subtitle": "Datos simulados",
+      "contact": "Contacto",
+      "address": "Direccion"
+    },
+    "history": {
+      "title": "Historial reciente",
+      "subtitle": "Sin registros aun",
+      "empty": "No hay trabajos vinculados por ahora."
+    }
+  },
+  "search": {
+    "title": "Busqueda rapida",
+    "description": "Encuentra clientes por nombre.",
+    "label": "Buscar",
+    "placeholder": "Buscar clientes"
+  },
+  "list": {
+    "title": "Clientes",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Aun no hay clientes",
+    "subtitle": "Agrega tu primer cliente para seguir los trabajos."
+  },
+  "fields": {
+    "name": "Nombre del cliente",
+    "email": "Email",
+    "phone": "Telefono",
+    "address": "Direccion"
+  },
+  "placeholders": {
+    "name": "Cliente Ejemplo",
+    "email": "cliente@empresa.com",
+    "phone": "+34 600 000 000",
+    "address": "Calle, numero, ciudad"
+  },
+  "messages": {
+    "created": "Cliente guardado con exito.",
+    "createError": "No se pudo guardar el cliente.",
+    "createFallback": "Error inesperado al guardar el cliente.",
+    "updated": "Cliente actualizado.",
+    "updateError": "No se pudo actualizar el cliente.",
+    "updateFallback": "Error inesperado al actualizar.",
+    "deleteConfirm": "Desea eliminar este cliente?",
+    "deleteError": "No se pudo eliminar el cliente.",
+    "deleteFallback": "Error inesperado al eliminar.",
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+  }
+}

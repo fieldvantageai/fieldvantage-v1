@@ -1,0 +1,59 @@
+{
+  "appName": "FieldVantage",
+  "workspace": "Espacio",
+  "actions": {
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "login": "Ingresar",
+    "register": "Crear empresa",
+    "newCustomer": "Nuevo cliente",
+    "remove": "Eliminar",
+    "back": "Volver",
+    "close": "Cerrar",
+    "apply": "Aplicar"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Contrasena"
+  },
+  "labels": {
+    "status": "Estado"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "jobs": "Trabajos",
+    "customers": "Clientes",
+    "employees": "Empleados",
+    "teams": "Equipos",
+    "settings": "Configuracion"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "empty": "Nada por aqui todavia.",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "landing": {
+    "title": "Operaciones de campo con visibilidad clara y ejecucion simple.",
+    "subtitle": "Centraliza equipos, clientes y ordenes de servicio en una experiencia limpia y rapida para el dia a dia.",
+    "features": {
+      "title": "Flujo sencillo para equipos en campo",
+      "subtitle": "Enfoca el trabajo del equipo y sigue los resultados.",
+      "cards": [
+        {
+          "title": "Trabajos en curso",
+          "text": "Visualiza lo que esta en ejecucion y lo que viene."
+        },
+        {
+          "title": "Clientes centralizados",
+          "text": "Datos esenciales con contexto para la atencion."
+        },
+        {
+          "title": "Equipos alineados",
+          "text": "Distribuye tareas con claridad y responsables definidos."
+        }
+      ]
+    }
+  }
+}

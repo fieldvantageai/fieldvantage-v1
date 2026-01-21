@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+.vercel/
+.turbo/
+.env
+.env.*.local
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo
+coverage/
+dist/
+.idea/
+.vscode/
+
+# Local secrets or backups
+Password.txt

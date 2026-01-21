@@ -1,0 +1,51 @@
+{
+  "title": "Employees",
+  "subtitle": "Invite employees and organize permissions.",
+  "actions": {
+    "new": "New employee"
+  },
+  "new": {
+    "title": "New employee",
+    "subtitle": "Register a new team member."
+  },
+  "edit": {
+    "title": "Edit employee",
+    "subtitle": "Update data and permissions."
+  },
+  "detail": {
+    "edit": "Edit employee",
+    "summary": {
+      "title": "Summary",
+      "subtitle": "Mock data",
+      "contact": "Contact",
+      "phoneFallback": "Phone not provided"
+    }
+  },
+  "list": {
+    "title": "Active team",
+    "description": "Mock list"
+  },
+  "empty": {
+    "title": "No employees yet",
+    "subtitle": "Invite the first team members."
+  },
+  "fields": {
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "activeStatus": "Employee active"
+  },
+  "messages": {
+    "created": "Employee created.",
+    "createError": "Failed to create employee.",
+    "createFallback": "Unexpected error while creating employee.",
+    "updated": "Employee updated.",
+    "updateError": "Failed to update employee.",
+    "updateFallback": "Unexpected error while updating employee.",
+    "deleteConfirm": "Do you want to remove this employee?",
+    "deleteError": "Failed to remove employee.",
+    "deleteFallback": "Unexpected error while removing employee.",
+    "cancelConfirm": "There is filled data. Do you want to cancel?"
+  }
+}

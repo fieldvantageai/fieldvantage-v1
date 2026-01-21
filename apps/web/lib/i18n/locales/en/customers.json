@@ -1,0 +1,69 @@
+{
+  "title": "Customers",
+  "subtitle": "List, search, and access customer details.",
+  "actions": {
+    "newJob": "Create job"
+  },
+  "new": {
+    "title": "New customer",
+    "subtitle": "Register basic customer information."
+  },
+  "edit": {
+    "title": "Edit customer",
+    "subtitle": "Update the customer's main details."
+  },
+  "detail": {
+    "title": "Customer details",
+    "subtitle": "Customer details",
+    "edit": "Edit customer",
+    "summary": {
+      "title": "Summary",
+      "subtitle": "Mock data",
+      "contact": "Contact",
+      "address": "Address"
+    },
+    "history": {
+      "title": "Recent history",
+      "subtitle": "No records yet",
+      "empty": "No jobs linked yet."
+    }
+  },
+  "search": {
+    "title": "Quick search",
+    "description": "Find customers by name.",
+    "label": "Search",
+    "placeholder": "Search customers"
+  },
+  "list": {
+    "title": "Customers",
+    "description": "Mock list"
+  },
+  "empty": {
+    "title": "No customers yet",
+    "subtitle": "Add your first customer to start tracking jobs."
+  },
+  "fields": {
+    "name": "Customer name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
+  },
+  "placeholders": {
+    "name": "Example Customer",
+    "email": "customer@company.com",
+    "phone": "+1 555 000 0000",
+    "address": "Street, number, city"
+  },
+  "messages": {
+    "created": "Customer saved successfully.",
+    "createError": "Failed to save customer.",
+    "createFallback": "Unexpected error while saving customer.",
+    "updated": "Customer updated.",
+    "updateError": "Failed to update customer.",
+    "updateFallback": "Unexpected error while updating.",
+    "deleteConfirm": "Do you want to remove this customer?",
+    "deleteError": "Failed to remove customer.",
+    "deleteFallback": "Unexpected error while removing.",
+    "cancelConfirm": "There is filled data. Do you want to cancel?"
+  }
+}

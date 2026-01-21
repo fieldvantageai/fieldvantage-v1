@@ -1,0 +1,153 @@
+# FieldVantage (V1) — Cursor Rules
+
+You are working on a greenfield codebase. Act as a senior product engineer + UX-minded architect.
+Priorities: correctness, security (multi-tenant), clean UX, lean V1, and maintainable structure.
+
+## 0) Non-negotiables
+- Use **Next.js 15 App Router** (TypeScript).
+- Use **Tailwind v4** for styling.
+- Use **Supabase** for Auth/Postgres/RLS/Storage.
+- Use **i18next** with locales: **en**, **pt-BR**, **es**.
+- Keep V1 lean. Avoid over-engineering.
+- Every feature must be multi-tenant by `company_id` with RLS strategy in mind.
+
+## 1) Next.js 15 patterns (must follow)
+- Route Handlers: use `await cookies()` when creating server clients.
+- `params` in `page.tsx` may be `Promise`; handle accordingly.
+- Prefer server components for data fetching where possible.
+- Prefer route handlers (`app/api/.../route.ts`) for mutations unless server actions are clearly better.
+- Never assume browser-only APIs on the server.
+
+## 2) Supabase rules (must follow)
+- Always use `@supabase/ssr` for server/route clients.
+- For admin operations (service role), ALWAYS import exactly:
+  `import { supabaseAdmin } from '@/lib/supabaseAdmin'`
+  Do NOT create helper wrappers like `getSupabaseAdmin()`.
+- Enforce company scoping at DB-level (RLS) + in queries.
+- Never leak cross-tenant data in joins (always filter by `company_id`).
+- Use safe transactions/rollback patterns where relevant (e.g., signup + profile creation).
+
+## 3) Authentication & onboarding rules
+- Only a Company Owner/Admin can self-register.
+- Employees and Customers NEVER self-register.
+- Employees/Customers join only via invitation link (token).
+- Company Registration is the only place with email/password entry.
+- Edit profile screens must NOT include email/password fields.
+
+## 4) UI/UX rules
+- Style: clean, modern, “Qonto-like”, minimal clutter.
+- Always include:
+  - loading states
+  - empty states
+  - toast notifications for success/error
+  - clear inline validation messages
+- Forms:
+  - `react-hook-form` + `yup`
+  - schemas and default values must live in separate files:
+    `formSchema.ts` and `formDefaults.ts`
+  - Use reusable components:
+    - `<Section title="...">`
+    - `<Input .../>` (supports icon, error, helper text)
+    - `<SaveAnimatedButton />`
+- Keep spacing consistent and accessible.
+
+## 5) Code organization
+Use this structure (create if missing):
+
+apps/web/
+  app/
+    (public)/
+      page.tsx
+      login/page.tsx
+      register/company/page.tsx
+      invite/accept/[token]/page.tsx
+    (app)/
+      layout.tsx            # authenticated layout shell
+      dashboard/page.tsx
+      customers/
+        page.tsx
+        new/page.tsx
+        [id]/page.tsx
+        [id]/edit/page.tsx
+      employees/
+      teams/
+      jobs/
+      settings/
+    api/
+      auth/
+      companies/
+      customers/
+      employees/
+      teams/
+      jobs/
+      invites/
+  components/
+    layout/
+    ui/
+    forms/
+  features/
+    auth/
+    companies/
+    customers/
+    employees/
+    teams/
+    jobs/
+  lib/
+    supabase/
+      server.ts
+      client.ts
+    supabaseAdmin.ts
+    i18n/
+  styles/
+
+Rules:
+- Prefer feature modules under `features/`.
+- Reusable UI components under `components/ui`.
+- Route handlers must be thin; business logic goes in `features/*`.
+- Always type inputs/outputs. No `any`.
+
+## 6) Data model expectations (V1)
+Tables should support:
+- companies, users (profile), company_members (role)
+- customers
+- teams, team_members
+- jobs, job_assignments
+- notes/comments
+- payments (manual)
+- invites (token, role, company_id, expires_at, used_at)
+
+All tables must include:
+- `id` uuid (PK)
+- `company_id` uuid (except auth tables)
+- `created_at`, `updated_at`
+All reads/writes must be scoped by `company_id`.
+
+## 7) RLS policy mindset
+- Owner/Admin: full CRUD inside their company.
+- Employee: view jobs assigned to them; add internal comments; limited reads.
+- Customer: (optional in V1) view only their own jobs.
+- Never rely only on frontend checks for authorization.
+
+## 8) Output requirements when generating code
+When you generate code:
+- Provide complete file paths and full file contents.
+- Keep changes small and incremental.
+- Include a short “How to test” checklist.
+- If adding a dependency, explain why and how to install it.
+
+## 9) Quality bar
+- No TODO-heavy scaffolding. Implement working flows.
+- Avoid “clever” abstractions; prefer readable.
+- Validate inputs in route handlers.
+- Handle and surface errors gracefully.
+
+## 10) Initial build order (follow unless told otherwise)
+1) Project scaffold + Tailwind + i18n
+2) Supabase clients (server/client/admin)
+3) Auth: Company Registration + Login
+4) Invitation accept flow
+5) Authed shell layout (sidebar)
+6) Customers CRUD
+7) Jobs CRUD + assignments
+8) Teams/Employees
+9) Payments tracking

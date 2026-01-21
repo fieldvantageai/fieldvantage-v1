@@ -1,0 +1,51 @@
+{
+  "title": "Colaboradores",
+  "subtitle": "Convide colaboradores e organize permissoes.",
+  "actions": {
+    "new": "Novo colaborador"
+  },
+  "new": {
+    "title": "Novo colaborador",
+    "subtitle": "Cadastre um novo membro da equipe."
+  },
+  "edit": {
+    "title": "Editar colaborador",
+    "subtitle": "Atualize dados e permissoes."
+  },
+  "detail": {
+    "edit": "Editar colaborador",
+    "summary": {
+      "title": "Resumo",
+      "subtitle": "Dados simulados",
+      "contact": "Contato",
+      "phoneFallback": "Telefone nao informado"
+    }
+  },
+  "list": {
+    "title": "Equipe ativa",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Nenhum colaborador ainda",
+    "subtitle": "Convide os primeiros membros do time."
+  },
+  "fields": {
+    "fullName": "Nome completo",
+    "email": "Email",
+    "phone": "Telefone",
+    "role": "Cargo",
+    "activeStatus": "Colaborador ativo"
+  },
+  "messages": {
+    "created": "Colaborador criado.",
+    "createError": "Falha ao criar colaborador.",
+    "createFallback": "Erro inesperado ao criar colaborador.",
+    "updated": "Colaborador atualizado.",
+    "updateError": "Falha ao atualizar colaborador.",
+    "updateFallback": "Erro inesperado ao atualizar colaborador.",
+    "deleteConfirm": "Deseja remover este colaborador?",
+    "deleteError": "Falha ao remover colaborador.",
+    "deleteFallback": "Erro inesperado ao remover colaborador.",
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
+  }
+}

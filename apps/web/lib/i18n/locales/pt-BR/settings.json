@@ -1,0 +1,32 @@
+{
+  "title": "Configuracoes",
+  "subtitle": "Ajuste preferencias do app e da empresa.",
+  "tabs": {
+    "app": "Geral do app",
+    "company": "Empresa"
+  },
+  "locale": {
+    "title": "Idioma do sistema",
+    "subtitle": "Defina o idioma exibido no aplicativo.",
+    "label": "Idioma",
+    "helper": "A escolha fica salva para este dispositivo."
+  },
+  "roles": {
+    "title": "Manutencao de cargos",
+    "subtitle": "Adicione ou remova cargos disponiveis para colaboradores.",
+    "newLabel": "Novo cargo",
+    "add": "Adicionar cargo",
+    "empty": "Nenhum cargo configurado. Use o campo acima para adicionar."
+  },
+  "localePrompt": {
+    "title": "Escolha o idioma do sistema",
+    "subtitle": "Voce pode alterar a qualquer momento em Configuracoes.",
+    "selected": "Selecionado",
+    "confirm": "Confirmar idioma"
+  },
+  "locales": {
+    "pt-BR": "Portugues (Brasil)",
+    "en": "Ingles",
+    "es": "Espanhol"
+  }
+}

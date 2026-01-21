@@ -1,0 +1,51 @@
+{
+  "title": "Empleados",
+  "subtitle": "Invita empleados y organiza permisos.",
+  "actions": {
+    "new": "Nuevo empleado"
+  },
+  "new": {
+    "title": "Nuevo empleado",
+    "subtitle": "Registra un nuevo miembro del equipo."
+  },
+  "edit": {
+    "title": "Editar empleado",
+    "subtitle": "Actualiza datos y permisos."
+  },
+  "detail": {
+    "edit": "Editar empleado",
+    "summary": {
+      "title": "Resumen",
+      "subtitle": "Datos simulados",
+      "contact": "Contacto",
+      "phoneFallback": "Telefono no informado"
+    }
+  },
+  "list": {
+    "title": "Equipo activo",
+    "description": "Lista simulada"
+  },
+  "empty": {
+    "title": "Aun no hay empleados",
+    "subtitle": "Invita a los primeros miembros del equipo."
+  },
+  "fields": {
+    "fullName": "Nombre completo",
+    "email": "Email",
+    "phone": "Telefono",
+    "role": "Cargo",
+    "activeStatus": "Empleado activo"
+  },
+  "messages": {
+    "created": "Empleado creado.",
+    "createError": "No se pudo crear el empleado.",
+    "createFallback": "Error inesperado al crear el empleado.",
+    "updated": "Empleado actualizado.",
+    "updateError": "No se pudo actualizar el empleado.",
+    "updateFallback": "Error inesperado al actualizar el empleado.",
+    "deleteConfirm": "Desea eliminar este empleado?",
+    "deleteError": "No se pudo eliminar el empleado.",
+    "deleteFallback": "Error inesperado al eliminar el empleado.",
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+  }
+}

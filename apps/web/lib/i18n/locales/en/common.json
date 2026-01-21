@@ -1,0 +1,59 @@
+{
+  "appName": "FieldVantage",
+  "workspace": "Workspace",
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "login": "Sign in",
+    "register": "Create company",
+    "newCustomer": "New customer",
+    "remove": "Remove",
+    "back": "Back",
+    "close": "Close",
+    "apply": "Apply"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "labels": {
+    "status": "Status"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "jobs": "Jobs",
+    "customers": "Customers",
+    "employees": "Employees",
+    "teams": "Teams",
+    "settings": "Settings"
+  },
+  "status": {
+    "loading": "Loading...",
+    "empty": "Nothing here yet.",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "landing": {
+    "title": "Field operations with clear visibility and simple execution.",
+    "subtitle": "Centralize teams, customers, and service orders in a clean, fast experience for daily work.",
+    "features": {
+      "title": "Lean flow for field teams",
+      "subtitle": "Focus the team's work and track outcomes.",
+      "cards": [
+        {
+          "title": "Jobs in progress",
+          "text": "See what is in execution and what comes next."
+        },
+        {
+          "title": "Centralized customers",
+          "text": "Essential data with context for support."
+        },
+        {
+          "title": "Aligned teams",
+          "text": "Distribute tasks with clarity and defined owners."
+        }
+      ]
+    }
+  }
+}

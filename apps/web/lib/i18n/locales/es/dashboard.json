@@ -1,0 +1,34 @@
+{
+  "title": "Panel",
+  "subtitle": "Vista rapida de las operaciones del dia.",
+  "cards": {
+    "jobsToday": "Trabajos de hoy",
+    "jobsWeek": "Trabajos de la semana",
+    "inProgress": "En progreso",
+    "completedToday": "Completados hoy"
+  },
+  "today": {
+    "title": "Trabajos de hoy",
+    "subtitle": "Lo programado para hoy.",
+    "timeLabel": "Horario",
+    "noAssignees": "Sin empleados asignados",
+    "viewAll": "Ver todos los trabajos",
+    "emptyTitle": "No hay trabajos hoy",
+    "emptySubtitle": "Crea el primer trabajo del dia para tu equipo.",
+    "createJob": "Crear trabajo"
+  },
+  "attention": {
+    "title": "Atencion necesaria",
+    "subtitle": "Trabajos que requieren accion.",
+    "overdue": "Atrasado",
+    "unassigned": "Sin asignacion",
+    "shouldStart": "Deberia haber iniciado"
+  },
+  "quick": {
+    "title": "Acciones rapidas",
+    "subtitle": "Atajos para operaciones frecuentes.",
+    "createJob": "Crear trabajo",
+    "inviteEmployee": "Invitar empleado",
+    "addCustomer": "Agregar cliente"
+  }
+}

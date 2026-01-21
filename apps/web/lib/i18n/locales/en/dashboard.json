@@ -1,0 +1,34 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Quick view of today's operations.",
+  "cards": {
+    "jobsToday": "Jobs today",
+    "jobsWeek": "Jobs this week",
+    "inProgress": "In progress",
+    "completedToday": "Completed today"
+  },
+  "today": {
+    "title": "Today's jobs",
+    "subtitle": "What is scheduled for today.",
+    "timeLabel": "Time",
+    "noAssignees": "No assigned employees",
+    "viewAll": "View all jobs",
+    "emptyTitle": "No jobs today",
+    "emptySubtitle": "Create the first job of the day for your team.",
+    "createJob": "Create job"
+  },
+  "attention": {
+    "title": "Attention needed",
+    "subtitle": "Jobs that require action.",
+    "overdue": "Overdue",
+    "unassigned": "Unassigned",
+    "shouldStart": "Should have started"
+  },
+  "quick": {
+    "title": "Quick actions",
+    "subtitle": "Shortcuts to frequent operations.",
+    "createJob": "Create job",
+    "inviteEmployee": "Invite employee",
+    "addCustomer": "Add customer"
+  }
+}
