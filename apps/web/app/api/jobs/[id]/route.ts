@@ -5,13 +5,18 @@ import {
   deleteJob,
   getJobById,
   updateJob
-} from "@/features/jobs/mock";
+} from "@/features/jobs/service";
+import { getSupabaseAuthUser } from "@/features/_shared/server";
 
 type RouteParams = {
   params: { id: string };
 };
 
 export async function GET(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const job = await getJobById(params.id);
   if (!job) {
     return NextResponse.json({ error: "Ordem nao encontrada." }, { status: 404 });
@@ -21,6 +26,10 @@ export async function GET(_: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const user = await getSupabaseAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
     const body = await request.json();
     const input = await newJobSchema.validate(body, {
       abortEarly: false,
@@ -32,7 +41,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       scheduled_for: input.scheduledFor,
       expected_completion: input.expectedCompletion,
       customer_name: input.customerName,
-      customer_id: input.customerId,
+      customer_id: input.customerId || null,
       assigned_employee_ids: input.assignedEmployeeIds ?? []
     });
 
@@ -55,6 +64,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const deleted = await deleteJob(params.id);
   if (!deleted) {
     return NextResponse.json({ error: "Ordem nao encontrada." }, { status: 404 });

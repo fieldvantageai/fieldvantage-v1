@@ -12,11 +12,18 @@
     "helper": "Your choice is saved for this device."
   },
   "roles": {
-    "title": "Role maintenance",
-    "subtitle": "Add or remove roles available for employees.",
+    "title": "Available roles",
+    "subtitle": "Default roles for employees.",
     "newLabel": "New role",
     "add": "Add role",
     "empty": "No roles configured. Use the field above to add."
+  },
+  "companyProfile": {
+    "title": "Company profile",
+    "subtitle": "Update your company info and logo.",
+    "cardTitle": "Company profile",
+    "cardSubtitle": "Edit business details and logo.",
+    "action": "Open profile"
   },
   "localePrompt": {
     "title": "Choose the system language",

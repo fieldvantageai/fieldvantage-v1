@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Section } from "@/components/ui/Section";
-import { listJobs } from "@/features/jobs/mock";
+import { listJobs } from "@/features/jobs/service";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 

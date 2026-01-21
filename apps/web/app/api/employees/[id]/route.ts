@@ -5,13 +5,18 @@ import {
   deleteEmployee,
   getEmployeeById,
   updateEmployee
-} from "@/features/employees/mock";
+} from "@/features/employees/service";
+import { getSupabaseAuthUser } from "@/features/_shared/server";
 
 type RouteParams = {
   params: { id: string };
 };
 
 export async function GET(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const employee = await getEmployeeById(params.id);
   if (!employee) {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
@@ -21,6 +26,10 @@ export async function GET(_: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const user = await getSupabaseAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
     const body = await request.json();
     const input = await newEmployeeSchema.validate(body, {
       abortEarly: false,
@@ -54,6 +63,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const deleted = await deleteEmployee(params.id);
   if (!deleted) {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });

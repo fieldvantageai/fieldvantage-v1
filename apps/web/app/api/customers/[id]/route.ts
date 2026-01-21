@@ -4,7 +4,8 @@ import {
   deleteCustomer,
   getCustomerById,
   updateCustomer
-} from "@/features/customers/mock";
+} from "@/features/customers/service";
+import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { newCustomerSchema } from "@/features/customers/forms/newCustomer/formSchema";
 
 type RouteParams = {
@@ -12,6 +13,10 @@ type RouteParams = {
 };
 
 export async function GET(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const customer = await getCustomerById(params.id);
   if (!customer) {
     return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });
@@ -21,6 +26,10 @@ export async function GET(_: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const user = await getSupabaseAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
     const body = await request.json();
     const input = await newCustomerSchema.validate(body, {
       abortEarly: false,
@@ -45,6 +54,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_: Request, { params }: RouteParams) {
+  const user = await getSupabaseAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
   const deleted = await deleteCustomer(params.id);
   if (!deleted) {
     return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });

@@ -57,7 +57,8 @@ export default function NewEmployeeForm() {
       }
 
       reset();
-      setToast({ message: t("messages.created"), variant: "success" });
+      router.push("/employees");
+      router.refresh();
     } catch (error) {
       setToast({
         message:
@@ -131,7 +132,7 @@ export default function NewEmployeeForm() {
             }
           }}
         >
-          {tCommon("actions.cancel")}
+          {tCommon("actions.back")}
         </Button>
         <SaveAnimatedButton
           type="submit"

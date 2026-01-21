@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { Section } from "@/components/ui/Section";
-import { getCustomerById } from "@/features/customers/mock";
+import { getCustomerById } from "@/features/customers/service";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { getServerLocale } from "@/lib/i18n/localeServer";

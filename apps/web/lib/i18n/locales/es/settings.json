@@ -12,11 +12,18 @@
     "helper": "Tu eleccion queda guardada en este dispositivo."
   },
   "roles": {
-    "title": "Mantenimiento de cargos",
-    "subtitle": "Agrega o elimina cargos disponibles para empleados.",
+    "title": "Cargos disponibles",
+    "subtitle": "Roles predeterminados para empleados.",
     "newLabel": "Nuevo cargo",
     "add": "Agregar cargo",
     "empty": "No hay cargos configurados. Usa el campo de arriba para agregar."
+  },
+  "companyProfile": {
+    "title": "Perfil de la empresa",
+    "subtitle": "Actualiza la informacion y el logo de tu empresa.",
+    "cardTitle": "Perfil de la empresa",
+    "cardSubtitle": "Edita los datos y el logotipo.",
+    "action": "Abrir perfil"
   },
   "localePrompt": {
     "title": "Elige el idioma del sistema",

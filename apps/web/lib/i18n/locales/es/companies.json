@@ -1,0 +1,33 @@
+{
+  "title": "Perfil de la empresa",
+  "subtitle": "Actualiza los datos y el logo de tu empresa.",
+  "fields": {
+    "name": "Nombre de la empresa",
+    "industry": "Industria",
+    "email": "Email",
+    "phone": "Telefono",
+    "addressLine1": "Direccion",
+    "addressLine2": "Complemento",
+    "city": "Ciudad",
+    "state": "Estado",
+    "zipCode": "Codigo postal",
+    "country": "Pais",
+    "logo": "Logo"
+  },
+  "logo": {
+    "helper": "PNG, JPG o WebP. Recomendado 512x512.",
+    "remove": "Eliminar logo"
+  },
+  "actions": {
+    "upload": "Subir logo",
+    "change": "Cambiar logo"
+  },
+  "fallbackName": "Mi empresa",
+  "messages": {
+    "updated": "Empresa actualizada.",
+    "updateError": "No se pudo guardar la empresa.",
+    "uploadError": "No se pudo subir el logo.",
+    "invalidFile": "Formato de archivo invalido.",
+    "fileTooLarge": "Archivo demasiado grande. Maximo 5MB."
+  }
+}

@@ -7,6 +7,11 @@
     "inProgress": "Em andamento",
     "completedToday": "Concluidas hoje"
   },
+  "companySetup": {
+    "title": "Finalize o cadastro da empresa",
+    "subtitle": "Antes de usar o painel, crie o perfil da empresa.",
+    "action": "Criar empresa"
+  },
   "today": {
     "title": "Ordens de hoje",
     "subtitle": "O que esta agendado para hoje.",

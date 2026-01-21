@@ -65,7 +65,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
         throw new Error(data?.error ?? t("messages.updateError"));
       }
 
-      setToast({ message: t("messages.updated"), variant: "success" });
+      router.push("/employees");
       router.refresh();
     } catch (error) {
       setToast({

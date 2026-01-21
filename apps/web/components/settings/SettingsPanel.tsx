@@ -1,33 +1,49 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
-import { Select } from "@/components/ui/Select";
-import {
-  defaultEmployeeRoles,
-  readEmployeeRoles,
-  saveEmployeeRoles
-} from "@/features/employees/roles";
+import { defaultEmployeeRoles } from "@/features/employees/roles";
 import { locales, type Locale } from "@/lib/i18n/config";
 import { useLocale } from "@/lib/i18n/localeClient";
 import { useClientT } from "@/lib/i18n/useClientT";
 
-const localeFlags: Record<Locale, string> = {
-  "pt-BR": "🇧🇷",
-  en: "🇺🇸",
-  es: "🇪🇸"
+const FlagIcon = ({ locale }: { locale: Locale }) => {
+  if (locale === "pt-BR") {
+    return (
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+        <rect width="20" height="14" rx="2" fill="#1E8E3E" />
+        <path d="M10 1.6L18 7L10 12.4L2 7L10 1.6Z" fill="#F4C430" />
+        <circle cx="10" cy="7" r="2.6" fill="#2A5CAA" />
+      </svg>
+    );
+  }
+  if (locale === "en") {
+    return (
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+        <rect width="20" height="14" rx="2" fill="#FFFFFF" />
+        <rect y="1" width="20" height="2" fill="#B91C1C" />
+        <rect y="5" width="20" height="2" fill="#B91C1C" />
+        <rect y="9" width="20" height="2" fill="#B91C1C" />
+        <rect y="13" width="20" height="1" fill="#B91C1C" />
+        <rect width="8.5" height="7.5" fill="#1E3A8A" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+      <rect width="20" height="14" rx="2" fill="#C81E1E" />
+      <rect y="3.5" width="20" height="7" fill="#F6C400" />
+    </svg>
+  );
 };
 
 export default function SettingsPanel() {
   const { t } = useClientT("settings");
   const { t: tCommon } = useClientT("common");
   const [activeTab, setActiveTab] = useState<"app" | "company">("app");
-  const [roleName, setRoleName] = useState("");
-  const [initialRoles, setInitialRoles] = useState(readEmployeeRoles());
-  const [roles, setRoles] = useState(readEmployeeRoles());
   const { locale, updateLocale } = useLocale();
   const [pendingLocale, setPendingLocale] = useState<Locale>(locale);
 
@@ -39,49 +55,19 @@ export default function SettingsPanel() {
     () =>
       locales.map((option) => ({
         value: option,
-        label: `${localeFlags[option]} ${t(`locales.${option}`)}`
+        label: t(`locales.${option}`)
       })),
     [t]
   );
 
-  const handleAddRole = () => {
-    const trimmed = roleName.trim();
-    if (!trimmed) {
-      return;
-    }
-    const alreadyExists = roles.some(
-      (role) => role.label.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (alreadyExists) {
-      return;
-    }
-    const updated = [...roles, { id: "", label: trimmed }];
-    setRoles(updated);
-    setRoleName("");
-  };
-
-  const handleRemoveRole = (roleId: string, roleLabel: string) => {
-    const updated = roles.filter(
-      (role) => role.id !== roleId || role.label !== roleLabel
-    );
-    setRoles(updated);
-  };
-
   const handleApply = () => {
-    const safeRoles = roles.length === 0 ? defaultEmployeeRoles : roles;
-    const sanitized = saveEmployeeRoles(safeRoles);
-    setRoles(sanitized);
-    setInitialRoles(sanitized);
-
     if (pendingLocale !== locale) {
       updateLocale(pendingLocale);
     }
   };
 
-  const hasRoleChanges =
-    JSON.stringify(roles) !== JSON.stringify(initialRoles);
   const hasLocaleChanges = pendingLocale !== locale;
-  const hasChanges = hasRoleChanges || hasLocaleChanges;
+  const hasChanges = hasLocaleChanges;
 
   return (
     <div className="space-y-6">
@@ -108,59 +94,74 @@ export default function SettingsPanel() {
           description={t("locale.subtitle")}
         >
           <div className="max-w-sm space-y-2">
-            <Select
-              label={t("locale.label")}
-              value={pendingLocale}
-              options={localeOptions}
-              onChange={(event) => setPendingLocale(event.target.value as Locale)}
-            />
-            <p className="text-xs text-slate-500">
-              {t("locale.helper")}
-            </p>
+            <label className="text-sm font-medium text-slate-700">
+              {t("locale.label")}
+            </label>
+            <div className="space-y-2">
+              {localeOptions.map((option) => {
+                const isSelected = pendingLocale === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setPendingLocale(option.value)}
+                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-2 text-sm transition ${
+                      isSelected
+                        ? "border-brand-300 bg-brand-50 text-brand-700"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                    }`}
+                    aria-pressed={isSelected}
+                  >
+                    <span className="flex items-center gap-2">
+                      <FlagIcon locale={option.value} />
+                      {option.label}
+                    </span>
+                    {isSelected ? (
+                      <span className="text-xs font-semibold">✓</span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-slate-500">{t("locale.helper")}</p>
           </div>
         </Section>
       ) : (
         <Section
-          title={t("roles.title")}
-          description={t("roles.subtitle")}
+          title={t("companyProfile.title")}
+          description={t("companyProfile.subtitle")}
         >
           <div className="space-y-4">
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="min-w-[220px] flex-1">
-                <Input
-                  label={t("roles.newLabel")}
-                  value={roleName}
-                  onChange={(event) => setRoleName(event.target.value)}
-                />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {t("companyProfile.title")}
+              </p>
+              <div className="mt-2 space-y-2">
+                <Link
+                  href="/settings/company"
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-brand-200 hover:bg-brand-50"
+                >
+                  <span>{t("companyProfile.action")}</span>
+                  <span className="text-xs font-semibold text-slate-400">→</span>
+                </Link>
               </div>
-              <Button type="button" onClick={handleAddRole}>
-                {t("roles.add")}
-              </Button>
             </div>
 
-            {roles.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
-                {t("roles.empty")}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {roles.map((role) => (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {t("roles.title")}
+              </p>
+              <div className="mt-2 space-y-2">
+                {defaultEmployeeRoles.map((role) => (
                   <div
-                    key={`${role.id}-${role.label}`}
-                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
+                    key={role.id}
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
                   >
-                    <span>{role.label}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => handleRemoveRole(role.id, role.label)}
-                    >
-                      {tCommon("actions.remove")}
-                    </Button>
+                    {role.label}
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
         </Section>
       )}

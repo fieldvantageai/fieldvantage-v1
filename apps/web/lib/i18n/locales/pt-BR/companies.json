@@ -1,0 +1,33 @@
+{
+  "title": "Perfil da empresa",
+  "subtitle": "Atualize dados e logotipo da sua empresa.",
+  "fields": {
+    "name": "Nome da empresa",
+    "industry": "Segmento",
+    "email": "Email",
+    "phone": "Telefone",
+    "addressLine1": "Endereco",
+    "addressLine2": "Complemento",
+    "city": "Cidade",
+    "state": "Estado",
+    "zipCode": "CEP",
+    "country": "Pais",
+    "logo": "Logotipo"
+  },
+  "logo": {
+    "helper": "PNG, JPG ou WebP. Recomendado 512x512.",
+    "remove": "Remover logo"
+  },
+  "actions": {
+    "upload": "Enviar logo",
+    "change": "Trocar logo"
+  },
+  "fallbackName": "Minha empresa",
+  "messages": {
+    "updated": "Empresa atualizada.",
+    "updateError": "Falha ao salvar empresa.",
+    "uploadError": "Falha ao enviar o logo.",
+    "invalidFile": "Formato de arquivo invalido.",
+    "fileTooLarge": "Arquivo muito grande. Maximo 5MB."
+  }
+}

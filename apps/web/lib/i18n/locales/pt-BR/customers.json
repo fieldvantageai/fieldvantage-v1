@@ -18,7 +18,7 @@
     "edit": "Editar cliente",
     "summary": {
       "title": "Resumo",
-      "subtitle": "Dados simulados",
+      "subtitle": "Informacoes do cliente.",
       "contact": "Contato",
       "address": "Endereco"
     },
@@ -32,11 +32,13 @@
     "title": "Busca rapida",
     "description": "Encontre clientes por nome.",
     "label": "Pesquisar",
-    "placeholder": "Buscar clientes"
+    "placeholder": "Buscar clientes",
+    "minChars": "Digite ao menos 3 caracteres para buscar.",
+    "noResults": "Nenhum cliente encontrado."
   },
   "list": {
     "title": "Clientes",
-    "description": "Lista simulada"
+    "description": "Lista atualizada de clientes."
   },
   "empty": {
     "title": "Nenhum cliente ainda",

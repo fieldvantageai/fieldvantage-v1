@@ -57,7 +57,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         throw new Error(data?.error ?? t("messages.updateError"));
       }
 
-      setToast({ message: t("messages.updated"), variant: "success" });
+      router.push("/customers");
       router.refresh();
     } catch (error) {
       setToast({

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
-import { getEmployeeById } from "@/features/employees/mock";
+import { getEmployeeById } from "@/features/employees/service";
 import { getEmployeeRoleLabel } from "@/features/employees/roleLabels";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";

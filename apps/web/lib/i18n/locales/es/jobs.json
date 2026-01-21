@@ -14,7 +14,7 @@
   },
   "list": {
     "title": "Trabajos activos",
-    "description": "Lista simulada"
+    "description": "Sigue los trabajos activos."
   },
   "empty": {
     "title": "Aun no hay trabajos",
@@ -25,7 +25,7 @@
     "edit": "Editar trabajo",
     "summary": {
       "title": "Resumen del trabajo",
-      "subtitle": "Datos simulados",
+      "subtitle": "Detalles del trabajo.",
       "scheduled": "Programacion",
       "expectedCompletion": "Prevision de finalizacion",
       "notDefined": "No definida"
@@ -46,7 +46,8 @@
   "status": {
     "scheduled": "Programado",
     "in_progress": "En progreso",
-    "completed": "Completado"
+    "done": "Completado",
+    "canceled": "Cancelado"
   },
   "fields": {
     "title": "Titulo del trabajo",

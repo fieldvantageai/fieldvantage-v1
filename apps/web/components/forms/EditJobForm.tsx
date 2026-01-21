@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
 import { ToastBanner } from "@/components/ui/Toast";
-import { listEmployees } from "@/features/employees/mock";
 import {
   newJobSchema,
   type NewJobFormValues
@@ -61,8 +60,12 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   useEffect(() => {
     const loadEmployees = async () => {
       try {
-        const data = await listEmployees();
-        setEmployees(data);
+        const response = await fetch("/api/employees");
+        if (!response.ok) {
+          throw new Error("Falha ao carregar colaboradores.");
+        }
+        const payload = (await response.json()) as { data?: Employee[] };
+        setEmployees(payload.data ?? []);
       } catch {
         setEmployees([]);
       }
@@ -200,7 +203,8 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         options={[
           { value: "scheduled", label: t("status.scheduled") },
           { value: "in_progress", label: t("status.in_progress") },
-          { value: "completed", label: t("status.completed") }
+          { value: "done", label: t("status.done") },
+          { value: "canceled", label: t("status.canceled") }
         ]}
         {...register("status")}
       />

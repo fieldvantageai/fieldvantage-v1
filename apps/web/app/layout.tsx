@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import LocalePrompt from "@/components/layout/LocalePrompt";
 import { getServerLocale } from "@/lib/i18n/localeServer";
@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "Operacoes de campo com foco em produtividade."
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1
+};
+
 export default async function RootLayout({
   children
 }: Readonly<{
@@ -17,7 +22,7 @@ export default async function RootLayout({
   const locale = await getServerLocale();
   return (
     <html lang={locale}>
-      <body className="min-h-screen bg-slate-50 text-slate-900">
+      <body className="min-h-screen bg-slate-50 text-slate-900 overflow-x-hidden">
         <LocalePrompt />
         {children}
       </body>

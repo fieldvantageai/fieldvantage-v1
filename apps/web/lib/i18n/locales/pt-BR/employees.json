@@ -16,14 +16,22 @@
     "edit": "Editar colaborador",
     "summary": {
       "title": "Resumo",
-      "subtitle": "Dados simulados",
+      "subtitle": "Informacoes do colaborador.",
       "contact": "Contato",
       "phoneFallback": "Telefone nao informado"
     }
   },
   "list": {
     "title": "Equipe ativa",
-    "description": "Lista simulada"
+    "description": "Lista atualizada de colaboradores."
+  },
+  "search": {
+    "title": "Busca rapida",
+    "description": "Encontre colaboradores por nome, email ou cargo.",
+    "label": "Pesquisar",
+    "placeholder": "Buscar colaboradores",
+    "minChars": "Digite ao menos 3 caracteres para buscar.",
+    "noResults": "Nenhum colaborador encontrado."
   },
   "empty": {
     "title": "Nenhum colaborador ainda",

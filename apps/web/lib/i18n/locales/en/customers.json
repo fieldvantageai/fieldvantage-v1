@@ -18,7 +18,7 @@
     "edit": "Edit customer",
     "summary": {
       "title": "Summary",
-      "subtitle": "Mock data",
+      "subtitle": "Customer details.",
       "contact": "Contact",
       "address": "Address"
     },
@@ -32,11 +32,13 @@
     "title": "Quick search",
     "description": "Find customers by name.",
     "label": "Search",
-    "placeholder": "Search customers"
+    "placeholder": "Search customers",
+    "minChars": "Type at least 3 characters to search.",
+    "noResults": "No customers found."
   },
   "list": {
     "title": "Customers",
-    "description": "Mock list"
+    "description": "Up-to-date customer list."
   },
   "empty": {
     "title": "No customers yet",

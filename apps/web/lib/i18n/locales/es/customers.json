@@ -18,7 +18,7 @@
     "edit": "Editar cliente",
     "summary": {
       "title": "Resumen",
-      "subtitle": "Datos simulados",
+      "subtitle": "Detalles del cliente.",
       "contact": "Contacto",
       "address": "Direccion"
     },
@@ -32,11 +32,13 @@
     "title": "Busqueda rapida",
     "description": "Encuentra clientes por nombre.",
     "label": "Buscar",
-    "placeholder": "Buscar clientes"
+    "placeholder": "Buscar clientes",
+    "minChars": "Escribe al menos 3 caracteres para buscar.",
+    "noResults": "No se encontraron clientes."
   },
   "list": {
     "title": "Clientes",
-    "description": "Lista simulada"
+    "description": "Lista actualizada de clientes."
   },
   "empty": {
     "title": "Aun no hay clientes",

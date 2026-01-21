@@ -5,10 +5,22 @@ export type BaseEntity = {
   updated_at: string;
 };
 
-export type Company = BaseEntity & {
+export type Company = {
+  id: string;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
   name: string;
-  legal_name?: string;
-  industry?: string;
+  industry?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
+  logo_url?: string | null;
 };
 
 export type UserProfile = BaseEntity & {
@@ -20,17 +32,23 @@ export type UserProfile = BaseEntity & {
 
 export type Customer = BaseEntity & {
   name: string;
-  email: string;
-  phone: string;
-  address: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
+  notes?: string | null;
 };
 
 export type Employee = BaseEntity & {
-  user_id: string;
   full_name: string;
-  role: string;
-  email: string;
-  phone?: string;
+  role: "owner" | "admin" | "employee";
+  email?: string | null;
+  phone?: string | null;
   status: "active" | "inactive";
 };
 
@@ -40,12 +58,13 @@ export type Team = BaseEntity & {
 };
 
 export type Job = BaseEntity & {
-  customer_id: string;
-  customer_name?: string;
-  title: string;
-  status: "scheduled" | "in_progress" | "completed";
+  customer_id: string | null;
+  customer_name?: string | null;
+  title?: string | null;
+  status: "scheduled" | "in_progress" | "done" | "canceled";
   scheduled_for: string;
-  expected_completion?: string;
+  expected_completion?: string | null;
+  notes?: string | null;
   assigned_employee_ids?: string[];
 };
 

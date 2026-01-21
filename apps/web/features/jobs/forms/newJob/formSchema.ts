@@ -9,8 +9,8 @@ export const newJobSchema = yup.object({
     .string()
     .required("Previsao de termino obrigatoria."),
   status: yup
-    .mixed<"scheduled" | "in_progress" | "completed">()
-    .oneOf(["scheduled", "in_progress", "completed"])
+    .mixed<"scheduled" | "in_progress" | "done" | "canceled">()
+    .oneOf(["scheduled", "in_progress", "done", "canceled"])
     .required("Status obrigatorio."),
   assignedEmployeeIds: yup.array().of(yup.string().required()).default([])
 });

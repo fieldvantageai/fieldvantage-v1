@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import EditCustomerForm from "@/components/forms/EditCustomerForm";
 import { Section } from "@/components/ui/Section";
-import { getCustomerById } from "@/features/customers/mock";
+import { getCustomerById } from "@/features/customers/service";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 

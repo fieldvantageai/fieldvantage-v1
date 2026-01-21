@@ -7,6 +7,11 @@
     "inProgress": "In progress",
     "completedToday": "Completed today"
   },
+  "companySetup": {
+    "title": "Complete company setup",
+    "subtitle": "Before using the dashboard, create your company profile.",
+    "action": "Create company"
+  },
   "today": {
     "title": "Today's jobs",
     "subtitle": "What is scheduled for today.",

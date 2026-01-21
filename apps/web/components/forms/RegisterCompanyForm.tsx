@@ -95,8 +95,8 @@ export default function RegisterCompanyForm() {
         {...register("password")}
       />
       <div className="flex items-center justify-between gap-3">
-        <Button type="button" variant="ghost">
-          {tCommon("actions.cancel")}
+        <Button type="button" variant="ghost" onClick={() => router.back()}>
+          {tCommon("actions.back")}
         </Button>
         <SaveAnimatedButton
           type="submit"

@@ -16,14 +16,22 @@
     "edit": "Edit employee",
     "summary": {
       "title": "Summary",
-      "subtitle": "Mock data",
+      "subtitle": "Employee details.",
       "contact": "Contact",
       "phoneFallback": "Phone not provided"
     }
   },
   "list": {
     "title": "Active team",
-    "description": "Mock list"
+    "description": "Up-to-date team list."
+  },
+  "search": {
+    "title": "Quick search",
+    "description": "Find employees by name, email, or role.",
+    "label": "Search",
+    "placeholder": "Search employees",
+    "minChars": "Type at least 3 characters to search.",
+    "noResults": "No employees found."
   },
   "empty": {
     "title": "No employees yet",

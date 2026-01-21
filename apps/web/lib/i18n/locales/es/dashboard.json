@@ -7,6 +7,11 @@
     "inProgress": "En progreso",
     "completedToday": "Completados hoy"
   },
+  "companySetup": {
+    "title": "Completa el registro de la empresa",
+    "subtitle": "Antes de usar el panel, crea el perfil de la empresa.",
+    "action": "Crear empresa"
+  },
   "today": {
     "title": "Trabajos de hoy",
     "subtitle": "Lo programado para hoy.",

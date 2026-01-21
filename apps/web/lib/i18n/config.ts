@@ -11,6 +11,7 @@ export const namespaces = [
   "jobs",
   "employees",
   "teams",
-  "settings"
+  "settings",
+  "companies"
 ] as const;
 export type Namespace = (typeof namespaces)[number];

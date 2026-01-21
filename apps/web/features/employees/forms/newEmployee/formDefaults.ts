@@ -4,6 +4,6 @@ export const newEmployeeDefaults: NewEmployeeFormValues = {
   fullName: "",
   email: "",
   phone: "",
-  role: "technician",
+  role: "employee",
   status: "active"
 };

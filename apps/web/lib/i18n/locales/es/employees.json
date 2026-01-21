@@ -16,14 +16,22 @@
     "edit": "Editar empleado",
     "summary": {
       "title": "Resumen",
-      "subtitle": "Datos simulados",
+      "subtitle": "Detalles del colaborador.",
       "contact": "Contacto",
       "phoneFallback": "Telefono no informado"
     }
   },
   "list": {
     "title": "Equipo activo",
-    "description": "Lista simulada"
+    "description": "Lista actualizada del equipo."
+  },
+  "search": {
+    "title": "Busqueda rapida",
+    "description": "Encuentra colaboradores por nombre, email o cargo.",
+    "label": "Buscar",
+    "placeholder": "Buscar colaboradores",
+    "minChars": "Escribe al menos 3 caracteres para buscar.",
+    "noResults": "No se encontraron colaboradores."
   },
   "empty": {
     "title": "Aun no hay empleados",

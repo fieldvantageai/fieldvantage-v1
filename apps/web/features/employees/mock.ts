@@ -7,9 +7,8 @@ const seedEmployees: Employee[] = [
   {
     id: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
     company_id: companyId,
-    user_id: "user-1",
     full_name: "Lucas Andrade",
-    role: "manager",
+    role: "admin",
     email: "lucas@empresa.com",
     phone: "+55 11 98888-1111",
     status: "active",
@@ -19,9 +18,8 @@ const seedEmployees: Employee[] = [
   {
     id: "ffffffff-ffff-ffff-ffff-ffffffffffff",
     company_id: companyId,
-    user_id: "user-2",
     full_name: "Bruna Campos",
-    role: "technician",
+    role: "employee",
     email: "bruna@empresa.com",
     phone: "+55 21 97777-2222",
     status: "active",
@@ -31,9 +29,8 @@ const seedEmployees: Employee[] = [
   {
     id: "11111111-2222-3333-4444-555555555555",
     company_id: companyId,
-    user_id: "user-3",
     full_name: "Rafael Lima",
-    role: "dispatcher",
+    role: "employee",
     email: "rafael@empresa.com",
     phone: "+55 31 96666-3333",
     status: "inactive",
@@ -64,7 +61,6 @@ export async function createEmployee(input: CreateEmployeeInput) {
   const newEmployee: Employee = {
     id: `00000000-0000-0000-0000-${idSuffix}`,
     company_id: companyId,
-    user_id: `user-${nextIndex}`,
     status: "active",
     created_at: now,
     updated_at: now,

@@ -1,0 +1,33 @@
+{
+  "title": "Company profile",
+  "subtitle": "Update company details and logo.",
+  "fields": {
+    "name": "Company name",
+    "industry": "Industry",
+    "email": "Email",
+    "phone": "Phone",
+    "addressLine1": "Address",
+    "addressLine2": "Address line 2",
+    "city": "City",
+    "state": "State",
+    "zipCode": "ZIP code",
+    "country": "Country",
+    "logo": "Logo"
+  },
+  "logo": {
+    "helper": "PNG, JPG, or WebP. Recommended 512x512.",
+    "remove": "Remove logo"
+  },
+  "actions": {
+    "upload": "Upload logo",
+    "change": "Change logo"
+  },
+  "fallbackName": "My company",
+  "messages": {
+    "updated": "Company updated.",
+    "updateError": "Failed to save company.",
+    "uploadError": "Failed to upload logo.",
+    "invalidFile": "Invalid file format.",
+    "fileTooLarge": "File too large. Max 5MB."
+  }
+}

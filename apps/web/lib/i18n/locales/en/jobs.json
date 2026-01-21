@@ -14,7 +14,7 @@
   },
   "list": {
     "title": "Active jobs",
-    "description": "Mock list"
+    "description": "Track active jobs."
   },
   "empty": {
     "title": "No jobs yet",
@@ -25,7 +25,7 @@
     "edit": "Edit job",
     "summary": {
       "title": "Job summary",
-      "subtitle": "Mock data",
+      "subtitle": "Job details.",
       "scheduled": "Schedule",
       "expectedCompletion": "Expected completion",
       "notDefined": "Not defined"
@@ -46,7 +46,8 @@
   "status": {
     "scheduled": "Scheduled",
     "in_progress": "In progress",
-    "completed": "Completed"
+    "done": "Done",
+    "canceled": "Canceled"
   },
   "fields": {
     "title": "Job title",

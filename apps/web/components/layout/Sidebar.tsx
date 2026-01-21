@@ -5,7 +5,12 @@ import { usePathname } from "next/navigation";
 
 import { useClientT } from "@/lib/i18n/useClientT";
 
-export default function Sidebar() {
+type SidebarProps = {
+  className?: string;
+  onNavigate?: () => void;
+};
+
+export default function Sidebar({ className, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useClientT("common");
 
@@ -18,7 +23,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-60 shrink-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <aside
+      className={`w-60 shrink-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${className ?? ""}`}
+    >
       <div className="mb-6">
         <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
           FieldVantage
@@ -34,7 +41,8 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition ${
+              onClick={onNavigate}
+              className={`flex min-h-11 items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition ${
                 isActive
                   ? "bg-brand-50 text-brand-700"
                   : "text-slate-700 hover:bg-slate-50"

@@ -49,10 +49,8 @@ export default function NewCustomerForm() {
       }
 
       reset();
-      setToast({
-        message: t("messages.created"),
-        variant: "success"
-      });
+      router.push("/customers");
+      router.refresh();
     } catch (error) {
       setToast({
         message:
@@ -112,7 +110,7 @@ export default function NewCustomerForm() {
             }
           }}
         >
-          {tCommon("actions.cancel")}
+          {tCommon("actions.back")}
         </Button>
         <SaveAnimatedButton
           type="submit"

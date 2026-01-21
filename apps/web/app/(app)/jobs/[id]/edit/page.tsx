@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import EditJobForm from "@/components/forms/EditJobForm";
 import { Section } from "@/components/ui/Section";
-import { getJobById } from "@/features/jobs/mock";
+import { getJobById } from "@/features/jobs/service";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 

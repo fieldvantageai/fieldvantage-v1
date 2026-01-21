@@ -7,7 +7,10 @@ export const newEmployeeSchema = yup.object({
     .email("Informe um email valido.")
     .required("Email obrigatorio."),
   phone: yup.string().optional(),
-  role: yup.string().required("Cargo obrigatorio."),
+  role: yup
+    .mixed<"owner" | "admin" | "employee">()
+    .oneOf(["owner", "admin", "employee"])
+    .required("Cargo obrigatorio."),
   status: yup
     .mixed<"active" | "inactive">()
     .oneOf(["active", "inactive"])

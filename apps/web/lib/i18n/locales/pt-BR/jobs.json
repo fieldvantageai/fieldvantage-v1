@@ -14,7 +14,7 @@
   },
   "list": {
     "title": "Ordens em andamento",
-    "description": "Lista simulada"
+    "description": "Acompanhe as ordens ativas."
   },
   "empty": {
     "title": "Nenhuma ordem ainda",
@@ -25,7 +25,7 @@
     "edit": "Editar ordem",
     "summary": {
       "title": "Resumo da ordem",
-      "subtitle": "Dados simulados",
+      "subtitle": "Detalhes da ordem.",
       "scheduled": "Agendamento",
       "expectedCompletion": "Previsao de termino",
       "notDefined": "Nao definida"
@@ -46,7 +46,8 @@
   "status": {
     "scheduled": "Agendada",
     "in_progress": "Em andamento",
-    "completed": "Concluida"
+    "done": "Concluida",
+    "canceled": "Cancelada"
   },
   "fields": {
     "title": "Titulo da ordem",

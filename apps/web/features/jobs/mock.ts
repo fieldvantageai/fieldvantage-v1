@@ -39,7 +39,7 @@ const seedJobs: Job[] = [
     customer_id: "33333333-3333-3333-3333-333333333333",
     customer_name: "Gamma Foods",
     title: "Vistoria tecnica - Unidade BH",
-    status: "completed",
+    status: "done",
     scheduled_for: "2026-01-15T10:00:00.000Z",
     expected_completion: "2026-01-16",
     assigned_employee_ids: ["11111111-2222-3333-4444-555555555555"],

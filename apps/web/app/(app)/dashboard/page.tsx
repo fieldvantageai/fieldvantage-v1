@@ -2,8 +2,9 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
-import { listEmployees } from "@/features/employees/mock";
-import { listJobs } from "@/features/jobs/mock";
+import { getMyCompany } from "@/features/companies/service";
+import { listEmployees } from "@/features/employees/service";
+import { listJobs } from "@/features/jobs/service";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 
@@ -11,6 +12,26 @@ export default async function DashboardPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "dashboard");
   const tJobs = await getT(locale, "jobs");
+  const company = await getMyCompany();
+
+  if (!company) {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-semibold text-slate-900">{t("title")}</h1>
+          <p className="text-sm text-slate-500">{t("subtitle")}</p>
+        </header>
+        <Section
+          title={t("companySetup.title")}
+          description={t("companySetup.subtitle")}
+        >
+          <Link href="/settings/company">
+            <Button>{t("companySetup.action")}</Button>
+          </Link>
+        </Section>
+      </div>
+    );
+  }
 
   const jobs = await listJobs();
   const employees = await listEmployees();
@@ -46,9 +67,7 @@ export default async function DashboardPage() {
   );
 
   const inProgress = jobs.filter((job) => job.status === "in_progress").length;
-  const completedToday = jobsToday.filter(
-    (job) => job.status === "completed"
-  ).length;
+  const completedToday = jobsToday.filter((job) => job.status === "done").length;
 
   const cards = [
     { label: t("cards.jobsToday"), value: jobsToday.length },
@@ -60,7 +79,7 @@ export default async function DashboardPage() {
   const attentionItems = jobs
     .flatMap((job) => {
       const scheduled = new Date(job.scheduled_for);
-      const isOverdue = scheduled < now && job.status !== "completed";
+      const isOverdue = scheduled < now && job.status !== "done";
       const isUnassigned = !job.assigned_employee_ids?.length;
       const shouldHaveStarted =
         scheduled < now && job.status === "scheduled";
@@ -78,7 +97,8 @@ export default async function DashboardPage() {
       return reasons.map((reason) => ({
         id: `${job.id}-${reason}`,
         label: customerLabel,
-        reason
+        reason,
+        href: `/jobs/${job.id}/edit`
       }));
     })
     .slice(0, 3);
@@ -140,7 +160,8 @@ export default async function DashboardPage() {
               const statusStyles = {
                 scheduled: "bg-slate-100 text-slate-700",
                 in_progress: "bg-amber-50 text-amber-700",
-                completed: "bg-emerald-50 text-emerald-700"
+                done: "bg-emerald-50 text-emerald-700",
+                canceled: "bg-rose-50 text-rose-700"
               }[job.status];
 
               return (
@@ -180,9 +201,10 @@ export default async function DashboardPage() {
         >
           <div className="space-y-2 text-sm text-slate-700">
             {attentionItems.map((item) => (
-              <div
+              <Link
                 key={item.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3"
+                href={item.href}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-100"
               >
                 <span className="font-semibold text-slate-900">
                   {item.label}
@@ -190,7 +212,7 @@ export default async function DashboardPage() {
                 <span className="text-xs font-semibold text-amber-700">
                   {item.reason}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </Section>
