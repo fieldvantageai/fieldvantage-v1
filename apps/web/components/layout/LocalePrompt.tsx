@@ -45,10 +45,10 @@ export default function LocalePrompt() {
               key={locale}
               type="button"
               onClick={() => setSelected(locale)}
-              className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition ${
+              className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition ${
                 selected === locale
                   ? "border-brand-300 bg-brand-50 text-brand-700"
-                  : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                  : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
               }`}
             >
               <span className="flex items-center gap-3">
@@ -65,7 +65,7 @@ export default function LocalePrompt() {
         </div>
         <button
           type="button"
-          className="mt-5 w-full rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
+          className="mt-5 w-full rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
           onClick={() => {
             setStoredLocale(selected);
             setIsOpen(false);

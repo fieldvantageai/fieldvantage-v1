@@ -9,15 +9,16 @@ import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { newCustomerSchema } from "@/features/customers/forms/newCustomer/formSchema";
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function GET(_: Request, { params }: RouteParams) {
+  const { id } = await params;
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  const customer = await getCustomerById(params.id);
+  const customer = await getCustomerById(id);
   if (!customer) {
     return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });
   }
@@ -26,6 +27,7 @@ export async function GET(_: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
@@ -35,7 +37,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       abortEarly: false,
       stripUnknown: true
     });
-    const updated = await updateCustomer(params.id, input);
+    const updated = await updateCustomer(id, input);
     if (!updated) {
       return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });
     }
@@ -54,11 +56,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_: Request, { params }: RouteParams) {
+  const { id } = await params;
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  const deleted = await deleteCustomer(params.id);
+  const deleted = await deleteCustomer(id);
   if (!deleted) {
     return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });
   }

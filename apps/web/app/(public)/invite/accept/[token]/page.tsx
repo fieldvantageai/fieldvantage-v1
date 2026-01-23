@@ -4,7 +4,7 @@ import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 
 type PageProps = {
-  params: Promise<{ token: string }> | { token: string };
+  params: Promise<{ token: string }>;
 };
 
 export default async function AcceptInvitePage({ params }: PageProps) {
@@ -13,12 +13,12 @@ export default async function AcceptInvitePage({ params }: PageProps) {
   const { token } = await params;
 
   return (
-    <div className="max-w-xl">
+    <div className="mx-auto w-full max-w-xl">
       <Section
         title={t("invite.title")}
         description={t("invite.subtitle")}
       >
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 text-sm text-slate-600 shadow-sm">
           {t("invite.tokenLabel")}: <span className="font-mono">{token}</span>
         </div>
         <Button className="w-full">{t("invite.actions.accept")}</Button>

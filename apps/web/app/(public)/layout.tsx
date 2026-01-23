@@ -9,8 +9,8 @@ export default function PublicLayout({
 }>) {
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="text-lg font-semibold text-slate-900">
             FieldVantage
           </Link>
@@ -24,7 +24,7 @@ export default function PublicLayout({
           </div>
         </div>
       </header>
-      <main className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         {children}
       </main>
     </div>

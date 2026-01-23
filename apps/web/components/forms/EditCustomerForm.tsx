@@ -37,9 +37,9 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
     resolver: yupResolver(newCustomerSchema),
     defaultValues: {
       name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      address: customer.address
+      email: customer.email ?? "",
+      phone: customer.phone ?? "",
+      address: customer.address ?? ""
     }
   });
 
@@ -125,11 +125,11 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         error={errors.address?.message}
         {...register("address")}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="ghost" onClick={() => router.push("/customers")}>
           {tCommon("actions.back")}
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:ml-auto">
           <Button type="button" variant="secondary" onClick={onDelete}>
             {tCommon("actions.remove")}
           </Button>

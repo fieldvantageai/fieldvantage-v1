@@ -18,7 +18,9 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-6">
         <header className="space-y-1">
-          <h1 className="text-2xl font-semibold text-slate-900">{t("title")}</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+            {t("title")}
+          </h1>
           <p className="text-sm text-slate-500">{t("subtitle")}</p>
         </header>
         <Section
@@ -106,15 +108,17 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+          {t("title")}
+        </h1>
         <p className="text-sm text-slate-500">{t("subtitle")}</p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((item) => (
           <div
             key={item.label}
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm"
           >
             <p className="text-xs uppercase tracking-wide text-slate-400">
               {item.label}
@@ -128,7 +132,7 @@ export default async function DashboardPage() {
 
       <Section title={t("today.title")} description={t("today.subtitle")}>
         {jobsToday.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-6 text-center">
             <p className="text-base font-semibold text-slate-900">
               {t("today.emptyTitle")}
             </p>
@@ -167,7 +171,7 @@ export default async function DashboardPage() {
               return (
                 <div
                   key={job.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-slate-900">
@@ -204,7 +208,7 @@ export default async function DashboardPage() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-100"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-100/80 bg-amber-50/80 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-100"
               >
                 <span className="font-semibold text-slate-900">
                   {item.label}
@@ -220,14 +224,18 @@ export default async function DashboardPage() {
 
       <Section title={t("quick.title")} description={t("quick.subtitle")}>
         <div className="flex flex-wrap gap-3">
-          <Link href="/jobs/new">
-            <Button>{t("quick.createJob")}</Button>
+          <Link href="/jobs/new" className="w-full sm:w-auto">
+            <Button className="w-full">{t("quick.createJob")}</Button>
           </Link>
-          <Link href="/employees/new">
-            <Button variant="secondary">{t("quick.inviteEmployee")}</Button>
+          <Link href="/employees/new" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full">
+              {t("quick.inviteEmployee")}
+            </Button>
           </Link>
-          <Link href="/customers/new">
-            <Button variant="secondary">{t("quick.addCustomer")}</Button>
+          <Link href="/customers/new" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full">
+              {t("quick.addCustomer")}
+            </Button>
           </Link>
         </div>
       </Section>

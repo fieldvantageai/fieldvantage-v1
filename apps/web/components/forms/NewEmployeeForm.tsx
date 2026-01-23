@@ -103,7 +103,7 @@ export default function NewEmployeeForm() {
         }))}
         {...register("role")}
       />
-      <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+      <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
         <input
           type="checkbox"
           className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
@@ -117,7 +117,7 @@ export default function NewEmployeeForm() {
         <span>{t("fields.activeStatus")}</span>
       </label>
       <input type="hidden" {...register("status")} />
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="button"
           variant="ghost"

@@ -95,7 +95,7 @@ export default function NewCustomerForm() {
         error={errors.address?.message}
         {...register("address")}
       />
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="button"
           variant="ghost"

@@ -42,7 +42,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   } = useForm<NewJobFormValues>({
     resolver: yupResolver(newJobSchema),
     defaultValues: {
-      title: job.title,
+      title: job.title ?? "",
       customerName: job.customer_name ?? "",
       customerId: job.customer_id ?? "",
       scheduledFor: job.scheduled_for,
@@ -229,7 +229,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         </div>
 
         {assignedEmployees.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
             {t("assignment.empty")}
           </div>
         ) : (
@@ -237,7 +237,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
             {assignedEmployees.map((employee) => (
               <div
                 key={employee.id}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
               >
                 <div>
                   <p className="font-semibold text-slate-900">
@@ -258,7 +258,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         )}
 
         {showSelector ? (
-          <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="space-y-3 rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4">
             <Input
               label={t("assignment.filterLabel")}
               placeholder={t("assignment.filterPlaceholder")}
@@ -278,10 +278,10 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                       key={employee.id}
                       type="button"
                       onClick={() => handleAddEmployee(employee.id)}
-                      className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition ${
+                      className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition ${
                         isSelected
                           ? "border-brand-200 bg-brand-50 text-brand-700"
-                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          : "border-slate-200/70 bg-white/90 text-slate-700 hover:bg-slate-50/60"
                       }`}
                     >
                       <div>
@@ -306,11 +306,11 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="ghost" onClick={() => router.push("/jobs")}>
           {tCommon("actions.back")}
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:ml-auto">
           <Button type="button" variant="secondary" onClick={onDelete}>
             {tCommon("actions.remove")}
           </Button>

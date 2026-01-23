@@ -7,7 +7,7 @@ export default async function NewCustomerPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "customers");
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto w-full max-w-2xl">
       <Section
         title={t("new.title")}
         description={t("new.subtitle")}

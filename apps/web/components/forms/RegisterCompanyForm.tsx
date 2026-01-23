@@ -94,7 +94,7 @@ export default function RegisterCompanyForm() {
         error={errors.password?.message}
         {...register("password")}
       />
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="ghost" onClick={() => router.back()}>
           {tCommon("actions.back")}
         </Button>

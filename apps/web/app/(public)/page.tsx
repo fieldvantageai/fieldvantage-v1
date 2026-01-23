@@ -15,10 +15,10 @@ export default async function LandingPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-600">
           {t("appName")}
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900 md:text-4xl">
+        <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
           {t("landing.title")}
         </h1>
-        <p className="max-w-2xl text-base text-slate-600">
+        <p className="max-w-2xl text-sm text-slate-500">
           {t("landing.subtitle")}
         </p>
         <div className="flex flex-wrap gap-3">
@@ -51,7 +51,7 @@ export default async function LandingPage() {
           ].map((card) => (
             <div
               key={card.title}
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm"
             >
               <h3 className="text-sm font-semibold text-slate-900">
                 {card.title}

@@ -24,8 +24,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={inputId}
           name={name}
-          className={`w-full appearance-none rounded-xl border bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 ${
-            error ? "border-rose-400 focus:border-rose-400" : "border-slate-200"
+          className={`w-full appearance-none rounded-xl border bg-white/90 px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 ${
+            error ? "border-rose-400 focus:border-rose-400" : "border-slate-200/70"
           } ${className ?? ""}`}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${inputId}-error` : undefined}

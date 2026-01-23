@@ -2,7 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import { Input } from "@/components/ui/Input";
@@ -17,6 +17,7 @@ import { useClientT } from "@/lib/i18n/useClientT";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useClientT("auth");
   const { t: tCommon } = useClientT("common");
   const [toast, setToast] = useState<{
@@ -47,7 +48,10 @@ export default function LoginForm() {
         throw new Error(data?.error ?? t("login.messages.error"));
       }
 
-      router.push("/dashboard");
+      const nextParam = searchParams.get("next");
+      const nextPath =
+        nextParam && nextParam.startsWith("/") ? nextParam : "/dashboard";
+      router.push(nextPath);
     } catch (error) {
       setToast({
         message:

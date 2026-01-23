@@ -105,10 +105,10 @@ export default function SettingsPanel() {
                     key={option.value}
                     type="button"
                     onClick={() => setPendingLocale(option.value)}
-                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-2 text-sm transition ${
+                    className={`flex w-full items-center justify-between rounded-2xl border px-4 py-2.5 text-sm transition ${
                       isSelected
                         ? "border-brand-300 bg-brand-50 text-brand-700"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                        : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
                     }`}
                     aria-pressed={isSelected}
                   >
@@ -139,7 +139,7 @@ export default function SettingsPanel() {
               <div className="mt-2 space-y-2">
                 <Link
                   href="/settings/company"
-                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-brand-200 hover:bg-brand-50"
+                  className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700 transition hover:border-brand-200 hover:bg-brand-50"
                 >
                   <span>{t("companyProfile.action")}</span>
                   <span className="text-xs font-semibold text-slate-400">→</span>
@@ -155,7 +155,7 @@ export default function SettingsPanel() {
                 {defaultEmployeeRoles.map((role) => (
                   <div
                     key={role.id}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
+                    className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
                   >
                     {role.label}
                   </div>

@@ -8,7 +8,7 @@ import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 
 type PageProps = {
-  params: Promise<{ id: string }> | { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function CustomerDetailPage({ params }: PageProps) {
@@ -25,7 +25,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
             {customer.name}
           </h1>
           <p className="text-sm text-slate-500">{t("detail.subtitle")}</p>
@@ -37,14 +37,14 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 
       <Section title={t("detail.summary.title")} description={t("detail.summary.subtitle")}>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {t("detail.summary.contact")}
             </p>
             <p className="mt-2 text-sm text-slate-700">{customer.email}</p>
             <p className="text-sm text-slate-700">{customer.phone}</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {t("detail.summary.address")}
             </p>
@@ -54,7 +54,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
       </Section>
 
       <Section title={t("detail.history.title")} description={t("detail.history.subtitle")}>
-        <div className="rounded-xl border border-dashed border-slate-200 bg-white p-6 text-sm text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-6 text-sm text-slate-500">
           {t("detail.history.empty")}
         </div>
       </Section>

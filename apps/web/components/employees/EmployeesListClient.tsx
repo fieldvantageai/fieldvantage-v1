@@ -65,7 +65,7 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
 
       <Section title={t("list.title")} description={t("list.description")}>
         {canFilter && visibleEmployees.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
             {t("search.noResults")}
           </div>
         ) : (
@@ -74,7 +74,7 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
               <Link
                 key={employee.id}
                 href={`/employees/${employee.id}`}
-                className="block rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
+                className="block rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>

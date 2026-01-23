@@ -240,7 +240,7 @@ export default function CompanyProfileForm({
         />
       </div>
 
-      <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-4">
+      <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4">
         <p className="text-sm font-semibold text-slate-900">{t("fields.logo")}</p>
         <p className="text-xs text-slate-500">{t("logo.helper")}</p>
         {logoPreview ? (
@@ -248,7 +248,7 @@ export default function CompanyProfileForm({
             <img
               src={logoPreview}
               alt={t("fields.logo")}
-              className="h-16 w-16 rounded-xl border border-slate-200 object-cover"
+              className="h-16 w-16 rounded-2xl border border-slate-200/70 object-cover shadow-sm"
             />
             <Button type="button" variant="secondary" onClick={handleLogoPick}>
               {t("actions.change")}
@@ -273,7 +273,7 @@ export default function CompanyProfileForm({
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-2">
         <SaveAnimatedButton
           type="submit"
           isLoading={isSubmitting}

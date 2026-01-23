@@ -8,7 +8,7 @@ export default async function RegisterCompanyPage() {
   const t = await getT(locale, "auth");
 
   return (
-    <div className="max-w-xl">
+    <div className="mx-auto w-full max-w-xl">
       <Section title={t("register.title")} description={t("register.subtitle")}>
         <RegisterCompanyForm />
       </Section>

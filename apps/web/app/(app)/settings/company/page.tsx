@@ -3,7 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { getMyCompany } from "@/features/companies/service";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export default async function CompanyProfilePage() {
   const locale = await getServerLocale();
@@ -12,15 +12,14 @@ export default async function CompanyProfilePage() {
 
   let logoPreviewUrl: string | null = null;
   if (company?.logo_url) {
-    const supabase = await createSupabaseServerClient();
-    const { data } = await supabase.storage
+    const { data } = await supabaseAdmin.storage
       .from("company-logos")
       .createSignedUrl(company.logo_url, 60 * 60);
     logoPreviewUrl = data?.signedUrl ?? null;
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="mx-auto w-full max-w-3xl">
       <Section title={t("title")} description={t("subtitle")}>
         <CompanyProfileForm company={company} logoPreviewUrl={logoPreviewUrl} />
       </Section>

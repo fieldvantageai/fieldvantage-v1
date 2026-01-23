@@ -15,7 +15,7 @@ export default async function CustomersPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
             {t("title")}
           </h1>
           <p className="text-sm text-slate-500">{t("subtitle")}</p>

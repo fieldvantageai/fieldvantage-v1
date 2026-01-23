@@ -64,7 +64,7 @@ export default function CustomersListClient({ customers }: CustomersListClientPr
 
       <Section title={t("list.title")} description={t("list.description")}>
         {canFilter && visibleCustomers.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
             {t("search.noResults")}
           </div>
         ) : (
@@ -72,7 +72,7 @@ export default function CustomersListClient({ customers }: CustomersListClientPr
             {visibleCustomers.map((customer) => (
               <div
                 key={customer.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
               >
                 <Link href={`/customers/${customer.id}`} className="flex-1">
                   <div>
@@ -92,7 +92,7 @@ export default function CustomersListClient({ customers }: CustomersListClientPr
                       customerName: customer.name
                     }
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 shadow-sm transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
                   aria-label={t("actions.newJob")}
                   title={t("actions.newJob")}
                 >

@@ -8,7 +8,7 @@ export default async function LoginPage() {
   const t = await getT(locale, "auth");
 
   return (
-    <div className="max-w-lg">
+    <div className="mx-auto w-full max-w-lg">
       <Section title={t("login.title")} description={t("login.subtitle")}>
         <LoginForm />
       </Section>

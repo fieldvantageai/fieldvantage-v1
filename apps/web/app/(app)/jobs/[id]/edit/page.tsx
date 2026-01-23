@@ -7,7 +7,7 @@ import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 
 type PageProps = {
-  params: Promise<{ id: string }> | { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditJobPage({ params }: PageProps) {
@@ -21,7 +21,7 @@ export default async function EditJobPage({ params }: PageProps) {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto w-full max-w-2xl">
       <Section
         title={t("edit.title")}
         description={t("edit.subtitle")}

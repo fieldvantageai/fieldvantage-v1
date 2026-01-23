@@ -9,15 +9,16 @@ import {
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function GET(_: Request, { params }: RouteParams) {
+  const { id } = await params;
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  const job = await getJobById(params.id);
+  const job = await getJobById(id);
   if (!job) {
     return NextResponse.json({ error: "Ordem nao encontrada." }, { status: 404 });
   }
@@ -26,6 +27,7 @@ export async function GET(_: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
@@ -35,7 +37,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       abortEarly: false,
       stripUnknown: true
     });
-    const updated = await updateJob(params.id, {
+    const updated = await updateJob(id, {
       title: input.title,
       status: input.status,
       scheduled_for: input.scheduledFor,
@@ -64,11 +66,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_: Request, { params }: RouteParams) {
+  const { id } = await params;
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  const deleted = await deleteJob(params.id);
+  const deleted = await deleteJob(id);
   if (!deleted) {
     return NextResponse.json({ error: "Ordem nao encontrada." }, { status: 404 });
   }

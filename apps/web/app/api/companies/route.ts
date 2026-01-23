@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getMyCompany, upsertMyCompany } from "@/features/companies/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET() {
   const user = await getSupabaseAuthUser();
@@ -14,8 +14,7 @@ export async function GET() {
     return NextResponse.json({ data: company });
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.storage
+  const { data } = await supabaseAdmin.storage
     .from("company-logos")
     .createSignedUrl(company.logo_url, 60 * 60);
 
@@ -61,8 +60,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ data: company });
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { data } = await supabase.storage
+    const { data } = await supabaseAdmin.storage
       .from("company-logos")
       .createSignedUrl(company.logo_url, 60 * 60);
 

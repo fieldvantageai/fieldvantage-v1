@@ -42,7 +42,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
     resolver: yupResolver(newEmployeeSchema),
     defaultValues: {
       fullName: employee.full_name,
-      email: employee.email,
+      email: employee.email ?? "",
       phone: employee.phone ?? "",
       role: employee.role,
       status: employee.status
@@ -137,7 +137,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
         }))}
         {...register("role")}
       />
-      <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+      <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
         <input
           type="checkbox"
           className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
@@ -151,11 +151,11 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
         <span>{t("fields.activeStatus")}</span>
       </label>
       <input type="hidden" {...register("status")} />
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="ghost" onClick={() => router.push("/employees")}>
           {tCommon("actions.back")}
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:ml-auto">
           <Button type="button" variant="secondary" onClick={onDelete}>
             {tCommon("actions.remove")}
           </Button>

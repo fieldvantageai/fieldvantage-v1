@@ -9,7 +9,7 @@ import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 
 type PageProps = {
-  params: Promise<{ id: string }> | { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EmployeeDetailPage({ params }: PageProps) {
@@ -27,7 +27,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
             {employee.full_name}
           </h1>
           <p className="text-sm text-slate-500">
@@ -41,7 +41,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
 
       <Section title={t("detail.summary.title")} description={t("detail.summary.subtitle")}>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {t("detail.summary.contact")}
             </p>
@@ -50,7 +50,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
               {employee.phone ?? t("detail.summary.phoneFallback")}
             </p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {tCommon("labels.status")}
             </p>
