@@ -12,7 +12,8 @@
     "back": "Back",
     "close": "Close",
     "openMenu": "Open menu",
-    "apply": "Apply"
+    "apply": "Apply",
+    "logout": "Sign out"
   },
   "fields": {
     "email": "Email",

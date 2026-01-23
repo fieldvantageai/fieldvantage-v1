@@ -12,7 +12,8 @@
     "back": "Voltar",
     "close": "Fechar",
     "openMenu": "Abrir menu",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "logout": "Sair"
   },
   "fields": {
     "email": "Email",

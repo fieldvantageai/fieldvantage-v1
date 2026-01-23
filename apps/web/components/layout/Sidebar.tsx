@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { useClientT } from "@/lib/i18n/useClientT";
 
@@ -13,7 +14,9 @@ type SidebarProps = {
 
 export default function Sidebar({ className, onNavigate, showHeader = true }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useClientT("common");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navItems = [
     { label: t("nav.dashboard"), href: "/dashboard" },
@@ -76,6 +79,27 @@ export default function Sidebar({ className, onNavigate, showHeader = true }: Si
           ) : null}
           <span className="pl-2">{settingsItem.label}</span>
         </Link>
+        <button
+          type="button"
+          onClick={async () => {
+            if (isLoggingOut) {
+              return;
+            }
+            setIsLoggingOut(true);
+            try {
+              await fetch("/api/auth/logout", { method: "POST" });
+            } finally {
+              setIsLoggingOut(false);
+              onNavigate?.();
+              router.push("/login");
+              router.refresh();
+            }
+          }}
+          className="flex min-h-12 w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium text-slate-500 transition active:scale-[0.98] active:opacity-90 hover:bg-slate-50/60 hover:text-slate-700"
+          aria-label={t("actions.logout")}
+        >
+          <span className="pl-2">{t("actions.logout")}</span>
+        </button>
       </nav>
     </aside>
   );

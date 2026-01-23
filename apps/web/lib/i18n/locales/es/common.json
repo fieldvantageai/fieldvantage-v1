@@ -12,7 +12,8 @@
     "back": "Volver",
     "close": "Cerrar",
     "openMenu": "Abrir menu",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "logout": "Cerrar sesión"
   },
   "fields": {
     "email": "Email",
