@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { registerCompanySchema } from "@/features/auth/registerCompany/formSchema";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(request: Request) {
@@ -17,7 +18,9 @@ export async function POST(request: Request) {
       email_confirm: true,
       user_metadata: {
         company_name: input.companyName,
-        owner_name: input.ownerName
+        owner_name: input.ownerName,
+        industry: input.industry,
+        team_size: input.teamSize
       }
     });
 
@@ -38,7 +41,9 @@ export async function POST(request: Request) {
       .insert({
         owner_id: userId,
         name: input.companyName,
-        email: input.email
+        email: input.email,
+        industry: input.industry,
+        team_size: input.teamSize
       })
       .select("id")
       .single();
@@ -66,6 +71,19 @@ export async function POST(request: Request) {
       await supabaseAdmin.auth.admin.deleteUser(userId);
       return NextResponse.json(
         { error: employeeError.message },
+        { status: 400 }
+      );
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: input.email,
+      password: input.password
+    });
+
+    if (signInError) {
+      return NextResponse.json(
+        { error: "Falha ao autenticar." },
         { status: 400 }
       );
     }

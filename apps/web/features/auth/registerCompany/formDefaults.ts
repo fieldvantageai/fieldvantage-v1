@@ -4,5 +4,7 @@ export const registerCompanyDefaults: RegisterCompanyFormValues = {
   companyName: "",
   ownerName: "",
   email: "",
-  password: ""
+  password: "",
+  industry: "",
+  teamSize: ""
 };

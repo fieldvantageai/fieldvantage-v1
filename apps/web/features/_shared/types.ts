@@ -20,6 +20,7 @@ export type Company = {
   state?: string | null;
   zip_code?: string | null;
   country?: string | null;
+  team_size?: string | null;
   logo_url?: string | null;
 };
 

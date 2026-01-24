@@ -22,11 +22,11 @@ export default async function LandingPage() {
           {t("landing.subtitle")}
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/register/company">
-            <Button>{t("actions.register")}</Button>
+          <Link href="/comecar">
+            <Button>Criar conta</Button>
           </Link>
-          <Link href="/login">
-            <Button variant="secondary">{t("actions.login")}</Button>
+          <Link href="/entrar">
+            <Button variant="secondary">Entrar</Button>
           </Link>
         </div>
       </div>

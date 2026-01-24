@@ -91,7 +91,7 @@ export default function Sidebar({ className, onNavigate, showHeader = true }: Si
             } finally {
               setIsLoggingOut(false);
               onNavigate?.();
-              router.push("/login");
+              router.push("/entrar");
               router.refresh();
             }
           }}

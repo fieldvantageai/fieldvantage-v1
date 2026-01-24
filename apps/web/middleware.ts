@@ -3,6 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [
   "/",
+  "/comecar",
+  "/entrar",
   "/login",
   "/register",
   "/register/company",
@@ -10,7 +12,14 @@ const PUBLIC_PATHS = [
   "/invite/accept"
 ];
 
-const AUTH_ONLY_PATHS = ["/login", "/register", "/register/company", "/forgot-password"];
+const AUTH_ONLY_PATHS = [
+  "/comecar",
+  "/entrar",
+  "/login",
+  "/register",
+  "/register/company",
+  "/forgot-password"
+];
 
 const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -52,7 +61,7 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublicPath(pathname)) {
     const nextPath = `${pathname}${request.nextUrl.search}`;
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/entrar";
     redirectUrl.search = `?next=${encodeURIComponent(nextPath)}`;
     const redirectResponse = NextResponse.redirect(redirectUrl);
     response.cookies.getAll().forEach((cookie) => {
