@@ -1,0 +1,11 @@
+{
+  "name": "@fieldvantage/data",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@fieldvantage/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}

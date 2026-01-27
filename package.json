@@ -1,0 +1,8 @@
+{
+  "name": "fieldvantage",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

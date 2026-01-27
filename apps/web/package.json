@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fieldvantage/data": "workspace:*",
+    "@fieldvantage/shared": "workspace:*",
     "@hookform/resolvers": "^3.6.0",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.4",

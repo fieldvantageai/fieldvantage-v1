@@ -13,6 +13,7 @@ coverage/
 dist/
 .idea/
 .vscode/
+Prototipo/
 
 # Local secrets or backups
 Password.txt
