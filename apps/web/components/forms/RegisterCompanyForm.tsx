@@ -25,8 +25,8 @@ type StepKey =
   | "teamSize"
   | "companyName";
 
-type CardOption = {
-  value: string;
+type CardOption<T extends string = string> = {
+  value: T;
   title: string;
   icon: React.ReactNode;
 };
@@ -87,11 +87,14 @@ export default function RegisterCompanyForm() {
     register("teamSize");
   }, [register]);
 
-  const industry = watch("industry");
-  const teamSize = watch("teamSize");
+  type IndustryValue = NonNullable<RegisterCompanyFormValues["industry"]>;
+  type TeamSizeValue = NonNullable<RegisterCompanyFormValues["teamSize"]>;
+
+  const industry = watch("industry") as IndustryValue | "";
+  const teamSize = watch("teamSize") as TeamSizeValue | "";
   const companyName = watch("companyName");
 
-  const businessOptions = useMemo<CardOption[]>(
+  const businessOptions = useMemo<CardOption<IndustryValue>[]>(
     () => [
       {
         value: "cleaning",
@@ -127,7 +130,7 @@ export default function RegisterCompanyForm() {
     [t]
   );
 
-  const teamOptions = useMemo<CardOption[]>(
+  const teamOptions = useMemo<CardOption<TeamSizeValue>[]>(
     () => [
       {
         value: "owner_operator",
@@ -178,10 +181,10 @@ export default function RegisterCompanyForm() {
     }
   };
 
-  const renderOptionGrid = (
-    options: CardOption[],
-    selectedValue: string,
-    onSelect: (value: string) => void
+  const renderOptionGrid = <T extends string>(
+    options: CardOption<T>[],
+    selectedValue: T | "" | undefined,
+    onSelect: (value: T) => void
   ) => (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {options.map((option) => {

@@ -1,10 +1,10 @@
 import type { RegisterCompanyFormValues } from "./formSchema";
 
-export const registerCompanyDefaults: RegisterCompanyFormValues = {
+export const registerCompanyDefaults: Partial<RegisterCompanyFormValues> = {
   companyName: "",
   ownerName: "",
   email: "",
   password: "",
-  industry: "",
-  teamSize: ""
+  industry: undefined,
+  teamSize: undefined
 };
