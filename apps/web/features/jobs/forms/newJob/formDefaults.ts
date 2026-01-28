@@ -5,7 +5,10 @@ export const newJobDefaults: NewJobFormValues = {
   customerName: "",
   customerId: "",
   scheduledFor: "",
-  expectedCompletion: "",
+  estimatedEndAt: "",
   status: "scheduled",
-  assignedEmployeeIds: []
+  assignedEmployeeIds: [],
+  isRecurring: false,
+  recurrence: null,
+  notes: ""
 };

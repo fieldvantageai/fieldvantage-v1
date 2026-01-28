@@ -56,10 +56,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const ownerFirstName = input.ownerName.split(" ")[0] ?? input.ownerName;
+    const ownerLastName =
+      input.ownerName.split(" ").slice(1).join(" ") || ownerFirstName;
     const { error: employeeError } = await supabaseAdmin
       .from("employees")
       .insert({
         company_id: company.id,
+        first_name: ownerFirstName,
+        last_name: ownerLastName,
         full_name: input.ownerName,
         email: input.email,
         role: "owner",

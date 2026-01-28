@@ -5,10 +5,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import CustomerAvatarUpload from "../customers/CustomerAvatarUpload";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { ToastBanner } from "@/components/ui/Toast";
 import {
   newEmployeeSchema,
@@ -41,6 +43,8 @@ export default function NewEmployeeForm() {
   });
 
   const isActive = watch("status") === "active";
+  const avatarUrl = watch("avatarUrl");
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (values: NewEmployeeFormValues) => {
     setToast(null);
@@ -69,7 +73,7 @@ export default function NewEmployeeForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {toast ? (
         <ToastBanner
           message={toast.message}
@@ -78,22 +82,107 @@ export default function NewEmployeeForm() {
           closeLabel={tCommon("actions.close")}
         />
       ) : null}
-      <Input
-        label={t("fields.fullName")}
-        error={errors.fullName?.message}
-        {...register("fullName")}
+
+      <CustomerAvatarUpload
+        label={t("fields.avatar")}
+        value={avatarUrl}
+        previewUrl={avatarPreviewUrl}
+        onUpload={async (file: File) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          const response = await fetch("/api/employees/avatar", {
+            method: "POST",
+            body: formData
+          });
+          if (!response.ok) {
+            const data = (await response.json()) as { error?: string };
+            throw new Error(data?.error ?? t("messages.createError"));
+          }
+          const payload = (await response.json()) as {
+            data: { avatar_url: string; avatar_signed_url?: string | null };
+          };
+          setValue("avatarUrl", payload.data.avatar_url, { shouldDirty: true });
+          setAvatarPreviewUrl(payload.data.avatar_signed_url ?? payload.data.avatar_url);
+          return payload.data;
+        }}
+        onRemove={() => {
+          setValue("avatarUrl", "", { shouldDirty: true });
+          setAvatarPreviewUrl(null);
+        }}
       />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          label={t("fields.firstName")}
+          error={errors.firstName?.message}
+          {...register("firstName")}
+        />
+        <Input
+          label={t("fields.lastName")}
+          error={errors.lastName?.message}
+          {...register("lastName")}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          label={t("fields.email")}
+          type="email"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <Input
+          label={t("fields.phone")}
+          error={errors.phone?.message}
+          {...register("phone")}
+        />
+      </div>
+
       <Input
-        label={t("fields.email")}
-        type="email"
-        error={errors.email?.message}
-        {...register("email")}
+        label={t("fields.jobTitle")}
+        error={errors.jobTitle?.message}
+        {...register("jobTitle")}
       />
-      <Input
-        label={t("fields.phone")}
-        error={errors.phone?.message}
-        {...register("phone")}
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          label={t("fields.addressLine1")}
+          error={errors.addressLine1?.message}
+          {...register("addressLine1")}
+        />
+        <Input
+          label={t("fields.addressLine2")}
+          error={errors.addressLine2?.message}
+          {...register("addressLine2")}
+        />
+        <Input
+          label={t("fields.city")}
+          error={errors.city?.message}
+          {...register("city")}
+        />
+        <Input
+          label={t("fields.state")}
+          error={errors.state?.message}
+          {...register("state")}
+        />
+        <Input
+          label={t("fields.zipCode")}
+          error={errors.zipCode?.message}
+          {...register("zipCode")}
+        />
+        <Input
+          label={t("fields.country")}
+          error={errors.country?.message}
+          {...register("country")}
+        />
+      </div>
+
+      <Textarea
+        label={t("fields.notes")}
+        error={errors.notes?.message}
+        {...register("notes")}
       />
+
       <Select
         label={t("fields.role")}
         error={errors.role?.message}
@@ -137,7 +226,7 @@ export default function NewEmployeeForm() {
         <SaveAnimatedButton
           type="submit"
           isLoading={isSubmitting}
-          label={tCommon("actions.save")}
+          label={t("actions.create")}
           loadingLabel={tCommon("actions.saving")}
         />
       </div>

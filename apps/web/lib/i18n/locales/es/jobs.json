@@ -2,7 +2,9 @@
   "title": "Trabajos",
   "subtitle": "Gestiona trabajos y asigna equipos.",
   "actions": {
-    "new": "Nuevo trabajo"
+    "new": "Nuevo trabajo",
+    "delete": "Eliminar trabajo",
+    "edit": "Editar"
   },
   "new": {
     "title": "Nuevo trabajo",
@@ -14,33 +16,95 @@
   },
   "list": {
     "title": "Trabajos activos",
-    "description": "Sigue los trabajos activos."
+    "description": "Sigue los trabajos activos.",
+    "allTitle": "Todos los trabajos",
+    "allDescription": "Ve todos los trabajos de tu operacion."
+  },
+  "filters": {
+    "searchLabel": "Buscar",
+    "searchPlaceholder": "Buscar por titulo, cliente o colaborador...",
+    "fromLabel": "Desde",
+    "toLabel": "Hasta",
+    "statusLabel": "Estado",
+    "statusAll": "Todos",
+    "clear": "Limpiar filtros",
+    "any": "Cualquier fecha",
+    "helper": "Refina la lista usando filtros.",
+    "empty": "No se encontraron trabajos. Ajusta los filtros."
+  },
+  "pagination": {
+    "showing": "Mostrando {from}–{to} de {total}",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page": "Pagina {page} de {totalPages}"
+  },
+  "table": {
+    "title": "Titulo",
+    "customer": "Cliente",
+    "assigned": "Responsable",
+    "status": "Estado",
+    "startDate": "Fecha inicio",
+    "titleFallback": "Sin titulo",
+    "assignedFallback": "Sin responsable",
+    "actions": "Acciones",
+    "quickStatus": "Actualizar estado"
+  },
+  "statusUpdate": {
+    "title": "Actualizar estado",
+    "statusLabel": "Estado",
+    "changedAtLabel": "Fecha y hora del cambio"
   },
   "empty": {
     "title": "Aun no hay trabajos",
     "subtitle": "Comienza creando el primer trabajo."
   },
   "detail": {
+    "customerLabel": "Cliente:",
     "customerFallback": "Cliente no informado",
     "edit": "Editar trabajo",
     "summary": {
-      "title": "Resumen del trabajo",
-      "subtitle": "Detalles del trabajo.",
+      "title": "Detalles del trabajo",
+      "subtitle": "Informacion principal del trabajo.",
       "scheduled": "Programacion",
       "expectedCompletion": "Prevision de finalizacion",
+      "expectedCompletionDateOnly": "Prevision de finalizacion (fecha)",
       "notDefined": "No definida"
+    },
+    "customer": {
+      "title": "Informacion del cliente",
+      "subtitle": "Contacto y direccion principal.",
+      "fields": {
+        "name": "Cliente",
+        "emailFallback": "Email no informado",
+        "phoneFallback": "Telefono no informado",
+        "address": "Direccion del cliente (principal)",
+        "addressFallback": "Direccion no informada"
+      }
     },
     "team": {
       "title": "Equipo en el trabajo",
       "subtitle": "Personas actualmente asignadas",
+      "manageHint": "Gestiona asignaciones en Editar trabajo.",
+      "assignedLabel": "Asignado",
       "empty": "No hay empleados asignados.",
       "unknown": "Empleado no encontrado",
       "unknownEmail": "Email no informado"
     },
     "history": {
       "title": "Historial",
-      "subtitle": "Sin registros aun",
-      "empty": "No hay actualizaciones registradas."
+      "subtitle": "Actualizaciones mas recientes.",
+      "createdLabel": "Orden creada",
+      "statusChangedLabel": "Estado cambiado a",
+      "statusFallback": "Estado no informado",
+      "eventFallback": "Actualizacion registrada"
+    },
+    "recurrence": {
+      "label": "Recurrente",
+      "summary": "{repeat} cada {every}"
+    },
+    "notes": {
+      "title": "Notas",
+      "subtitle": "Notas registradas."
     }
   },
   "status": {
@@ -52,13 +116,16 @@
   "fields": {
     "title": "Titulo del trabajo",
     "customer": "Cliente",
+    "customerPlaceholder": "Selecciona un cliente",
     "scheduledFor": "Fecha programada",
     "expectedCompletion": "Prevision de finalizacion",
+    "expectedCompletionDateOnly": "Prevision de finalizacion (fecha)",
+    "estimatedEndAt": "Fin estimado",
     "status": "Estado"
   },
   "assignment": {
-    "title": "Empleados asignados",
-    "subtitle": "Selecciona quien trabajara en este trabajo.",
+    "title": "Colaboradores asignados",
+    "subtitle": "Define quien esta asignado a este trabajo.",
     "add": "Agregar empleado",
     "hideSelector": "Ocultar seleccion",
     "empty": "No hay empleados asignados.",
@@ -67,6 +134,49 @@
     "filterEmpty": "No se encontraron empleados.",
     "selected": "Seleccionado"
   },
+  "recurrence": {
+    "title": "Recurrencia personalizada",
+    "toggle": "Agenda recurrente",
+    "custom": "Recurrencia personalizada",
+    "empty": "Sin recurrencia definida",
+    "summary": "{repeat} cada {every}",
+    "repeatLabel": "Repetir",
+    "everyLabel": "Cada",
+    "everyPlaceholder": "Intervalo (ej.: 1, 2, 3...)",
+    "everyShort": "cada",
+    "weeklyLabel": "Repetir en:",
+    "monthlyOccurrenceLabel": "Que ocurrencia?",
+    "monthlyDayLabel": "Dia de la semana:",
+    "cancel": "Cancelar",
+    "done": "Listo",
+    "repeat": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "weekdays": {
+      "Mon": "Lun",
+      "Tue": "Mar",
+      "Wed": "Mie",
+      "Thu": "Jue",
+      "Fri": "Vie",
+      "Sat": "Sáb",
+      "Sun": "Dom"
+    },
+    "monthlyOccurrences": {
+      "1st": "1ro",
+      "2nd": "2do",
+      "3rd": "3ro",
+      "4th": "4to",
+      "Last": "Ultimo"
+    }
+  },
+  "notes": {
+    "row": "Notas",
+    "title": "Notas",
+    "label": "Notas"
+  },
   "messages": {
     "created": "Trabajo creado.",
     "createError": "No se pudo crear el trabajo.",
@@ -74,6 +184,7 @@
     "updated": "Trabajo actualizado.",
     "updateError": "No se pudo actualizar el trabajo.",
     "updateFallback": "Error inesperado al actualizar el trabajo.",
+    "deleteTitle": "Eliminar trabajo",
     "deleteConfirm": "Desea eliminar este trabajo?",
     "deleteError": "No se pudo eliminar el trabajo.",
     "deleteFallback": "Error inesperado al eliminar el trabajo.",

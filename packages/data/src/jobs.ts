@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Job, JobStatus } from "@fieldvantage/shared";
+import type { Job, JobRecurrence, JobStatus } from "@fieldvantage/shared";
 
 type JobRow = {
   id: string;
@@ -10,9 +10,11 @@ type JobRow = {
   title: string | null;
   scheduled_date: string;
   scheduled_time: string | null;
-  expected_completion: string | null;
+  estimated_end_at: string | null;
   status: JobStatus;
   notes: string | null;
+  is_recurring: boolean;
+  recurrence: JobRecurrence | null;
   created_at: string;
   updated_at: string;
 };
@@ -26,10 +28,12 @@ export type CreateJobInput = {
   customer_id?: string | null;
   customer_name?: string | null;
   scheduled_for: string;
-  expected_completion?: string | null;
+  estimated_end_at?: string | null;
   status: JobStatus;
   notes?: string | null;
   assigned_employee_ids?: string[];
+  is_recurring?: boolean;
+  recurrence?: JobRecurrence | null;
 };
 
 export type UpdateJobInput = Partial<CreateJobInput>;
@@ -42,9 +46,11 @@ const toJob = (row: JobRow, assignments: JobAssignmentRow[] = []): Job => ({
   title: row.title,
   status: row.status,
   scheduled_for: `${row.scheduled_date}T${row.scheduled_time?.slice(0, 5) ?? "00:00"}`,
-  expected_completion: row.expected_completion,
+  estimated_end_at: row.estimated_end_at,
   notes: row.notes,
   assigned_employee_ids: assignments.map((assignment) => assignment.employee_id),
+  is_recurring: row.is_recurring,
+  recurrence: row.recurrence ?? null,
   created_at: row.created_at,
   updated_at: row.updated_at
 });
@@ -80,7 +86,7 @@ export async function listJobs(supabase: SupabaseClient, companyId: string) {
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, expected_completion, status, notes, created_at, updated_at, job_assignments(employee_id)"
+      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id)"
     )
     .eq("company_id", companyId)
     .order("scheduled_date", { ascending: true })
@@ -107,7 +113,7 @@ export async function getJobById(
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, expected_completion, status, notes, created_at, updated_at, job_assignments(employee_id)"
+      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id)"
     )
     .eq("company_id", companyId)
     .eq("id", id)
@@ -146,16 +152,18 @@ export async function createJob(
     title: input.title ?? null,
     scheduled_date: scheduled.scheduled_date,
     scheduled_time: scheduled.scheduled_time,
-    expected_completion: input.expected_completion ?? null,
+    estimated_end_at: input.estimated_end_at ?? null,
     status: input.status,
-    notes: input.notes ?? null
+    notes: input.notes ?? null,
+    is_recurring: input.is_recurring ?? false,
+    recurrence: input.recurrence ?? null
   };
 
   const { data, error } = await supabase
     .from("jobs")
     .insert(payload)
     .select(
-      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, expected_completion, status, notes, created_at, updated_at"
+      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
     )
     .single();
 
@@ -195,9 +203,11 @@ export async function updateJob(
     title: input.title ?? undefined,
     scheduled_date: scheduled?.scheduled_date,
     scheduled_time: scheduled?.scheduled_time,
-    expected_completion: input.expected_completion ?? undefined,
+    estimated_end_at: input.estimated_end_at ?? undefined,
     status: input.status ?? undefined,
-    notes: input.notes ?? undefined
+    notes: input.notes ?? undefined,
+    is_recurring: input.is_recurring ?? undefined,
+    recurrence: input.recurrence ?? undefined
   };
 
   const { data, error } = await supabase
@@ -206,7 +216,7 @@ export async function updateJob(
     .eq("company_id", companyId)
     .eq("id", id)
     .select(
-      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, expected_completion, status, notes, created_at, updated_at"
+      "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
     )
     .maybeSingle();
 

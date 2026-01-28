@@ -1,8 +1,12 @@
 import type { NewCustomerFormValues } from "./formSchema";
 
 export const newCustomerDefaults: NewCustomerFormValues = {
-  name: "",
+  firstName: "",
+  lastName: "",
+  avatarUrl: "",
   email: "",
   phone: "",
-  address: ""
+  companyName: "",
+  notes: "",
+  addresses: []
 };

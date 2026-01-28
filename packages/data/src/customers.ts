@@ -6,8 +6,12 @@ type CustomerRow = {
   id: string;
   company_id: string;
   name: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string | null;
   email: string | null;
   phone: string | null;
+  company_name: string | null;
   address_line1: string | null;
   address_line2: string | null;
   city: string | null;
@@ -20,10 +24,13 @@ type CustomerRow = {
 };
 
 export type CreateCustomerInput = {
-  name: string;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string | null;
   email?: string | null;
   phone?: string | null;
-  address?: string | null;
+  company_name?: string | null;
+  notes?: string | null;
 };
 
 export type UpdateCustomerInput = Partial<CreateCustomerInput>;
@@ -32,8 +39,12 @@ const toCustomer = (row: CustomerRow): Customer => ({
   id: row.id,
   company_id: row.company_id,
   name: row.name,
+  first_name: row.first_name,
+  last_name: row.last_name,
+  avatar_url: row.avatar_url,
   email: row.email,
   phone: row.phone,
+  company_name: row.company_name,
   address: row.address_line1,
   address_line1: row.address_line1,
   address_line2: row.address_line2,
@@ -46,6 +57,25 @@ const toCustomer = (row: CustomerRow): Customer => ({
   updated_at: row.updated_at
 });
 
+export type CustomerAddressInput = {
+  type: "residential" | "business";
+  label?: string | null;
+  address_line1: string;
+  address_line2?: string | null;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  is_primary: boolean;
+};
+
+type CustomerAddressRow = CustomerAddressInput & {
+  id: string;
+  company_id: string;
+  customer_id: string;
+  created_at: string;
+};
+
 export async function listCustomers(
   supabase: SupabaseClient,
   companyId: string
@@ -53,7 +83,7 @@ export async function listCustomers(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      "id, company_id, name, email, phone, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
+      "id, company_id, name, first_name, last_name, avatar_url, email, phone, company_name, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
     )
     .eq("company_id", companyId)
     .order("name");
@@ -73,7 +103,7 @@ export async function getCustomerById(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      "id, company_id, name, email, phone, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
+      "id, company_id, name, first_name, last_name, avatar_url, email, phone, company_name, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
     )
     .eq("company_id", companyId)
     .eq("id", id)
@@ -91,19 +121,24 @@ export async function createCustomer(
   companyId: string,
   input: CreateCustomerInput
 ) {
+  const name = `${input.first_name} ${input.last_name}`.trim();
   const payload = {
     company_id: companyId,
-    name: input.name,
+    name,
+    first_name: input.first_name,
+    last_name: input.last_name,
+    avatar_url: input.avatar_url ?? null,
     email: input.email ?? null,
     phone: input.phone ?? null,
-    address_line1: input.address ?? null
+    company_name: input.company_name ?? null,
+    notes: input.notes ?? null
   };
 
   const { data, error } = await supabase
     .from("customers")
     .insert(payload)
     .select(
-      "id, company_id, name, email, phone, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
+      "id, company_id, name, first_name, last_name, avatar_url, email, phone, company_name, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
     )
     .single();
 
@@ -120,11 +155,19 @@ export async function updateCustomer(
   id: string,
   input: UpdateCustomerInput
 ) {
+  const name =
+    input.first_name || input.last_name
+      ? `${input.first_name ?? ""} ${input.last_name ?? ""}`.trim()
+      : undefined;
   const payload = {
-    name: input.name,
+    name,
+    first_name: input.first_name,
+    last_name: input.last_name,
+    avatar_url: input.avatar_url ?? null,
     email: input.email ?? null,
     phone: input.phone ?? null,
-    address_line1: input.address ?? null
+    company_name: input.company_name ?? null,
+    notes: input.notes ?? null
   };
 
   const { data, error } = await supabase
@@ -133,7 +176,7 @@ export async function updateCustomer(
     .eq("company_id", companyId)
     .eq("id", id)
     .select(
-      "id, company_id, name, email, phone, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
+      "id, company_id, name, first_name, last_name, avatar_url, email, phone, company_name, address_line1, address_line2, city, state, zip_code, country, notes, created_at, updated_at"
     )
     .maybeSingle();
 
@@ -160,4 +203,69 @@ export async function deleteCustomer(
   }
 
   return true;
+}
+
+export async function listCustomerAddresses(
+  supabase: SupabaseClient,
+  companyId: string,
+  customerId: string
+) {
+  const { data, error } = await supabase
+    .from("customer_addresses")
+    .select(
+      "id, company_id, customer_id, type, label, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
+    )
+    .eq("company_id", companyId)
+    .eq("customer_id", customerId)
+    .order("created_at");
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as CustomerAddressRow[];
+}
+
+export async function replaceCustomerAddresses(
+  supabase: SupabaseClient,
+  companyId: string,
+  customerId: string,
+  addresses: CustomerAddressInput[]
+) {
+  await supabase
+    .from("customer_addresses")
+    .delete()
+    .eq("company_id", companyId)
+    .eq("customer_id", customerId);
+
+  if (addresses.length === 0) {
+    return [];
+  }
+
+  const payload = addresses.map((address) => ({
+    company_id: companyId,
+    customer_id: customerId,
+    type: address.type,
+    label: address.label ?? null,
+    address_line1: address.address_line1,
+    address_line2: address.address_line2 ?? null,
+    city: address.city,
+    state: address.state,
+    zip_code: address.zip_code,
+    country: address.country,
+    is_primary: address.is_primary
+  }));
+
+  const { data, error } = await supabase
+    .from("customer_addresses")
+    .insert(payload)
+    .select(
+      "id, company_id, customer_id, type, label, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
+    );
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as CustomerAddressRow[];
 }

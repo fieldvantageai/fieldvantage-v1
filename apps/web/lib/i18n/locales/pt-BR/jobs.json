@@ -2,7 +2,9 @@
   "title": "Ordens",
   "subtitle": "Gerencie ordens e atribua equipes.",
   "actions": {
-    "new": "Nova ordem"
+    "new": "Nova ordem",
+    "delete": "Excluir ordem",
+    "edit": "Editar"
   },
   "new": {
     "title": "Nova ordem",
@@ -14,33 +16,95 @@
   },
   "list": {
     "title": "Ordens em andamento",
-    "description": "Acompanhe as ordens ativas."
+    "description": "Acompanhe as ordens ativas.",
+    "allTitle": "Todas as ordens",
+    "allDescription": "Visualize todas as ordens da sua operacao."
+  },
+  "filters": {
+    "searchLabel": "Busca",
+    "searchPlaceholder": "Buscar por titulo, cliente ou colaborador...",
+    "fromLabel": "De",
+    "toLabel": "Ate",
+    "statusLabel": "Status",
+    "statusAll": "Todas",
+    "clear": "Limpar filtros",
+    "any": "Qualquer data",
+    "helper": "Refine a lista usando filtros.",
+    "empty": "Nenhuma ordem encontrada. Ajuste os filtros."
+  },
+  "pagination": {
+    "showing": "Mostrando {from}–{to} de {total}",
+    "previous": "Anterior",
+    "next": "Proxima",
+    "page": "Pagina {page} de {totalPages}"
+  },
+  "table": {
+    "title": "Titulo",
+    "customer": "Cliente",
+    "assigned": "Responsavel",
+    "status": "Status",
+    "startDate": "Data inicio",
+    "titleFallback": "Sem titulo",
+    "assignedFallback": "Sem responsavel",
+    "actions": "Acoes",
+    "quickStatus": "Atualizar status"
+  },
+  "statusUpdate": {
+    "title": "Atualizar status",
+    "statusLabel": "Status",
+    "changedAtLabel": "Data e hora da alteracao"
   },
   "empty": {
     "title": "Nenhuma ordem ainda",
     "subtitle": "Comece criando a primeira ordem de servico."
   },
   "detail": {
+    "customerLabel": "Cliente:",
     "customerFallback": "Cliente nao informado",
     "edit": "Editar ordem",
     "summary": {
-      "title": "Resumo da ordem",
-      "subtitle": "Detalhes da ordem.",
+      "title": "Detalhes da ordem",
+      "subtitle": "Informacoes principais da ordem.",
       "scheduled": "Agendamento",
       "expectedCompletion": "Previsao de termino",
+      "expectedCompletionDateOnly": "Previsao de termino (data)",
       "notDefined": "Nao definida"
+    },
+    "customer": {
+      "title": "Informacoes do cliente",
+      "subtitle": "Contato e endereco principal.",
+      "fields": {
+        "name": "Cliente",
+        "emailFallback": "Email nao informado",
+        "phoneFallback": "Telefone nao informado",
+        "address": "Endereco do cliente (principal)",
+        "addressFallback": "Endereco nao informado"
+      }
     },
     "team": {
       "title": "Equipe na ordem",
       "subtitle": "Pessoas atualmente alocadas",
+      "manageHint": "Gerencie as alocacoes em Editar ordem.",
+      "assignedLabel": "Alocado",
       "empty": "Nenhum colaborador atribuido.",
       "unknown": "Colaborador nao encontrado",
       "unknownEmail": "Email nao informado"
     },
     "history": {
       "title": "Historico",
-      "subtitle": "Sem registros ainda",
-      "empty": "Nenhuma atualizacao registrada."
+      "subtitle": "Atualizacoes mais recentes.",
+      "createdLabel": "Ordem criada",
+      "statusChangedLabel": "Status alterado para",
+      "statusFallback": "Status nao informado",
+      "eventFallback": "Atualizacao registrada"
+    },
+    "recurrence": {
+      "label": "Recorrente",
+      "summary": "{repeat} a cada {every}"
+    },
+    "notes": {
+      "title": "Notas",
+      "subtitle": "Observacoes registradas."
     }
   },
   "status": {
@@ -52,13 +116,16 @@
   "fields": {
     "title": "Titulo da ordem",
     "customer": "Cliente",
+    "customerPlaceholder": "Selecione um cliente",
     "scheduledFor": "Data agendada",
     "expectedCompletion": "Previsao de termino",
+    "expectedCompletionDateOnly": "Previsao de termino (data)",
+    "estimatedEndAt": "Previsao de termino",
     "status": "Status"
   },
   "assignment": {
-    "title": "Colaboradores atribuidos",
-    "subtitle": "Selecione quem vai atuar nesta ordem.",
+    "title": "Colaboradores alocados",
+    "subtitle": "Defina quem esta alocado nesta ordem.",
     "add": "Adicionar colaborador",
     "hideSelector": "Fechar selecao",
     "empty": "Nenhum colaborador atribuido.",
@@ -67,6 +134,49 @@
     "filterEmpty": "Nenhum colaborador encontrado.",
     "selected": "Selecionado"
   },
+  "recurrence": {
+    "title": "Recorrencia personalizada",
+    "toggle": "Agenda recorrente",
+    "custom": "Recorrencia personalizada",
+    "empty": "Sem recorrencia definida",
+    "summary": "{repeat} a cada {every}",
+    "repeatLabel": "Repetir",
+    "everyLabel": "A cada",
+    "everyPlaceholder": "Intervalo (ex.: 1, 2, 3...)",
+    "everyShort": "a cada",
+    "weeklyLabel": "Repetir em:",
+    "monthlyOccurrenceLabel": "Qual ocorrencia?",
+    "monthlyDayLabel": "Dia da semana:",
+    "cancel": "Cancelar",
+    "done": "Concluir",
+    "repeat": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensal",
+      "yearly": "Anual"
+    },
+    "weekdays": {
+      "Mon": "Seg",
+      "Tue": "Ter",
+      "Wed": "Qua",
+      "Thu": "Qui",
+      "Fri": "Sex",
+      "Sat": "Sáb",
+      "Sun": "Dom"
+    },
+    "monthlyOccurrences": {
+      "1st": "1o",
+      "2nd": "2o",
+      "3rd": "3o",
+      "4th": "4o",
+      "Last": "Ultimo"
+    }
+  },
+  "notes": {
+    "row": "Notas",
+    "title": "Notas",
+    "label": "Notas"
+  },
   "messages": {
     "created": "Ordem criada.",
     "createError": "Falha ao criar ordem.",
@@ -74,6 +184,7 @@
     "updated": "Ordem atualizada.",
     "updateError": "Falha ao atualizar ordem.",
     "updateFallback": "Erro inesperado ao atualizar ordem.",
+    "deleteTitle": "Excluir ordem",
     "deleteConfirm": "Deseja remover esta ordem?",
     "deleteError": "Falha ao remover ordem.",
     "deleteFallback": "Erro inesperado ao remover ordem.",

@@ -10,13 +10,34 @@ type SidebarProps = {
   className?: string;
   onNavigate?: () => void;
   showHeader?: boolean;
+  userName?: string | null;
+  userRole?: string | null;
+  userAvatarUrl?: string | null;
+  userEmployeeId?: string | null;
 };
 
-export default function Sidebar({ className, onNavigate, showHeader = true }: SidebarProps) {
+export default function Sidebar({
+  className,
+  onNavigate,
+  showHeader = true,
+  userName,
+  userRole,
+  userAvatarUrl,
+  userEmployeeId
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useClientT("common");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const firstName =
+    userName?.trim().split(" ").filter(Boolean)[0] ?? t("status.loading");
+  const roleLabelMap: Record<string, string> = {
+    owner: t("roles.owner"),
+    admin: t("roles.admin"),
+    employee: t("roles.employee")
+  };
+  const roleLabel =
+    (userRole && roleLabelMap[userRole]) || userRole || t("roles.owner");
 
   const navItems = [
     { label: t("nav.dashboard"), href: "/dashboard" },
@@ -26,22 +47,37 @@ export default function Sidebar({ className, onNavigate, showHeader = true }: Si
   ];
   const settingsItem = { label: t("nav.settings"), href: "/settings" };
 
+  const profileHref = userEmployeeId
+    ? `/employees/${userEmployeeId}/edit`
+    : "/employees";
+
   return (
     <aside
-      className={`w-64 shrink-0 rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm ${className ?? ""}`}
+      className={`w-72 shrink-0 rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm ${className ?? ""}`}
     >
       {showHeader ? (
-        <>
-          <div className="mb-6 space-y-1">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              FieldVantage
-            </p>
-            <p className="text-lg font-semibold text-slate-900">
-              {t("workspace")}
-            </p>
+        <Link
+          href={profileHref}
+          onClick={onNavigate}
+          className="mb-6 flex items-center gap-3 rounded-2xl p-2 transition hover:bg-slate-50/70"
+          aria-label={t("nav.employees")}
+        >
+          <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-slate-200/70 bg-slate-100 text-xs font-semibold text-slate-500">
+            {userAvatarUrl ? (
+              <img
+                src={userAvatarUrl}
+                alt={firstName}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              firstName.charAt(0).toUpperCase()
+            )}
+          </span>
+          <div className="min-w-0">
+            <p className="text-lg font-semibold text-slate-900">{firstName}</p>
+            <p className="text-xs text-slate-500">{roleLabel}</p>
           </div>
-          <div className="mb-4 h-px bg-slate-200/70" />
-        </>
+        </Link>
       ) : null}
       <nav className="space-y-2">
         {navItems.map((item) => {

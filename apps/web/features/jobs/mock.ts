@@ -12,8 +12,11 @@ const seedJobs: Job[] = [
     title: "Manutencao preventiva - Loja Paulista",
     status: "scheduled",
     scheduled_for: "2026-01-20T09:00:00.000Z",
-    expected_completion: "2026-01-22",
+    estimated_end_at: "2026-01-22T18:00:00.000Z",
     assigned_employee_ids: ["eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"],
+    is_recurring: false,
+    recurrence: null,
+    notes: null,
     created_at: baseDate,
     updated_at: baseDate
   },
@@ -25,11 +28,14 @@ const seedJobs: Job[] = [
     title: "Instalacao de sensores - Centro RJ",
     status: "in_progress",
     scheduled_for: "2026-01-18T13:30:00.000Z",
-    expected_completion: "2026-01-19",
+    estimated_end_at: "2026-01-19T16:00:00.000Z",
     assigned_employee_ids: [
       "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
       "ffffffff-ffff-ffff-ffff-ffffffffffff"
     ],
+    is_recurring: true,
+    recurrence: { repeat: "weekly", every: 1, weeklyDays: ["Mon", "Wed"] },
+    notes: "Levar sensores extras.",
     created_at: baseDate,
     updated_at: baseDate
   },
@@ -41,8 +47,11 @@ const seedJobs: Job[] = [
     title: "Vistoria tecnica - Unidade BH",
     status: "done",
     scheduled_for: "2026-01-15T10:00:00.000Z",
-    expected_completion: "2026-01-16",
+    estimated_end_at: "2026-01-16T15:00:00.000Z",
     assigned_employee_ids: ["11111111-2222-3333-4444-555555555555"],
+    is_recurring: false,
+    recurrence: null,
+    notes: null,
     created_at: baseDate,
     updated_at: baseDate
   }
@@ -55,8 +64,11 @@ export type CreateJobInput = Pick<
   | "scheduled_for"
   | "customer_id"
   | "customer_name"
-  | "expected_completion"
+  | "estimated_end_at"
   | "assigned_employee_ids"
+  | "is_recurring"
+  | "recurrence"
+  | "notes"
 >;
 
 const mockJobs = [...seedJobs];

@@ -2,7 +2,9 @@
   "title": "Employees",
   "subtitle": "Invite employees and organize permissions.",
   "actions": {
-    "new": "New employee"
+    "new": "New employee",
+    "create": "Create employee",
+    "saveChanges": "Save changes"
   },
   "new": {
     "title": "New employee",
@@ -39,8 +41,19 @@
   },
   "fields": {
     "fullName": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "avatar": "Employee photo",
     "email": "Email",
     "phone": "Phone",
+    "jobTitle": "Job title",
+    "addressLine1": "Address line 1",
+    "addressLine2": "Address line 2",
+    "city": "City",
+    "state": "State",
+    "zipCode": "Zip code",
+    "country": "Country",
+    "notes": "Notes",
     "role": "Role",
     "activeStatus": "Employee active"
   },

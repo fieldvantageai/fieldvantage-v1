@@ -1,13 +1,18 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import {
   createCustomer as createCustomerData,
   deleteCustomer as deleteCustomerData,
   getCustomerById as getCustomerByIdData,
   listCustomers as listCustomersData,
+  listCustomerAddresses as listCustomerAddressesData,
+  replaceCustomerAddresses as replaceCustomerAddressesData,
   updateCustomer as updateCustomerData,
   type CreateCustomerInput,
+  type CustomerAddressInput,
   type UpdateCustomerInput
 } from "@fieldvantage/data";
+import type { Customer, CustomerAddress } from "@fieldvantage/shared";
 
 const getCompanyId = async (
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -36,13 +41,59 @@ export async function listCustomers() {
   return listCustomersData(supabase, companyId);
 }
 
-export async function getCustomerById(id: string) {
+export type CustomerWithAddresses = Customer & {
+  addresses: CustomerAddress[];
+  avatar_signed_url?: string | null;
+};
+
+export async function getCustomerById(id: string): Promise<CustomerWithAddresses | null> {
   const supabase = await createSupabaseServerClient();
   const companyId = await getCompanyId(supabase);
   if (!companyId) {
     return null;
   }
-  return getCustomerByIdData(supabase, companyId, id);
+  const customer = await getCustomerByIdData(supabase, companyId, id);
+  if (!customer) {
+    return null;
+  }
+  const addresses = (await listCustomerAddressesData(
+    supabase,
+    companyId,
+    id
+  )) as CustomerAddress[];
+  let avatarSignedUrl: string | null = null;
+  if (customer.avatar_url) {
+    const { data } = await supabaseAdmin.storage
+      .from("customer-avatars")
+      .createSignedUrl(customer.avatar_url, 60 * 60);
+    avatarSignedUrl = data?.signedUrl ?? null;
+  }
+  return {
+    ...customer,
+    addresses,
+    avatar_signed_url: avatarSignedUrl
+  };
+}
+
+export async function listCustomerAddresses(customerId: string) {
+  const supabase = await createSupabaseServerClient();
+  const companyId = await getCompanyId(supabase);
+  if (!companyId) {
+    return [];
+  }
+  return listCustomerAddressesData(supabase, companyId, customerId);
+}
+
+export async function replaceCustomerAddresses(
+  customerId: string,
+  addresses: CustomerAddressInput[]
+) {
+  const supabase = await createSupabaseServerClient();
+  const companyId = await getCompanyId(supabase);
+  if (!companyId) {
+    throw new Error("Empresa nao encontrada.");
+  }
+  return replaceCustomerAddressesData(supabase, companyId, customerId, addresses);
 }
 
 export async function createCustomer(input: CreateCustomerInput) {

@@ -7,10 +7,21 @@ const seedEmployees: Employee[] = [
   {
     id: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
     company_id: companyId,
+    first_name: "Lucas",
+    last_name: "Andrade",
     full_name: "Lucas Andrade",
+    avatar_url: null,
     role: "admin",
     email: "lucas@empresa.com",
     phone: "+55 11 98888-1111",
+    job_title: "Coordenador",
+    notes: null,
+    address_line1: null,
+    address_line2: null,
+    city: null,
+    state: null,
+    zip_code: null,
+    country: "USA",
     status: "active",
     created_at: baseDate,
     updated_at: baseDate
@@ -18,10 +29,21 @@ const seedEmployees: Employee[] = [
   {
     id: "ffffffff-ffff-ffff-ffff-ffffffffffff",
     company_id: companyId,
+    first_name: "Bruna",
+    last_name: "Campos",
     full_name: "Bruna Campos",
+    avatar_url: null,
     role: "employee",
     email: "bruna@empresa.com",
     phone: "+55 21 97777-2222",
+    job_title: "Tecnica",
+    notes: null,
+    address_line1: null,
+    address_line2: null,
+    city: null,
+    state: null,
+    zip_code: null,
+    country: "USA",
     status: "active",
     created_at: baseDate,
     updated_at: baseDate
@@ -29,10 +51,21 @@ const seedEmployees: Employee[] = [
   {
     id: "11111111-2222-3333-4444-555555555555",
     company_id: companyId,
+    first_name: "Rafael",
+    last_name: "Lima",
     full_name: "Rafael Lima",
+    avatar_url: null,
     role: "employee",
     email: "rafael@empresa.com",
     phone: "+55 31 96666-3333",
+    job_title: "Instalador",
+    notes: null,
+    address_line1: null,
+    address_line2: null,
+    city: null,
+    state: null,
+    zip_code: null,
+    country: "USA",
     status: "inactive",
     created_at: baseDate,
     updated_at: baseDate
@@ -41,7 +74,7 @@ const seedEmployees: Employee[] = [
 
 export type CreateEmployeeInput = Pick<
   Employee,
-  "full_name" | "role" | "email" | "phone"
+  "first_name" | "last_name" | "full_name" | "role" | "email" | "phone"
 >;
 
 const mockEmployees = [...seedEmployees];
@@ -58,13 +91,16 @@ export async function createEmployee(input: CreateEmployeeInput) {
   const now = new Date().toISOString();
   const nextIndex = mockEmployees.length + 1;
   const idSuffix = `${nextIndex}`.padStart(12, "0");
+  const resolvedFullName =
+    input.full_name || `${input.first_name} ${input.last_name}`.trim();
   const newEmployee: Employee = {
     id: `00000000-0000-0000-0000-${idSuffix}`,
     company_id: companyId,
     status: "active",
     created_at: now,
     updated_at: now,
-    ...input
+    ...input,
+    full_name: resolvedFullName
   };
   mockEmployees.push(newEmployee);
   return newEmployee;

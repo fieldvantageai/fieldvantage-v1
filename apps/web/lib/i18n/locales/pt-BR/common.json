@@ -13,7 +13,13 @@
     "close": "Fechar",
     "openMenu": "Abrir menu",
     "apply": "Aplicar",
-    "logout": "Sair"
+    "logout": "Sair",
+    "search": "Buscar"
+  },
+  "roles": {
+    "owner": "Proprietário",
+    "admin": "Administrador",
+    "employee": "Colaborador"
   },
   "fields": {
     "email": "Email",

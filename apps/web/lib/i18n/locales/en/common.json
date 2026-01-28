@@ -13,7 +13,13 @@
     "close": "Close",
     "openMenu": "Open menu",
     "apply": "Apply",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "search": "Search"
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "employee": "Employee"
   },
   "fields": {
     "email": "Email",

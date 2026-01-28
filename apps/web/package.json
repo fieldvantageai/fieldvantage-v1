@@ -13,11 +13,13 @@
     "@fieldvantage/data": "workspace:*",
     "@fieldvantage/shared": "workspace:*",
     "@hookform/resolvers": "^3.6.0",
+    "@radix-ui/react-popover": "^1.1.15",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.4",
     "i18next": "^23.14.0",
     "next": "15.5.9",
     "react": "18.3.1",
+    "react-day-picker": "^9.13.0",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.52.2",
     "yup": "^1.4.0"

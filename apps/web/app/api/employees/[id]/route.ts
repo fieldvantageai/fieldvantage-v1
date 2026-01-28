@@ -7,6 +7,7 @@ import {
   updateEmployee
 } from "@/features/employees/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -38,10 +39,24 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       stripUnknown: true
     });
 
+    const normalizeOptional = (value?: string | null) =>
+      value && value.trim().length > 0 ? value : null;
+    const fullName = `${input.firstName} ${input.lastName}`.trim();
     const updated = await updateEmployee(id, {
-      full_name: input.fullName,
-      email: input.email,
-      phone: input.phone,
+      first_name: input.firstName,
+      last_name: input.lastName,
+      full_name: fullName,
+      avatar_url: normalizeOptional(input.avatarUrl),
+      email: normalizeOptional(input.email),
+      phone: normalizeOptional(input.phone),
+      job_title: normalizeOptional(input.jobTitle),
+      notes: normalizeOptional(input.notes),
+      address_line1: normalizeOptional(input.addressLine1),
+      address_line2: normalizeOptional(input.addressLine2),
+      city: normalizeOptional(input.city),
+      state: normalizeOptional(input.state),
+      zip_code: normalizeOptional(input.zipCode),
+      country: normalizeOptional(input.country) ?? "USA",
       role: input.role,
       status: input.status
     });
@@ -50,7 +65,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
     }
 
-    return NextResponse.json({ data: updated });
+    let avatarSignedUrl: string | null = null;
+    if (updated.avatar_url) {
+      const { data } = await supabaseAdmin.storage
+        .from("customer-avatars")
+        .createSignedUrl(updated.avatar_url, 60 * 60);
+      avatarSignedUrl = data?.signedUrl ?? null;
+    }
+
+    return NextResponse.json({
+      data: {
+        ...updated,
+        avatar_signed_url: avatarSignedUrl
+      }
+    });
   } catch (error) {
     return NextResponse.json(
       {

@@ -41,10 +41,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       title: input.title,
       status: input.status,
       scheduled_for: input.scheduledFor,
-      expected_completion: input.expectedCompletion,
+      estimated_end_at: input.estimatedEndAt,
       customer_name: input.customerName,
       customer_id: input.customerId || null,
-      assigned_employee_ids: input.assignedEmployeeIds ?? []
+      assigned_employee_ids: input.assignedEmployeeIds ?? [],
+      is_recurring: input.isRecurring ?? false,
+      recurrence: input.recurrence ?? null,
+      notes: input.notes ?? null
     });
 
     if (!updated) {

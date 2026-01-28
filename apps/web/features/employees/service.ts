@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import {
   createEmployee as createEmployeeData,
   deleteEmployee as deleteEmployeeData,
@@ -8,6 +9,7 @@ import {
   type CreateEmployeeInput,
   type UpdateEmployeeInput
 } from "@fieldvantage/data";
+import type { Employee } from "@fieldvantage/shared";
 
 const getCompanyId = async (
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -36,13 +38,31 @@ export async function listEmployees() {
   return listEmployeesData(supabase, companyId);
 }
 
-export async function getEmployeeById(id: string) {
+export type EmployeeWithAvatar = Employee & {
+  avatar_signed_url?: string | null;
+};
+
+export async function getEmployeeById(id: string): Promise<EmployeeWithAvatar | null> {
   const supabase = await createSupabaseServerClient();
   const companyId = await getCompanyId(supabase);
   if (!companyId) {
     return null;
   }
-  return getEmployeeByIdData(supabase, companyId, id);
+  const employee = await getEmployeeByIdData(supabase, companyId, id);
+  if (!employee) {
+    return null;
+  }
+  let avatarSignedUrl: string | null = null;
+  if (employee.avatar_url) {
+    const { data } = await supabaseAdmin.storage
+      .from("customer-avatars")
+      .createSignedUrl(employee.avatar_url, 60 * 60);
+    avatarSignedUrl = data?.signedUrl ?? null;
+  }
+  return {
+    ...employee,
+    avatar_signed_url: avatarSignedUrl
+  };
 }
 
 export async function createEmployee(input: CreateEmployeeInput) {

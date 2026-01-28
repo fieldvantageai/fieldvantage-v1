@@ -2,7 +2,9 @@
   "title": "Jobs",
   "subtitle": "Manage jobs and assign teams.",
   "actions": {
-    "new": "New job"
+    "new": "New job",
+    "delete": "Delete job",
+    "edit": "Edit"
   },
   "new": {
     "title": "New job",
@@ -14,33 +16,95 @@
   },
   "list": {
     "title": "Active jobs",
-    "description": "Track active jobs."
+    "description": "Track active jobs.",
+    "allTitle": "All jobs",
+    "allDescription": "View every job in your operation."
+  },
+  "filters": {
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search by title, customer, or employee...",
+    "fromLabel": "From",
+    "toLabel": "To",
+    "statusLabel": "Status",
+    "statusAll": "All",
+    "clear": "Clear filters",
+    "any": "Any date",
+    "helper": "Refine the list using filters.",
+    "empty": "No jobs found. Try adjusting filters."
+  },
+  "pagination": {
+    "showing": "Showing {from}–{to} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {totalPages}"
+  },
+  "table": {
+    "title": "Title",
+    "customer": "Customer",
+    "assigned": "Assigned",
+    "status": "Status",
+    "startDate": "Start date",
+    "titleFallback": "Untitled",
+    "assignedFallback": "Unassigned",
+    "actions": "Actions",
+    "quickStatus": "Update status"
+  },
+  "statusUpdate": {
+    "title": "Update status",
+    "statusLabel": "Status",
+    "changedAtLabel": "Change date and time"
   },
   "empty": {
     "title": "No jobs yet",
     "subtitle": "Start by creating the first job."
   },
   "detail": {
+    "customerLabel": "Customer:",
     "customerFallback": "Customer not informed",
     "edit": "Edit job",
     "summary": {
-      "title": "Job summary",
-      "subtitle": "Job details.",
+      "title": "Job details",
+      "subtitle": "Main job information.",
       "scheduled": "Schedule",
       "expectedCompletion": "Expected completion",
+      "expectedCompletionDateOnly": "Expected completion (date)",
       "notDefined": "Not defined"
+    },
+    "customer": {
+      "title": "Customer information",
+      "subtitle": "Contact and primary address.",
+      "fields": {
+        "name": "Customer",
+        "emailFallback": "Email not provided",
+        "phoneFallback": "Phone not provided",
+        "address": "Customer address (primary)",
+        "addressFallback": "Address not provided"
+      }
     },
     "team": {
       "title": "Team on this job",
       "subtitle": "People currently assigned",
+      "manageHint": "Manage assignments in Edit job.",
+      "assignedLabel": "Assigned",
       "empty": "No employees assigned.",
       "unknown": "Employee not found",
       "unknownEmail": "Email not informed"
     },
     "history": {
       "title": "History",
-      "subtitle": "No records yet",
-      "empty": "No updates recorded."
+      "subtitle": "Most recent updates.",
+      "createdLabel": "Order created",
+      "statusChangedLabel": "Status changed to",
+      "statusFallback": "Status not informed",
+      "eventFallback": "Update recorded"
+    },
+    "recurrence": {
+      "label": "Recurring",
+      "summary": "{repeat} every {every}"
+    },
+    "notes": {
+      "title": "Notes",
+      "subtitle": "Recorded notes."
     }
   },
   "status": {
@@ -52,13 +116,16 @@
   "fields": {
     "title": "Job title",
     "customer": "Customer",
+    "customerPlaceholder": "Select a customer",
     "scheduledFor": "Scheduled date",
     "expectedCompletion": "Expected completion",
+    "expectedCompletionDateOnly": "Expected completion (date)",
+    "estimatedEndAt": "Estimated end",
     "status": "Status"
   },
   "assignment": {
-    "title": "Assigned employees",
-    "subtitle": "Select who will work on this job.",
+    "title": "Assigned collaborators",
+    "subtitle": "Define who is assigned to this job.",
     "add": "Add employee",
     "hideSelector": "Hide selection",
     "empty": "No employees assigned.",
@@ -67,6 +134,49 @@
     "filterEmpty": "No employees found.",
     "selected": "Selected"
   },
+  "recurrence": {
+    "title": "Custom Recurrence",
+    "toggle": "Recurring schedule",
+    "custom": "Custom Recurrence",
+    "empty": "No recurrence defined",
+    "summary": "{repeat} every {every}",
+    "repeatLabel": "Repeat",
+    "everyLabel": "Every",
+    "everyPlaceholder": "Interval (e.g., 1, 2, 3...)",
+    "everyShort": "every",
+    "weeklyLabel": "Repeat on:",
+    "monthlyOccurrenceLabel": "Which occurrence?",
+    "monthlyDayLabel": "Day of week:",
+    "cancel": "Cancel",
+    "done": "Done",
+    "repeat": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "weekdays": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
+    "monthlyOccurrences": {
+      "1st": "1st",
+      "2nd": "2nd",
+      "3rd": "3rd",
+      "4th": "4th",
+      "Last": "Last"
+    }
+  },
+  "notes": {
+    "row": "Notes",
+    "title": "Notes",
+    "label": "Notes"
+  },
   "messages": {
     "created": "Job created.",
     "createError": "Failed to create job.",
@@ -74,6 +184,7 @@
     "updated": "Job updated.",
     "updateError": "Failed to update job.",
     "updateFallback": "Unexpected error while updating job.",
+    "deleteTitle": "Delete job",
     "deleteConfirm": "Do you want to remove this job?",
     "deleteError": "Failed to remove job.",
     "deleteFallback": "Unexpected error while removing job.",

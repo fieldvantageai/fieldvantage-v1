@@ -3,10 +3,12 @@ import { NextResponse } from "next/server";
 import {
   deleteCustomer,
   getCustomerById,
+  replaceCustomerAddresses,
   updateCustomer
 } from "@/features/customers/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { newCustomerSchema } from "@/features/customers/forms/newCustomer/formSchema";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -37,11 +39,38 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       abortEarly: false,
       stripUnknown: true
     });
-    const updated = await updateCustomer(id, input);
+    const normalizeOptional = (value?: string | null) =>
+      value && value.trim().length > 0 ? value : null;
+    const updated = await updateCustomer(id, {
+      first_name: input.firstName,
+      last_name: input.lastName,
+      avatar_url: normalizeOptional(input.avatarUrl),
+      email: normalizeOptional(input.email),
+      phone: normalizeOptional(input.phone),
+      company_name: normalizeOptional(input.companyName),
+      notes: normalizeOptional(input.notes)
+    });
     if (!updated) {
       return NextResponse.json({ error: "Cliente nao encontrado." }, { status: 404 });
     }
-    return NextResponse.json({ data: updated });
+    const addresses = await replaceCustomerAddresses(
+      id,
+      input.addresses ?? []
+    );
+    let avatarSignedUrl: string | null = null;
+    if (updated.avatar_url) {
+      const { data } = await supabaseAdmin.storage
+        .from("customer-avatars")
+        .createSignedUrl(updated.avatar_url, 60 * 60);
+      avatarSignedUrl = data?.signedUrl ?? null;
+    }
+    return NextResponse.json({
+      data: {
+        ...updated,
+        addresses,
+        avatar_signed_url: avatarSignedUrl
+      }
+    });
   } catch (error) {
     return NextResponse.json(
       {

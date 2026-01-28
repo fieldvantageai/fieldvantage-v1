@@ -87,3 +87,38 @@ export async function setJobAssignments(jobId: string, employeeIds: string[]) {
   const supabase = await createSupabaseServerClient();
   await setJobAssignmentsData(supabase, jobId, employeeIds);
 }
+
+export type JobEvent = {
+  id: string;
+  job_id: string;
+  company_id: string;
+  event_type: "created" | "status_changed";
+  event_label: string;
+  from_status: string | null;
+  to_status: string | null;
+  occurred_at: string;
+  created_by: string | null;
+  created_at: string;
+};
+
+export async function listJobEvents(jobId: string) {
+  const supabase = await createSupabaseServerClient();
+  const companyId = await getCompanyId(supabase);
+  if (!companyId) {
+    return [];
+  }
+  const { data, error } = await supabase
+    .from("job_events")
+    .select(
+      "id, job_id, company_id, event_type, event_label, from_status, to_status, occurred_at, created_by, created_at"
+    )
+    .eq("company_id", companyId)
+    .eq("job_id", jobId)
+    .order("occurred_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as JobEvent[];
+}

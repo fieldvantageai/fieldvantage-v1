@@ -10,11 +10,15 @@ import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
 import { ToastBanner } from "@/components/ui/Toast";
+import NotesDialog from "@/components/orders/NotesDialog";
+import RecurrenceModal from "@/components/orders/RecurrenceModal";
+import { formatRecurrenceSummary } from "@/components/orders/recurrenceSummary";
 import {
   newJobSchema,
   type NewJobFormValues
 } from "@/features/jobs/forms/newJob/formSchema";
-import type { Employee, Job } from "@/features/_shared/types";
+import type { Customer, Employee, Job } from "@/features/_shared/types";
+import type { JobRecurrence } from "@fieldvantage/shared";
 import { useClientT } from "@/lib/i18n/useClientT";
 
 type EditJobFormProps = {
@@ -30,8 +34,26 @@ export default function EditJobForm({ job }: EditJobFormProps) {
     variant: "success" | "error" | "info";
   } | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [filter, setFilter] = useState("");
   const [showSelector, setShowSelector] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRecurrence, setShowRecurrence] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  const toDateTimeLocalValue = (value?: string | null) => {
+    if (!value) {
+      return "";
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    const pad = (num: number) => String(num).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate()
+    )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
 
   const {
     register,
@@ -45,36 +67,71 @@ export default function EditJobForm({ job }: EditJobFormProps) {
       title: job.title ?? "",
       customerName: job.customer_name ?? "",
       customerId: job.customer_id ?? "",
-      scheduledFor: job.scheduled_for,
-      expectedCompletion: job.expected_completion ?? "",
+      scheduledFor: toDateTimeLocalValue(job.scheduled_for),
+      estimatedEndAt: toDateTimeLocalValue(job.estimated_end_at),
       status: job.status,
-      assignedEmployeeIds: job.assigned_employee_ids ?? []
+      assignedEmployeeIds: job.assigned_employee_ids ?? [],
+      isRecurring: job.is_recurring ?? false,
+      recurrence: job.recurrence ?? null,
+      notes: job.notes ?? ""
     }
   });
 
   useEffect(() => {
     register("assignedEmployeeIds");
     register("customerId");
+    register("isRecurring");
+    register("recurrence");
+    register("notes");
   }, [register]);
 
   useEffect(() => {
-    const loadEmployees = async () => {
+    const loadData = async () => {
       try {
-        const response = await fetch("/api/employees");
-        if (!response.ok) {
-          throw new Error("Falha ao carregar colaboradores.");
+        const [employeesResponse, customersResponse] = await Promise.all([
+          fetch("/api/employees"),
+          fetch("/api/customers")
+        ]);
+        if (employeesResponse.ok) {
+          const payload = (await employeesResponse.json()) as {
+            data?: Employee[];
+          };
+          setEmployees(payload.data ?? []);
         }
-        const payload = (await response.json()) as { data?: Employee[] };
-        setEmployees(payload.data ?? []);
+        if (customersResponse.ok) {
+          const payload = (await customersResponse.json()) as {
+            data?: Customer[];
+          };
+          setCustomers(payload.data ?? []);
+        }
       } catch {
         setEmployees([]);
+        setCustomers([]);
       }
     };
-    loadEmployees();
+    loadData();
   }, []);
 
   const assignedEmployeeIds = watch("assignedEmployeeIds");
+  const selectedCustomerId = watch("customerId");
+  const selectedStatus = watch("status");
+  const notesValue = watch("notes") ?? "";
+  const isRecurring = watch("isRecurring");
 
+  const statusClass =
+    selectedStatus === "done"
+      ? "text-emerald-700"
+      : selectedStatus === "in_progress"
+        ? "text-amber-700"
+        : selectedStatus === "canceled"
+          ? "text-rose-700"
+          : "text-slate-700";
+
+  const recurrenceSummary = (recurrence?: unknown) =>
+    formatRecurrenceSummary(
+      (recurrence ?? null) as JobRecurrence | null,
+      t
+    );
   const assignedEmployees = useMemo(
     () =>
       employees.filter((employee) =>
@@ -138,11 +195,6 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   };
 
   const onDelete = async () => {
-    const confirmed = window.confirm(t("messages.deleteConfirm"));
-    if (!confirmed) {
-      return;
-    }
-
     setToast(null);
     try {
       const response = await fetch(`/api/jobs/${job.id}`, {
@@ -179,24 +231,26 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         error={errors.title?.message}
         {...register("title")}
       />
-      <Input
+      <Select
         label={t("fields.customer")}
         error={errors.customerName?.message}
-        {...register("customerName")}
+        value={selectedCustomerId}
+        options={[
+          { value: "", label: t("fields.customerPlaceholder") },
+          ...customers.map((customer) => ({
+            value: customer.id,
+            label: customer.name
+          }))
+        ]}
+        onChange={(event) => {
+          const id = event.target.value;
+          const selected = customers.find((customer) => customer.id === id);
+          setValue("customerId", id, { shouldDirty: true });
+          setValue("customerName", selected?.name ?? "", { shouldDirty: true });
+        }}
       />
       <input type="hidden" {...register("customerId")} />
-      <Input
-        label={t("fields.scheduledFor")}
-        type="datetime-local"
-        error={errors.scheduledFor?.message}
-        {...register("scheduledFor")}
-      />
-      <Input
-        label={t("fields.expectedCompletion")}
-        type="date"
-        error={errors.expectedCompletion?.message}
-        {...register("expectedCompletion")}
-      />
+      <input type="hidden" {...register("customerName")} />
       <Select
         label={t("fields.status")}
         error={errors.status?.message}
@@ -206,8 +260,67 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           { value: "done", label: t("status.done") },
           { value: "canceled", label: t("status.canceled") }
         ]}
+        className={statusClass}
         {...register("status")}
       />
+      <Input
+        label={t("fields.scheduledFor")}
+        type="datetime-local"
+        error={errors.scheduledFor?.message}
+        {...register("scheduledFor")}
+      />
+      <Input
+        label={t("fields.estimatedEndAt")}
+        type="datetime-local"
+        error={errors.estimatedEndAt?.message}
+        {...register("estimatedEndAt")}
+      />
+
+      <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
+        <input
+          type="checkbox"
+          className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+          checked={Boolean(isRecurring)}
+          onChange={(event) => {
+            setValue("isRecurring", event.target.checked, { shouldDirty: true });
+            if (!event.target.checked) {
+              setValue("recurrence", null, { shouldDirty: true });
+            } else if (!watch("recurrence")) {
+              setValue(
+                "recurrence",
+                { repeat: "daily", every: 1 },
+                { shouldDirty: true }
+              );
+            }
+          }}
+        />
+        <span>{t("recurrence.toggle")}</span>
+      </label>
+
+      {isRecurring ? (
+        <button
+          type="button"
+          onClick={() => setShowRecurrence(true)}
+          className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50/70"
+        >
+          <span className="font-semibold">{t("recurrence.custom")}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="max-w-[220px] truncate text-xs text-slate-500">
+              {recurrenceSummary(watch("recurrence") ?? null)}
+            </span>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                d="M9 6l6 6-6 6"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
+          </span>
+        </button>
+      ) : null}
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -306,13 +419,47 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         ) : null}
       </div>
 
+      <button
+        type="button"
+        onClick={() => setShowNotes(true)}
+        className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50/70"
+      >
+        <span className="flex items-center gap-3">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path
+              d="M7 4h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </svg>
+          {t("notes.row")}
+        </span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path
+            d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
+      </button>
+
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="ghost" onClick={() => router.push("/jobs")}>
           {tCommon("actions.back")}
         </Button>
         <div className="flex items-center gap-2 sm:ml-auto">
-          <Button type="button" variant="secondary" onClick={onDelete}>
-            {tCommon("actions.remove")}
+          <Button
+            type="button"
+            className="bg-rose-50 text-rose-600 hover:bg-rose-100 focus-visible:ring-rose-200"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            {t("actions.delete")}
           </Button>
           <SaveAnimatedButton
             type="submit"
@@ -322,6 +469,56 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           />
         </div>
       </div>
+      <RecurrenceModal
+        open={showRecurrence}
+        value={watch("recurrence") ?? null}
+        onCancel={() => setShowRecurrence(false)}
+        onSave={(value) => {
+          setValue("recurrence", value, { shouldDirty: true });
+          setValue("isRecurring", true, { shouldDirty: true });
+          setShowRecurrence(false);
+        }}
+      />
+      <NotesDialog
+        open={showNotes}
+        value={notesValue}
+        onCancel={() => setShowNotes(false)}
+        onSave={(value) => {
+          setValue("notes", value, { shouldDirty: true });
+          setShowNotes(false);
+        }}
+      />
+      {showDeleteConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <p className="text-base font-semibold text-slate-900">
+              {t("messages.deleteTitle")}
+            </p>
+            <p className="mt-2 text-sm text-slate-600">
+              {t("messages.deleteConfirm")}
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                {tCommon("actions.cancel")}
+              </Button>
+              <Button
+                type="button"
+                className="bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-300"
+                onClick={async () => {
+                  setShowDeleteConfirm(false);
+                  await onDelete();
+                }}
+              >
+                {t("actions.delete")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }

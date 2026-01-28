@@ -46,14 +46,23 @@
   },
   "fields": {
     "name": "Customer name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "avatar": "Customer photo",
     "email": "Email",
     "phone": "Phone",
+    "companyName": "Company",
+    "notes": "Notes",
     "address": "Address"
   },
   "placeholders": {
     "name": "Example Customer",
+    "firstName": "First name",
+    "lastName": "Last name",
     "email": "customer@company.com",
     "phone": "+1 555 000 0000",
+    "companyName": "Company (optional)",
+    "notes": "Important notes about the customer",
     "address": "Street, number, city"
   },
   "messages": {

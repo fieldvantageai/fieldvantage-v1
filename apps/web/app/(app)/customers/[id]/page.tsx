@@ -24,11 +24,20 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-            {customer.name}
-          </h1>
-          <p className="text-sm text-slate-500">{t("detail.subtitle")}</p>
+        <div className="flex items-center gap-4">
+          {customer.avatar_signed_url ? (
+            <img
+              src={customer.avatar_signed_url}
+              alt={customer.name}
+              className="h-12 w-12 rounded-full border border-slate-200/70 object-cover shadow-sm"
+            />
+          ) : null}
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+              {customer.name}
+            </h1>
+            <p className="text-sm text-slate-500">{t("detail.subtitle")}</p>
+          </div>
         </div>
         <Link href={`/customers/${customer.id}/edit`}>
           <Button>{t("detail.edit")}</Button>
@@ -41,14 +50,37 @@ export default async function CustomerDetailPage({ params }: PageProps) {
             <p className="text-xs uppercase text-slate-400">
               {t("detail.summary.contact")}
             </p>
-            <p className="mt-2 text-sm text-slate-700">{customer.email}</p>
-            <p className="text-sm text-slate-700">{customer.phone}</p>
+            <p className="mt-2 text-sm text-slate-700">{customer.email ?? "-"}</p>
+            <p className="text-sm text-slate-700">{customer.phone ?? "-"}</p>
+            <p className="mt-2 text-sm text-slate-700">
+              {customer.company_name ?? "-"}
+            </p>
           </div>
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {t("detail.summary.address")}
             </p>
-            <p className="mt-2 text-sm text-slate-700">{customer.address}</p>
+            {customer.addresses?.length ? (
+              <div className="mt-2 space-y-2 text-sm text-slate-700">
+                {customer.addresses.map((address) => (
+                  <div key={address.id}>
+                    <p className="font-semibold text-slate-900">
+                      {address.label || t("detail.summary.address")}
+                    </p>
+                    <p>
+                      {address.address_line1}
+                      {address.address_line2 ? `, ${address.address_line2}` : ""}
+                    </p>
+                    <p>
+                      {address.city}, {address.state} {address.zip_code}
+                    </p>
+                    <p>{address.country}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-slate-500">-</p>
+            )}
           </div>
         </div>
       </Section>

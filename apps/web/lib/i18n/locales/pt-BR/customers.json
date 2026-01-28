@@ -46,14 +46,23 @@
   },
   "fields": {
     "name": "Nome do cliente",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "avatar": "Foto do cliente",
     "email": "Email",
     "phone": "Telefone",
+    "companyName": "Empresa",
+    "notes": "Observacoes",
     "address": "Endereco"
   },
   "placeholders": {
     "name": "Cliente Exemplo",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
     "email": "cliente@empresa.com",
     "phone": "+55 11 90000-0000",
+    "companyName": "Empresa (opcional)",
+    "notes": "Anotacoes importantes sobre o cliente",
     "address": "Rua, numero, cidade"
   },
   "messages": {

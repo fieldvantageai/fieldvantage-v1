@@ -2,7 +2,9 @@
   "title": "Colaboradores",
   "subtitle": "Convide colaboradores e organize permissoes.",
   "actions": {
-    "new": "Novo colaborador"
+    "new": "Novo colaborador",
+    "create": "Criar colaborador",
+    "saveChanges": "Salvar alteracoes"
   },
   "new": {
     "title": "Novo colaborador",
@@ -39,8 +41,19 @@
   },
   "fields": {
     "fullName": "Nome completo",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "avatar": "Foto do colaborador",
     "email": "Email",
     "phone": "Telefone",
+    "jobTitle": "Cargo",
+    "addressLine1": "Endereco",
+    "addressLine2": "Complemento",
+    "city": "Cidade",
+    "state": "Estado",
+    "zipCode": "CEP",
+    "country": "Pais",
+    "notes": "Observacoes",
     "role": "Cargo",
     "activeStatus": "Colaborador ativo"
   },

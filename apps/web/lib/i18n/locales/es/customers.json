@@ -46,14 +46,23 @@
   },
   "fields": {
     "name": "Nombre del cliente",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "avatar": "Foto del cliente",
     "email": "Email",
     "phone": "Telefono",
+    "companyName": "Empresa",
+    "notes": "Notas",
     "address": "Direccion"
   },
   "placeholders": {
     "name": "Cliente Ejemplo",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
     "email": "cliente@empresa.com",
     "phone": "+34 600 000 000",
+    "companyName": "Empresa (opcional)",
+    "notes": "Notas importantes sobre el cliente",
     "address": "Calle, numero, ciudad"
   },
   "messages": {

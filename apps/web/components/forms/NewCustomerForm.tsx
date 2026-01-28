@@ -2,11 +2,14 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import AddressRepeater from "../customers/AddressRepeater";
+import CustomerAvatarUpload from "../customers/CustomerAvatarUpload";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
+import { Textarea } from "@/components/ui/Textarea";
 import { ToastBanner } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
 import {
@@ -28,12 +31,23 @@ export default function NewCustomerForm() {
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
+    watch,
     reset,
+    control,
     formState: { errors, isSubmitting, isDirty }
   } = useForm<NewCustomerFormValues>({
     resolver: yupResolver(newCustomerSchema),
     defaultValues: newCustomerDefaults
   });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "addresses"
+  });
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const avatarUrl = watch("avatarUrl");
+  const addresses = watch("addresses") ?? [];
 
   const onSubmit = async (values: NewCustomerFormValues) => {
     setToast(null);
@@ -60,8 +74,40 @@ export default function NewCustomerForm() {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/customers/avatar", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const data = (await response.json()) as { error?: string };
+      throw new Error(data?.error ?? t("messages.createError"));
+    }
+
+    const payload = (await response.json()) as {
+      data: { avatar_url: string; avatar_signed_url?: string | null };
+    };
+
+    setValue("avatarUrl", payload.data.avatar_url, { shouldDirty: true });
+    setAvatarPreviewUrl(payload.data.avatar_signed_url ?? payload.data.avatar_url);
+    return payload.data;
+  };
+
+  const handleSetPrimary = (index: number) => {
+    const current = getValues("addresses") ?? [];
+    current.forEach((_, idx) => {
+      setValue(`addresses.${idx}.is_primary`, idx === index, {
+        shouldDirty: true
+      });
+    });
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {toast ? (
         <ToastBanner
           message={toast.message}
@@ -70,30 +116,87 @@ export default function NewCustomerForm() {
           closeLabel={tCommon("actions.close")}
         />
       ) : null}
-      <Input
-        label={t("fields.name")}
-        placeholder={t("placeholders.name")}
-        error={errors.name?.message}
-        {...register("name")}
+      <CustomerAvatarUpload
+        label={t("fields.avatar")}
+        value={avatarUrl}
+        previewUrl={avatarPreviewUrl}
+        onUpload={handleAvatarUpload}
+        onRemove={() => {
+          setValue("avatarUrl", "", { shouldDirty: true });
+          setAvatarPreviewUrl(null);
+        }}
       />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          label={t("fields.firstName")}
+          placeholder={t("placeholders.firstName")}
+          error={errors.firstName?.message}
+          {...register("firstName")}
+        />
+        <Input
+          label={t("fields.lastName")}
+          placeholder={t("placeholders.lastName")}
+          error={errors.lastName?.message}
+          {...register("lastName")}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input
+          label={t("fields.email")}
+          placeholder={t("placeholders.email")}
+          type="email"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <Input
+          label={t("fields.phone")}
+          placeholder={t("placeholders.phone")}
+          error={errors.phone?.message}
+          {...register("phone")}
+        />
+      </div>
+
       <Input
-        label={t("fields.email")}
-        placeholder={t("placeholders.email")}
-        type="email"
-        error={errors.email?.message}
-        {...register("email")}
+        label={t("fields.companyName")}
+        placeholder={t("placeholders.companyName")}
+        error={errors.companyName?.message}
+        {...register("companyName")}
       />
-      <Input
-        label={t("fields.phone")}
-        placeholder={t("placeholders.phone")}
-        error={errors.phone?.message}
-        {...register("phone")}
+
+      <Textarea
+        label={t("fields.notes")}
+        placeholder={t("placeholders.notes")}
+        error={errors.notes?.message}
+        {...register("notes")}
       />
-      <Input
-        label={t("fields.address")}
-        placeholder={t("placeholders.address")}
-        error={errors.address?.message}
-        {...register("address")}
+
+      <AddressRepeater
+        fields={fields}
+        register={register}
+        errors={errors}
+        primaryIndex={
+          (() => {
+            const index = addresses.findIndex((address) => address.is_primary);
+            return index >= 0 ? index : null;
+          })()
+        }
+        onAdd={() =>
+          append({
+            type: "residential",
+            label: "",
+            address_line1: "",
+            address_line2: "",
+            city: "",
+            state: "",
+            zip_code: "",
+            country: "USA",
+            is_primary: fields.length === 0
+          })
+        }
+        onRemove={(index: number) => remove(index)}
+        onSetPrimary={(index: number) => handleSetPrimary(index)}
       />
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
