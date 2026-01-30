@@ -80,15 +80,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   if (existingJob?.status && existingJob.status !== body.status) {
-    await supabase.from("job_events").insert({
+    await supabase.from("order_status_events").insert({
       company_id: company.id,
-      job_id: id,
-      event_type: "status_changed",
-      event_label: `Status changed to ${body.status}`,
-      from_status: existingJob.status,
-      to_status: body.status,
-      occurred_at: parsed.toISOString(),
-      created_by: user.id
+      order_id: id,
+      old_status: existingJob.status,
+      new_status: body.status,
+      changed_at: parsed.toISOString(),
+      changed_by: user.id
     });
   }
 

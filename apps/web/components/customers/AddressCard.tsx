@@ -4,6 +4,7 @@ import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import type { NewCustomerFormValues } from "@/features/customers/forms/newCustomer/formSchema";
 
@@ -93,6 +94,13 @@ export default function AddressCard({
           label="Pais"
           error={addressErrors?.country?.message as string | undefined}
           {...register(`${base}.country`)}
+        />
+        <Textarea
+          label="Notas (opcional)"
+          className="sm:col-span-2"
+          rows={3}
+          error={addressErrors?.note?.message as string | undefined}
+          {...register(`${base}.note`)}
         />
       </div>
       <input type="hidden" {...register(`${base}.is_primary`)} />

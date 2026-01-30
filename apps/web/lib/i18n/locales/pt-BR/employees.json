@@ -21,6 +21,12 @@
       "subtitle": "Informacoes do colaborador.",
       "contact": "Contato",
       "phoneFallback": "Telefone nao informado"
+    },
+    "jobs": {
+      "title": "Ordens alocadas",
+      "subtitle": "Ordens em que este colaborador esta alocado.",
+      "empty": "Nenhuma ordem alocada para este colaborador.",
+      "titleFallback": "Ordem sem titulo"
     }
   },
   "list": {
@@ -54,7 +60,7 @@
     "zipCode": "CEP",
     "country": "Pais",
     "notes": "Observacoes",
-    "role": "Cargo",
+    "role": "Perfil de acesso",
     "activeStatus": "Colaborador ativo"
   },
   "messages": {

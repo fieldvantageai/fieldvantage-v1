@@ -60,6 +60,7 @@ const toCustomer = (row: CustomerRow): Customer => ({
 export type CustomerAddressInput = {
   type: "residential" | "business";
   label?: string | null;
+  note?: string | null;
   address_line1: string;
   address_line2?: string | null;
   city: string;
@@ -213,7 +214,7 @@ export async function listCustomerAddresses(
   const { data, error } = await supabase
     .from("customer_addresses")
     .select(
-      "id, company_id, customer_id, type, label, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
+      "id, company_id, customer_id, type, label, note, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
     )
     .eq("company_id", companyId)
     .eq("customer_id", customerId)
@@ -247,6 +248,7 @@ export async function replaceCustomerAddresses(
     customer_id: customerId,
     type: address.type,
     label: address.label ?? null,
+    note: address.note ?? null,
     address_line1: address.address_line1,
     address_line2: address.address_line2 ?? null,
     city: address.city,
@@ -260,7 +262,7 @@ export async function replaceCustomerAddresses(
     .from("customer_addresses")
     .insert(payload)
     .select(
-      "id, company_id, customer_id, type, label, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
+      "id, company_id, customer_id, type, label, note, address_line1, address_line2, city, state, zip_code, country, is_primary, created_at"
     );
 
   if (error) {

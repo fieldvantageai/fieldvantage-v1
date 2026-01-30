@@ -10,6 +10,9 @@ export async function getSupabaseAuthUser() {
   if (error) {
     return null;
   }
+  if (data.user?.user_metadata?.is_active === false) {
+    return null;
+  }
   return data.user ?? null;
 }
 

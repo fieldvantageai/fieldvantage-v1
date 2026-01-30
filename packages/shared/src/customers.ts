@@ -26,6 +26,7 @@ export type CustomerAddress = {
   customer_id: string;
   type: "residential" | "business";
   label?: string | null;
+  note?: string | null;
   address_line1: string;
   address_line2?: string | null;
   city: string;
@@ -58,6 +59,7 @@ export const customerAddressSchema = yup.object({
     .oneOf(["residential", "business"])
     .required("Tipo de endereco obrigatorio."),
   label: optionalText(),
+  note: optionalText(),
   address_line1: yup.string().required("Endereco obrigatorio."),
   address_line2: optionalText(),
   city: yup.string().required("Cidade obrigatoria."),

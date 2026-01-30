@@ -22,6 +22,17 @@
       "contact": "Contacto",
       "address": "Direccion"
     },
+    "address": {
+      "primary": "Principal",
+      "notes": "Notas de la direccion",
+      "fallbackLabel": "Direccion"
+    },
+    "jobs": {
+      "title": "Trabajos de este cliente",
+      "subtitle": "Trabajos vinculados a este cliente.",
+      "empty": "No hay trabajos vinculados a este cliente.",
+      "titleFallback": "Trabajo sin titulo"
+    },
     "history": {
       "title": "Historial reciente",
       "subtitle": "Sin registros aun",

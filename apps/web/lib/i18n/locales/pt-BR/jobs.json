@@ -4,7 +4,9 @@
   "actions": {
     "new": "Nova ordem",
     "delete": "Excluir ordem",
-    "edit": "Editar"
+    "edit": "Editar",
+    "changeStatus": "Alterar status",
+    "viewHistory": "Ver historico"
   },
   "new": {
     "title": "Nova ordem",
@@ -47,7 +49,8 @@
     "titleFallback": "Sem titulo",
     "assignedFallback": "Sem responsavel",
     "actions": "Acoes",
-    "quickStatus": "Atualizar status"
+    "quickStatus": "Atualizar status",
+    "actionsMenu": "Abrir acoes"
   },
   "statusUpdate": {
     "title": "Atualizar status",
@@ -94,9 +97,14 @@
       "title": "Historico",
       "subtitle": "Atualizacoes mais recentes.",
       "createdLabel": "Ordem criada",
-      "statusChangedLabel": "Status alterado para",
+      "statusChangedLabel": "Status alterado",
       "statusFallback": "Status nao informado",
-      "eventFallback": "Atualizacao registrada"
+      "eventFallback": "Atualizacao registrada",
+      "emptyStatus": "Nenhuma alteracao de status registrada.",
+      "fromTo": "De {from} para {to}",
+      "userLabel": "Por",
+      "userFallback": "Sistema",
+      "updateStatus": "Atualizar status"
     },
     "recurrence": {
       "label": "Recorrente",
@@ -132,7 +140,11 @@
     "filterLabel": "Filtrar por nome",
     "filterPlaceholder": "Digite para buscar",
     "filterEmpty": "Nenhum colaborador encontrado.",
-    "selected": "Selecionado"
+    "selected": "Selecionado",
+    "showInactive": "Mostrar inativos",
+    "allowInactive": "Permitir inativos (backdated)",
+    "inactiveBadge": "Inativo",
+    "inactiveError": "Este colaborador esta inativo e nao pode ser atribuido."
   },
   "recurrence": {
     "title": "Recorrencia personalizada",

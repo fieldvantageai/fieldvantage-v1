@@ -4,7 +4,9 @@
   "actions": {
     "new": "New job",
     "delete": "Delete job",
-    "edit": "Edit"
+    "edit": "Edit",
+    "changeStatus": "Change status",
+    "viewHistory": "View history"
   },
   "new": {
     "title": "New job",
@@ -47,7 +49,8 @@
     "titleFallback": "Untitled",
     "assignedFallback": "Unassigned",
     "actions": "Actions",
-    "quickStatus": "Update status"
+    "quickStatus": "Update status",
+    "actionsMenu": "Open actions"
   },
   "statusUpdate": {
     "title": "Update status",
@@ -94,9 +97,14 @@
       "title": "History",
       "subtitle": "Most recent updates.",
       "createdLabel": "Order created",
-      "statusChangedLabel": "Status changed to",
+      "statusChangedLabel": "Status changed",
       "statusFallback": "Status not informed",
-      "eventFallback": "Update recorded"
+      "eventFallback": "Update recorded",
+      "emptyStatus": "No status changes recorded.",
+      "fromTo": "From {from} to {to}",
+      "userLabel": "By",
+      "userFallback": "System",
+      "updateStatus": "Update status"
     },
     "recurrence": {
       "label": "Recurring",
@@ -132,7 +140,11 @@
     "filterLabel": "Filter by name",
     "filterPlaceholder": "Type to search",
     "filterEmpty": "No employees found.",
-    "selected": "Selected"
+    "selected": "Selected",
+    "showInactive": "Show inactive",
+    "allowInactive": "Allow inactive (backdated)",
+    "inactiveBadge": "Inactive",
+    "inactiveError": "This employee is inactive and cannot be assigned."
   },
   "recurrence": {
     "title": "Custom Recurrence",

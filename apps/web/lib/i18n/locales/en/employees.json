@@ -21,6 +21,12 @@
       "subtitle": "Employee details.",
       "contact": "Contact",
       "phoneFallback": "Phone not provided"
+    },
+    "jobs": {
+      "title": "Assigned jobs",
+      "subtitle": "Jobs this employee is assigned to.",
+      "empty": "No jobs assigned to this employee.",
+      "titleFallback": "Untitled job"
     }
   },
   "list": {
@@ -54,7 +60,7 @@
     "zipCode": "Zip code",
     "country": "Country",
     "notes": "Notes",
-    "role": "Role",
+    "role": "Access role",
     "activeStatus": "Employee active"
   },
   "messages": {

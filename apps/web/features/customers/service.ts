@@ -12,7 +12,7 @@ import {
   type CustomerAddressInput,
   type UpdateCustomerInput
 } from "@fieldvantage/data";
-import type { Customer, CustomerAddress } from "@fieldvantage/shared";
+import type { Customer, CustomerAddress, JobStatus } from "@fieldvantage/shared";
 
 const getCompanyId = async (
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -121,4 +121,46 @@ export async function deleteCustomer(id: string) {
     return false;
   }
   return deleteCustomerData(supabase, companyId, id);
+}
+
+export type CustomerJobSummary = {
+  id: string;
+  title: string | null;
+  customer_name: string | null;
+  status: JobStatus;
+  scheduled_for: string;
+};
+
+const toScheduledFor = (date: string, time?: string | null) =>
+  `${date}T${time?.slice(0, 5) ?? "00:00"}`;
+
+export async function listCustomerJobs(customerId: string) {
+  const supabase = await createSupabaseServerClient();
+  const companyId = await getCompanyId(supabase);
+  if (!companyId) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("id, title, customer_name, status, scheduled_date, scheduled_time")
+    .eq("company_id", companyId)
+    .eq("customer_id", customerId)
+    .order("scheduled_date", { ascending: false })
+    .order("scheduled_time", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    title: row.title as string | null,
+    customer_name: row.customer_name as string | null,
+    status: row.status as JobStatus,
+    scheduled_for: toScheduledFor(
+      row.scheduled_date as string,
+      row.scheduled_time as string | null
+    )
+  }));
 }

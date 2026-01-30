@@ -32,6 +32,7 @@ export type CreateJobInput = {
   status: JobStatus;
   notes?: string | null;
   assigned_employee_ids?: string[];
+  allow_inactive_assignments?: boolean;
   is_recurring?: boolean;
   recurrence?: JobRecurrence | null;
 };
@@ -172,7 +173,12 @@ export async function createJob(
   }
 
   if (input.assigned_employee_ids?.length) {
-    await setJobAssignments(supabase, data.id, input.assigned_employee_ids);
+    await setJobAssignments(
+      supabase,
+      data.id,
+      input.assigned_employee_ids,
+      input.allow_inactive_assignments ?? false
+    );
   }
 
   return toJob(
@@ -229,7 +235,12 @@ export async function updateJob(
   }
 
   if (input.assigned_employee_ids) {
-    await setJobAssignments(supabase, id, input.assigned_employee_ids);
+    await setJobAssignments(
+      supabase,
+      id,
+      input.assigned_employee_ids,
+      input.allow_inactive_assignments ?? false
+    );
   }
 
   const assignments =
@@ -268,7 +279,8 @@ export async function deleteJob(
 export async function setJobAssignments(
   supabase: SupabaseClient,
   jobId: string,
-  employeeIds: string[]
+  employeeIds: string[],
+  allowInactive = false
 ) {
   await supabase.from("job_assignments").delete().eq("job_id", jobId);
 
@@ -278,7 +290,8 @@ export async function setJobAssignments(
 
   const payload = employeeIds.map((employeeId) => ({
     job_id: jobId,
-    employee_id: employeeId
+    employee_id: employeeId,
+    allow_inactive: allowInactive
   }));
 
   const { error } = await supabase.from("job_assignments").insert(payload);

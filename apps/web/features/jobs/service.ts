@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import {
   createJob as createJobData,
   deleteJob as deleteJobData,
@@ -121,4 +122,75 @@ export async function listJobEvents(jobId: string) {
   }
 
   return (data ?? []) as JobEvent[];
+}
+
+export type OrderStatusEvent = {
+  id: string;
+  company_id: string;
+  order_id: string;
+  old_status: string | null;
+  new_status: string;
+  changed_at: string;
+  changed_by: string | null;
+  created_at: string;
+};
+
+export async function listOrderStatusEvents(orderId: string) {
+  const supabase = await createSupabaseServerClient();
+  const companyId = await getCompanyId(supabase);
+  if (!companyId) {
+    return [];
+  }
+  const { data, error } = await supabase
+    .from("order_status_events")
+    .select(
+      "id, company_id, order_id, old_status, new_status, changed_at, changed_by, created_at"
+    )
+    .eq("company_id", companyId)
+    .eq("order_id", orderId)
+    .order("changed_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as OrderStatusEvent[];
+}
+
+export type OrderStatusEventWithActor = OrderStatusEvent & {
+  actor_name?: string | null;
+  actor_email?: string | null;
+};
+
+export async function listOrderStatusEventsWithActors(orderId: string) {
+  const events = await listOrderStatusEvents(orderId);
+  const actorIds = Array.from(
+    new Set(events.map((event) => event.changed_by).filter(Boolean))
+  ) as string[];
+
+  if (actorIds.length === 0) {
+    return events as OrderStatusEventWithActor[];
+  }
+
+  const actorMap = new Map<string, { name?: string | null; email?: string | null }>();
+  await Promise.all(
+    actorIds.map(async (id) => {
+      const { data } = await supabaseAdmin.auth.admin.getUserById(id);
+      const name =
+        (data?.user?.user_metadata as { full_name?: string } | null)?.full_name ??
+        (data?.user?.user_metadata as { owner_name?: string } | null)?.owner_name ??
+        null;
+      const email = data?.user?.email ?? null;
+      actorMap.set(id, { name, email });
+    })
+  );
+
+  return events.map((event) => {
+    const actor = event.changed_by ? actorMap.get(event.changed_by) : null;
+    return {
+      ...event,
+      actor_name: actor?.name ?? null,
+      actor_email: actor?.email ?? null
+    };
+  }) as OrderStatusEventWithActor[];
 }

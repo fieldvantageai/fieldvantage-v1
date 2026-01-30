@@ -223,6 +223,9 @@ export default function OrdersListClient({
           setStatusDialogJob(job);
           setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
         }}
+        onHistoryAction={(job) => {
+          router.push(`/jobs/${job.id}#history`);
+        }}
       />
       <StatusUpdateDialog
         open={Boolean(statusDialogJob)}

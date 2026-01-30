@@ -154,6 +154,50 @@ export async function POST(request: Request) {
       stripUnknown: true
     });
 
+    const supabase = await createSupabaseServerClient();
+    const { data: company } = await supabase
+      .from("companies")
+      .select("id, owner_id")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (!company?.id) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+
+    const inactiveIds =
+      input.assignedEmployeeIds?.length
+        ? (
+            await supabase
+              .from("employees")
+              .select("id")
+              .eq("company_id", company.id)
+              .in("id", input.assignedEmployeeIds)
+              .eq("is_active", false)
+          ).data ?? []
+        : [];
+
+    const allowInactive = Boolean(input.allowInactive);
+    const isOwner = company.owner_id === user.id;
+    const isAdmin = !isOwner && user.email
+      ? (
+          await supabase
+            .from("employees")
+            .select("role")
+            .eq("company_id", company.id)
+            .eq("email", user.email)
+            .maybeSingle()
+        ).data?.role === "admin"
+      : false;
+    const canAllowInactive = isOwner || isAdmin;
+
+    if (inactiveIds.length > 0 && (!allowInactive || !canAllowInactive)) {
+      return NextResponse.json(
+        { error: "EMPLOYEE_INACTIVE", message: "Colaborador inativo." },
+        { status: 409 }
+      );
+    }
+
     const job = await createJob({
       title: input.title,
       status: input.status,
@@ -162,17 +206,11 @@ export async function POST(request: Request) {
       customer_name: input.customerName,
       customer_id: input.customerId || null,
       assigned_employee_ids: input.assignedEmployeeIds ?? [],
+      allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,
       recurrence: input.recurrence ?? null,
       notes: input.notes ?? null
     });
-
-    const supabase = await createSupabaseServerClient();
-    const { data: company } = await supabase
-      .from("companies")
-      .select("id")
-      .eq("owner_id", user.id)
-      .maybeSingle();
 
     if (company?.id) {
       await supabase.from("job_events").insert({

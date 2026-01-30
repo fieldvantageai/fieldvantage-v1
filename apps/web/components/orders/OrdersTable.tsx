@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import StatusBadge from "./StatusBadge";
@@ -19,6 +20,7 @@ type OrdersTableProps = {
   sortDir: "asc" | "desc";
   onSort: (key: SortKey) => void;
   onStatusAction: (job: OrdersTableRow) => void;
+  onHistoryAction: (job: OrdersTableRow) => void;
 };
 
 export default function OrdersTable({
@@ -29,10 +31,26 @@ export default function OrdersTable({
   sortKey,
   sortDir,
   onSort,
-  onStatusAction
+  onStatusAction,
+  onHistoryAction
 }: OrdersTableProps) {
   const { t } = useClientT("jobs");
   const router = useRouter();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!openMenuId) {
+      return;
+    }
+    const onClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [openMenuId]);
 
   if (!isLoading && orders.length === 0) {
     return (
@@ -57,7 +75,7 @@ export default function OrdersTable({
   ];
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm">
+    <div className="relative overflow-visible rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm">
       <div className="hidden grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,0.5fr)] gap-4 border-b border-slate-200/70 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400 sm:grid">
         {columns.map((column) => (
           <button
@@ -127,61 +145,64 @@ export default function OrdersTable({
                 <p className="hidden text-sm text-slate-600 sm:block">
                   {dateFormatter.format(new Date(job.scheduled_for))}
                 </p>
-                <div className="flex items-center gap-2 sm:justify-end">
-                  <button
-                    type="button"
-                    title={t("actions.edit")}
-                    aria-label={t("actions.edit")}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      router.push(`/jobs/${job.id}/edit`);
-                    }}
+                <div className="flex items-center justify-end">
+                  <div
+                    className="relative"
+                    ref={job.id === openMenuId ? menuRef : null}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M4 20h4l11-11-4-4L4 16v4Z"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="m14 6 4 4"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    title={t("table.quickStatus")}
-                    aria-label={t("table.quickStatus")}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onStatusAction(job);
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 6v6l4 2"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="8"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      />
-                    </svg>
-                  </button>
+                    <button
+                      type="button"
+                      aria-label={t("table.actionsMenu")}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenMenuId((prev) => (prev === job.id ? null : job.id));
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <circle cx="5" cy="12" r="1.7" fill="currentColor" />
+                        <circle cx="12" cy="12" r="1.7" fill="currentColor" />
+                        <circle cx="19" cy="12" r="1.7" fill="currentColor" />
+                      </svg>
+                    </button>
+                    {openMenuId === job.id ? (
+                      <div className="absolute right-0 top-11 z-20 w-44 rounded-2xl border border-slate-200/70 bg-white/95 p-2 text-sm text-slate-700 shadow-lg">
+                        <button
+                          type="button"
+                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setOpenMenuId(null);
+                            router.push(`/jobs/${job.id}/edit`);
+                          }}
+                        >
+                          {t("actions.edit")}
+                        </button>
+                        <button
+                          type="button"
+                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setOpenMenuId(null);
+                            onStatusAction(job);
+                          }}
+                        >
+                          {t("actions.changeStatus")}
+                        </button>
+                        <button
+                          type="button"
+                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setOpenMenuId(null);
+                            onHistoryAction(job);
+                          }}
+                        >
+                          {t("actions.viewHistory")}
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>

@@ -22,6 +22,17 @@
       "contact": "Contato",
       "address": "Endereco"
     },
+    "address": {
+      "primary": "Principal",
+      "notes": "Notas do endereco",
+      "fallbackLabel": "Endereco"
+    },
+    "jobs": {
+      "title": "Ordens do cliente",
+      "subtitle": "Ordens vinculadas a este cliente.",
+      "empty": "Nenhuma ordem vinculada a este cliente.",
+      "titleFallback": "Ordem sem titulo"
+    },
     "history": {
       "title": "Historico recente",
       "subtitle": "Sem registros ainda",

@@ -53,6 +53,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         ? customer.addresses.map((address) => ({
             type: address.type,
             label: address.label ?? "",
+            note: address.note ?? "",
             address_line1: address.address_line1,
             address_line2: address.address_line2 ?? "",
             city: address.city,
@@ -216,6 +217,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
           append({
             type: "residential",
             label: "",
+            note: "",
             address_line1: "",
             address_line2: "",
             city: "",

@@ -35,6 +35,8 @@ export default function NewJobForm() {
   const [showSelector, setShowSelector] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
+  const [allowInactive, setAllowInactive] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -56,6 +58,7 @@ export default function NewJobForm() {
     register("isRecurring");
     register("recurrence");
     register("notes");
+    register("allowInactive");
   }, [register]);
 
   useEffect(() => {
@@ -123,17 +126,25 @@ export default function NewJobForm() {
 
   const filteredEmployees = useMemo(() => {
     const search = filter.trim().toLowerCase();
+    const baseEmployees = showInactive
+      ? employees
+      : employees.filter((employee) => employee.status === "active");
     if (!search) {
-      return employees;
+      return baseEmployees;
     }
-    return employees.filter((employee) =>
+    return baseEmployees.filter((employee) =>
       employee.full_name.toLowerCase().includes(search)
     );
-  }, [employees, filter]);
+  }, [employees, filter, showInactive]);
 
   const handleAddEmployee = (employeeId: string) => {
     const current = assignedEmployeeIds ?? [];
     if (current.includes(employeeId)) {
+      return;
+    }
+    const selected = employees.find((employee) => employee.id === employeeId);
+    if (selected?.status === "inactive" && !allowInactive) {
+      setToast({ message: t("assignment.inactiveError"), variant: "error" });
       return;
     }
     setValue("assignedEmployeeIds", [...current, employeeId], {
@@ -160,8 +171,11 @@ export default function NewJobForm() {
       });
 
       if (!response.ok) {
-        const data = (await response.json()) as { error?: string };
-        throw new Error(data?.error ?? t("messages.createError"));
+        const data = (await response.json()) as { error?: string; message?: string };
+        if (data?.error === "EMPLOYEE_INACTIVE") {
+          throw new Error(t("assignment.inactiveError"));
+        }
+        throw new Error(data?.error ?? data?.message ?? t("messages.createError"));
       }
 
       reset();
@@ -300,6 +314,40 @@ export default function NewJobForm() {
             {showSelector ? t("assignment.hideSelector") : t("assignment.add")}
           </Button>
         </div>
+        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+              checked={showInactive}
+              onChange={(event) => {
+                const next = event.target.checked;
+                setShowInactive(next);
+                if (!next) {
+                  setAllowInactive(false);
+                  setValue("allowInactive", false, { shouldDirty: true });
+                }
+              }}
+            />
+            <span>{t("assignment.showInactive")}</span>
+          </label>
+          {showInactive ? (
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+                checked={allowInactive}
+                onChange={(event) => {
+                  setAllowInactive(event.target.checked);
+                  setValue("allowInactive", event.target.checked, {
+                    shouldDirty: true
+                  });
+                }}
+              />
+              <span>{t("assignment.allowInactive")}</span>
+            </label>
+          ) : null}
+        </div>
 
         {assignedEmployees.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
@@ -318,13 +366,20 @@ export default function NewJobForm() {
                   </p>
                   <p className="text-xs text-slate-500">{employee.email}</p>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleRemoveEmployee(employee.id)}
-                >
-                  {tCommon("actions.remove")}
-                </Button>
+                <div className="flex items-center gap-2">
+                  {employee.status === "inactive" ? (
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+                      {t("assignment.inactiveBadge")}
+                    </span>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => handleRemoveEmployee(employee.id)}
+                  >
+                    {tCommon("actions.remove")}
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -346,6 +401,8 @@ export default function NewJobForm() {
               <div className="space-y-2">
                 {filteredEmployees.map((employee) => {
                   const isSelected = assignedEmployeeIds?.includes(employee.id);
+                  const isInactive = employee.status === "inactive";
+                  const disabled = isInactive && !allowInactive;
                   return (
                     <button
                       key={employee.id}
@@ -354,8 +411,10 @@ export default function NewJobForm() {
                       className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition ${
                         isSelected
                           ? "border-brand-200 bg-brand-50 text-brand-700"
-                          : "border-slate-200/70 bg-white/90 text-slate-700 hover:bg-slate-50/60"
-                      }`}
+                          : disabled
+                            ? "border-slate-200/70 bg-white/90 text-slate-400 opacity-70"
+                            : "border-slate-200/70 bg-white/90 text-slate-700 hover:bg-slate-50/60"
+                      } ${disabled ? "cursor-not-allowed" : ""}`}
                     >
                       <div>
                         <p className="font-semibold text-slate-900">
@@ -365,9 +424,16 @@ export default function NewJobForm() {
                           {employee.email}
                         </p>
                       </div>
-                      <span className="text-xs font-semibold">
-                        {isSelected ? t("assignment.selected") : t("assignment.add")}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {isInactive ? (
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+                            {t("assignment.inactiveBadge")}
+                          </span>
+                        ) : null}
+                        <span className="text-xs font-semibold">
+                          {isSelected ? t("assignment.selected") : t("assignment.add")}
+                        </span>
+                      </div>
                     </button>
                   );
                 })}

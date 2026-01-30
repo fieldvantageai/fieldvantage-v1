@@ -186,6 +186,7 @@ export default function NewCustomerForm() {
           append({
             type: "residential",
             label: "",
+            note: "",
             address_line1: "",
             address_line2: "",
             city: "",

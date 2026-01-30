@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
+import OrderStatusControl from "@/components/orders/OrderStatusControl";
 import { getCustomerById } from "@/features/customers/service";
 import { listEmployees } from "@/features/employees/service";
-import { getJobById, listJobEvents } from "@/features/jobs/service";
+import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 
@@ -32,7 +32,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const primaryAddress =
     customer?.addresses.find((address) => address.is_primary) ??
     customer?.addresses[0];
-  const jobEvents = await listJobEvents(job.id);
+  const statusEvents = await listOrderStatusEventsWithActors(job.id);
 
   const dateTimeFormatter = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
@@ -53,42 +53,19 @@ export default async function JobDetailPage({ params }: PageProps) {
   const formatTemplate = (template: string, values: Record<string, string | number>) =>
     template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
   const expectedHasTime = job.estimated_end_at?.includes("T");
-  const statusVariant =
-    job.status === "done"
-      ? "success"
-      : job.status === "in_progress"
-        ? "warning"
-        : job.status === "canceled"
-          ? "danger"
-          : "default";
-
-  const createdFallback = {
-    id: "created-fallback",
-    event_type: "created",
-    occurred_at: job.created_at
-  };
-  const createdExists = jobEvents.some((event) => event.event_type === "created");
-  const historyEvents = (createdExists
-    ? jobEvents
-    : [createdFallback, ...jobEvents]
-  ).sort(
-    (left, right) =>
-      new Date(right.occurred_at).getTime() -
-      new Date(left.occurred_at).getTime()
-  );
-
-  const historyLabel = (event: { event_type?: string; to_status?: string | null }) => {
-    if (event.event_type === "created") {
-      return t("detail.history.createdLabel");
+  const historyItems = [
+    ...statusEvents,
+    {
+      id: `created-${job.id}`,
+      changed_at: job.created_at,
+      old_status: null,
+      new_status: job.status,
+      changed_by: null,
+      actor_name: null,
+      actor_email: null,
+      type: "created" as const
     }
-    if (event.event_type === "status_changed") {
-      const statusLabel = event.to_status
-        ? t(`status.${event.to_status}`)
-        : t("detail.history.statusFallback");
-      return `${t("detail.history.statusChangedLabel")} ${statusLabel}`;
-    }
-    return t("detail.history.eventFallback");
-  };
+  ];
 
   return (
     <div className="space-y-6">
@@ -125,7 +102,7 @@ export default async function JobDetailPage({ params }: PageProps) {
               {tCommon("labels.status")}
             </p>
             <div className="mt-2">
-              <Badge variant={statusVariant}>{t(`status.${job.status}`)}</Badge>
+              <OrderStatusControl orderId={job.id} status={job.status} />
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
@@ -152,6 +129,55 @@ export default async function JobDetailPage({ params }: PageProps) {
           </div>
         </div>
       </Section>
+
+      <div id="history">
+        <Section title={t("detail.history.title")} description={t("detail.history.subtitle")}>
+          <div className="space-y-3">
+            {statusEvents.length === 0 ? (
+              <p className="text-sm text-slate-500">{t("detail.history.emptyStatus")}</p>
+            ) : null}
+            {historyItems.map((event) => {
+              const isCreated = "type" in event && event.type === "created";
+              const newStatusLabel = event.new_status
+                ? t(`status.${event.new_status}`)
+                : t("detail.history.statusFallback");
+              const oldStatusLabel = event.old_status
+                ? t(`status.${event.old_status}`)
+                : null;
+              const actorLabel =
+                event.actor_name || event.actor_email || t("detail.history.userFallback");
+              return (
+                <div
+                  key={event.id}
+                  className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3"
+                >
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-500" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {isCreated
+                        ? t("detail.history.createdLabel")
+                        : t("detail.history.statusChangedLabel")}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {isCreated
+                        ? newStatusLabel
+                        : oldStatusLabel
+                          ? formatTemplate(t("detail.history.fromTo"), {
+                              from: oldStatusLabel,
+                              to: newStatusLabel
+                            })
+                          : newStatusLabel}
+                    </p>
+                    <div className="text-xs text-slate-400">
+                      {actorLabel} · {formatDateTime(event.changed_at)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Section>
+      </div>
 
       {job.is_recurring ? (
         <div className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-600">
@@ -246,27 +272,6 @@ export default async function JobDetailPage({ params }: PageProps) {
           </div>
         </Section>
       ) : null}
-
-      <Section title={t("detail.history.title")} description={t("detail.history.subtitle")}>
-        <div className="space-y-3">
-          {historyEvents.map((event) => (
-            <div
-              key={event.id}
-              className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3"
-            >
-              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-500" />
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-900">
-                  {historyLabel(event)}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {formatDateTime(event.occurred_at)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
     </div>
   );
 }

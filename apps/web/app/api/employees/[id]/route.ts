@@ -33,6 +33,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
     }
+    const current = await getEmployeeById(id);
+    if (!current) {
+      return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
+    }
     const body = await request.json();
     const input = await newEmployeeSchema.validate(body, {
       abortEarly: false,
@@ -63,6 +67,21 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     if (!updated) {
       return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
+    }
+
+    if (updated.email && current.status !== updated.status) {
+      const { data } = await supabaseAdmin.auth.admin.listUsers();
+      const authUser = data?.users?.find(
+        (item) => item.email?.toLowerCase() === updated.email?.toLowerCase()
+      );
+      if (authUser?.id) {
+        await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
+          user_metadata: {
+            ...(authUser.user_metadata ?? {}),
+            is_active: updated.status === "active"
+          }
+        });
+      }
     }
 
     let avatarSignedUrl: string | null = null;

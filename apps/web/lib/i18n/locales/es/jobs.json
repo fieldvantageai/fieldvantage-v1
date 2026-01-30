@@ -4,7 +4,9 @@
   "actions": {
     "new": "Nuevo trabajo",
     "delete": "Eliminar trabajo",
-    "edit": "Editar"
+    "edit": "Editar",
+    "changeStatus": "Cambiar estado",
+    "viewHistory": "Ver historial"
   },
   "new": {
     "title": "Nuevo trabajo",
@@ -47,7 +49,8 @@
     "titleFallback": "Sin titulo",
     "assignedFallback": "Sin responsable",
     "actions": "Acciones",
-    "quickStatus": "Actualizar estado"
+    "quickStatus": "Actualizar estado",
+    "actionsMenu": "Abrir acciones"
   },
   "statusUpdate": {
     "title": "Actualizar estado",
@@ -94,9 +97,14 @@
       "title": "Historial",
       "subtitle": "Actualizaciones mas recientes.",
       "createdLabel": "Orden creada",
-      "statusChangedLabel": "Estado cambiado a",
+      "statusChangedLabel": "Estado cambiado",
       "statusFallback": "Estado no informado",
-      "eventFallback": "Actualizacion registrada"
+      "eventFallback": "Actualizacion registrada",
+      "emptyStatus": "No hay cambios de estado registrados.",
+      "fromTo": "De {from} a {to}",
+      "userLabel": "Por",
+      "userFallback": "Sistema",
+      "updateStatus": "Actualizar estado"
     },
     "recurrence": {
       "label": "Recurrente",
@@ -132,7 +140,11 @@
     "filterLabel": "Filtrar por nombre",
     "filterPlaceholder": "Escribe para buscar",
     "filterEmpty": "No se encontraron empleados.",
-    "selected": "Seleccionado"
+    "selected": "Seleccionado",
+    "showInactive": "Mostrar inactivos",
+    "allowInactive": "Permitir inactivos (backdated)",
+    "inactiveBadge": "Inactivo",
+    "inactiveError": "Este empleado esta inactivo y no se puede asignar."
   },
   "recurrence": {
     "title": "Recurrencia personalizada",

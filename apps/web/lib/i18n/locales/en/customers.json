@@ -22,6 +22,17 @@
       "contact": "Contact",
       "address": "Address"
     },
+    "address": {
+      "primary": "Primary",
+      "notes": "Address notes",
+      "fallbackLabel": "Address"
+    },
+    "jobs": {
+      "title": "Jobs for this customer",
+      "subtitle": "Jobs linked to this customer.",
+      "empty": "No jobs linked to this customer.",
+      "titleFallback": "Untitled job"
+    },
     "history": {
       "title": "Recent history",
       "subtitle": "No records yet",

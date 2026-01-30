@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/Badge";
 import type { JobStatus } from "@fieldvantage/shared";
 import { useClientT } from "@/lib/i18n/useClientT";

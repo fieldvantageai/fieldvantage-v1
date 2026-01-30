@@ -21,6 +21,12 @@
       "subtitle": "Detalles del colaborador.",
       "contact": "Contacto",
       "phoneFallback": "Telefono no informado"
+    },
+    "jobs": {
+      "title": "Trabajos asignados",
+      "subtitle": "Trabajos en los que este empleado esta asignado.",
+      "empty": "No hay trabajos asignados a este empleado.",
+      "titleFallback": "Trabajo sin titulo"
     }
   },
   "list": {
@@ -54,7 +60,7 @@
     "zipCode": "Codigo postal",
     "country": "Pais",
     "notes": "Notas",
-    "role": "Cargo",
+    "role": "Rol de acceso",
     "activeStatus": "Empleado activo"
   },
   "messages": {

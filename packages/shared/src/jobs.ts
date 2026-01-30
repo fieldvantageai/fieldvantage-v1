@@ -36,6 +36,7 @@ export const newJobSchema = yup.object({
     .oneOf(["scheduled", "in_progress", "done", "canceled"])
     .required("Status obrigatorio."),
   assignedEmployeeIds: yup.array().of(yup.string().required()).default([]),
+  allowInactive: yup.boolean().default(false),
   isRecurring: yup.boolean().default(false),
   recurrence: yup
     .mixed<JobRecurrence>()
