@@ -36,7 +36,14 @@ export async function POST(request: Request) {
         "id, company_id, employee_id, status, expires_at, employee:employee_id(id, user_id, email)"
       )
       .eq("token_hash", tokenHash)
-      .maybeSingle();
+      .maybeSingle<{
+        id: string;
+        company_id: string;
+        employee_id: string;
+        status: string;
+        expires_at: string;
+        employee: { id: string; user_id: string | null; email: string | null } | null;
+      }>();
 
     if (inviteError) {
       return NextResponse.json({ error: inviteError.message }, { status: 500 });

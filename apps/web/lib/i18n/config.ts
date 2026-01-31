@@ -8,6 +8,8 @@ export const namespaces = [
   "auth",
   "dashboard",
   "customers",
+  "invites",
+  "access",
   "jobs",
   "employees",
   "teams",

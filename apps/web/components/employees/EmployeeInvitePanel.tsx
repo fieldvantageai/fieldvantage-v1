@@ -215,6 +215,9 @@ export default function EmployeeInvitePanel({
             type="button"
             variant="secondary"
             onClick={async () => {
+              if (!inviteLink) {
+                return;
+              }
               try {
                 await navigator.clipboard.writeText(inviteLink);
                 setToast({

@@ -19,7 +19,19 @@ export async function GET(request: Request) {
       "id, expires_at, status, employee:employee_id(id, first_name, last_name, email, user_id), company:company_id(id, name, logo_url)"
     )
     .eq("token_hash", tokenHash)
-    .maybeSingle();
+    .maybeSingle<{
+      id: string;
+      expires_at: string;
+      status: string;
+      employee: {
+        id: string;
+        first_name: string | null;
+        last_name: string | null;
+        email: string | null;
+        user_id: string | null;
+      } | null;
+      company: { id: string; name: string; logo_url: string | null } | null;
+    }>();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

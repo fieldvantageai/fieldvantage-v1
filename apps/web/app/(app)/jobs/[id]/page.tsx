@@ -160,7 +160,10 @@ export default async function JobDetailPage({ params }: PageProps) {
                 : null;
               const actorLabel =
                 event.actor_name || event.actor_email || t("detail.history.userFallback");
-              const note = event.note?.trim();
+              const note =
+                "note" in event && typeof event.note === "string"
+                  ? event.note.trim()
+                  : null;
               return (
                 <div
                   key={event.id}

@@ -4,19 +4,39 @@ import { getMyCompany, upsertMyCompany } from "@/features/companies/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+type CompanySummary = {
+  id: string;
+  name: string;
+  logo_url?: string | null;
+};
+
+const toCompanySummary = (
+  company?: { id: string; name: string; logo_url?: string | null } | null
+) =>
+  company
+    ? {
+        id: company.id,
+        name: company.name,
+        logo_url: company.logo_url ?? null
+      }
+    : null;
+
 export async function GET() {
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  let company = await getMyCompany();
+  const ownerCompany = await getMyCompany();
+  let company = toCompanySummary(ownerCompany);
   if (!company) {
     const { data: employee } = await supabaseAdmin
       .from("employees")
       .select("company:company_id(id, name, logo_url)")
       .eq("user_id", user.id)
-      .maybeSingle();
-    company = (employee?.company as typeof company) ?? null;
+      .maybeSingle<{
+        company: { id: string; name: string; logo_url: string | null } | null;
+      }>();
+    company = employee?.company ?? null;
   }
   if (!company?.logo_url) {
     return NextResponse.json({ data: company });
@@ -62,7 +82,8 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const company = await upsertMyCompany(body as { name: string });
+    const updated = await upsertMyCompany(body as { name: string });
+    const company = toCompanySummary(updated);
 
     if (!company?.logo_url) {
       return NextResponse.json({ data: company });
