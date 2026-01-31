@@ -10,6 +10,8 @@ import { locales, type Locale } from "@/lib/i18n/config";
 import { useLocale } from "@/lib/i18n/localeClient";
 import { useClientT } from "@/lib/i18n/useClientT";
 
+type NavigationPreference = "auto" | "google_maps" | "apple_maps" | "waze";
+
 const FlagIcon = ({ locale }: { locale: Locale }) => {
   if (locale === "pt-BR") {
     return (
@@ -46,10 +48,53 @@ export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState<"app" | "company">("app");
   const { locale, updateLocale } = useLocale();
   const [pendingLocale, setPendingLocale] = useState<Locale>(locale);
+  const [navigationPreference, setNavigationPreference] =
+    useState<NavigationPreference>("auto");
+  const [pendingNavigationPreference, setPendingNavigationPreference] =
+    useState<NavigationPreference>("auto");
+  const [isLoadingNavigation, setIsLoadingNavigation] = useState(true);
 
   useEffect(() => {
     setPendingLocale(locale);
   }, [locale]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPreference = async () => {
+      try {
+        const response = await fetch("/api/user/preferences", {
+          cache: "no-store"
+        });
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as {
+          data?: { preferred_navigation_app?: NavigationPreference | null };
+        };
+        const preference = payload.data?.preferred_navigation_app ?? "auto";
+        if (isMounted) {
+          setNavigationPreference(preference);
+          setPendingNavigationPreference(preference);
+        }
+      } catch {
+        if (isMounted) {
+          setNavigationPreference("auto");
+          setPendingNavigationPreference("auto");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingNavigation(false);
+        }
+      }
+    };
+
+    loadPreference();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const localeOptions = useMemo(
     () =>
@@ -60,14 +105,52 @@ export default function SettingsPanel() {
     [t]
   );
 
-  const handleApply = () => {
+  const isIOS = useMemo(
+    () =>
+      typeof navigator !== "undefined" && /iPad|iPhone|iPod/i.test(navigator.userAgent),
+    []
+  );
+
+  const navigationOptions = useMemo(() => {
+    const base = [
+      { value: "auto", label: t("navigation.options.auto") },
+      { value: "google_maps", label: t("navigation.options.google") },
+      { value: "waze", label: t("navigation.options.waze") }
+    ] as Array<{ value: NavigationPreference; label: string }>;
+    if (isIOS) {
+      base.splice(2, 0, {
+        value: "apple_maps",
+        label: t("navigation.options.apple")
+      });
+    }
+    return base;
+  }, [t, isIOS]);
+
+  const handleApply = async () => {
     if (pendingLocale !== locale) {
       updateLocale(pendingLocale);
+    }
+    if (
+      !isLoadingNavigation &&
+      pendingNavigationPreference !== navigationPreference
+    ) {
+      const response = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preferred_navigation_app: pendingNavigationPreference
+        })
+      });
+      if (response.ok) {
+        setNavigationPreference(pendingNavigationPreference);
+      }
     }
   };
 
   const hasLocaleChanges = pendingLocale !== locale;
-  const hasChanges = hasLocaleChanges;
+  const hasNavigationChanges =
+    pendingNavigationPreference !== navigationPreference && !isLoadingNavigation;
+  const hasChanges = hasLocaleChanges || hasNavigationChanges;
 
   return (
     <div className="space-y-6">
@@ -89,43 +172,81 @@ export default function SettingsPanel() {
       </div>
 
       {activeTab === "app" ? (
-        <Section
-          title={t("locale.title")}
-          description={t("locale.subtitle")}
-        >
-          <div className="max-w-sm space-y-2">
-            <label className="text-sm font-medium text-slate-700">
-              {t("locale.label")}
-            </label>
-            <div className="space-y-2">
-              {localeOptions.map((option) => {
-                const isSelected = pendingLocale === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPendingLocale(option.value)}
-                    className={`flex w-full items-center justify-between rounded-2xl border px-4 py-2.5 text-sm transition ${
-                      isSelected
-                        ? "border-brand-300 bg-brand-50 text-brand-700"
-                        : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
-                    }`}
-                    aria-pressed={isSelected}
-                  >
-                    <span className="flex items-center gap-2">
-                      <FlagIcon locale={option.value} />
-                      {option.label}
-                    </span>
-                    {isSelected ? (
-                      <span className="text-xs font-semibold">✓</span>
-                    ) : null}
-                  </button>
-                );
-              })}
+        <div className="space-y-6">
+          <Section
+            title={t("locale.title")}
+            description={t("locale.subtitle")}
+          >
+            <div className="max-w-sm space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                {t("locale.label")}
+              </label>
+              <div className="space-y-2">
+                {localeOptions.map((option) => {
+                  const isSelected = pendingLocale === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPendingLocale(option.value)}
+                      className={`flex w-full items-center justify-between rounded-2xl border px-4 py-2.5 text-sm transition ${
+                        isSelected
+                          ? "border-brand-300 bg-brand-50 text-brand-700"
+                          : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                      }`}
+                      aria-pressed={isSelected}
+                    >
+                      <span className="flex items-center gap-2">
+                        <FlagIcon locale={option.value} />
+                        {option.label}
+                      </span>
+                      {isSelected ? (
+                        <span className="text-xs font-semibold">✓</span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500">{t("locale.helper")}</p>
             </div>
-            <p className="text-xs text-slate-500">{t("locale.helper")}</p>
-          </div>
-        </Section>
+          </Section>
+
+          <Section
+            title={t("navigation.title")}
+            description={t("navigation.subtitle")}
+          >
+            <div className="max-w-sm space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                {t("navigation.label")}
+              </label>
+              <div className="space-y-2">
+                {navigationOptions.map((option) => {
+                  const isSelected = pendingNavigationPreference === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPendingNavigationPreference(option.value)}
+                      className={`flex w-full items-center justify-between rounded-2xl border px-4 py-2.5 text-sm transition ${
+                        isSelected
+                          ? "border-brand-300 bg-brand-50 text-brand-700"
+                          : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                      }`}
+                      aria-pressed={isSelected}
+                      disabled={isLoadingNavigation}
+                    >
+                      <span>{option.label}</span>
+                      {isSelected ? (
+                        <span className="text-xs font-semibold">✓</span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500">{t("navigation.helper")}</p>
+            </div>
+          </Section>
+        </div>
       ) : (
         <Section
           title={t("companyProfile.title")}

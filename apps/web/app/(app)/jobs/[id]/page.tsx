@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
 import OrderStatusControl from "@/components/orders/OrderStatusControl";
+import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById } from "@/features/customers/service";
 import { listEmployees } from "@/features/employees/service";
 import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
@@ -208,9 +209,12 @@ export default async function JobDetailPage({ params }: PageProps) {
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-400">
-              {t("detail.customer.fields.address")}
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs uppercase text-slate-400">
+                {t("detail.customer.fields.address")}
+              </p>
+              <OpenInMapsButton address={primaryAddress ?? null} label="Direções" />
+            </div>
             {primaryAddress ? (
               <div className="mt-2 text-sm text-slate-700">
                 <p>{primaryAddress.address_line1}</p>

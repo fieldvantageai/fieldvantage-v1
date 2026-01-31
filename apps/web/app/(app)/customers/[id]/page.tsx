@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { Section } from "@/components/ui/Section";
+import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById, listCustomerJobs } from "@/features/customers/service";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -106,12 +107,15 @@ export default async function CustomerDetailPage({ params }: PageProps) {
                             ) : null}
                           </div>
                         </div>
-                        {notes ? (
-                          <AddressNotesModal
-                            notes={notes}
-                            label={t("detail.address.notes")}
-                          />
-                        ) : null}
+                        <div className="flex items-center gap-2">
+                          <OpenInMapsButton address={address} label="Abrir no mapa" />
+                          {notes ? (
+                            <AddressNotesModal
+                              notes={notes}
+                              label={t("detail.address.notes")}
+                            />
+                          ) : null}
+                        </div>
                       </div>
                       <div className="mt-2 text-sm text-slate-700">
                         <p>

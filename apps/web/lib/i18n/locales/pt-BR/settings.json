@@ -11,6 +11,18 @@
     "label": "Idioma",
     "helper": "A escolha fica salva para este dispositivo."
   },
+  "navigation": {
+    "title": "Navegacao",
+    "subtitle": "Defina o app preferido para abrir enderecos.",
+    "label": "App de navegacao",
+    "helper": "Voce pode deixar em automatico e trocar quando quiser.",
+    "options": {
+      "auto": "Automatico (recomendado)",
+      "google": "Google Maps",
+      "apple": "Apple Maps (iOS)",
+      "waze": "Waze"
+    }
+  },
   "roles": {
     "title": "Cargos disponiveis",
     "subtitle": "Papeis padrao para colaboradores.",

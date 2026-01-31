@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Employee, EmployeeRole, EmployeeStatus } from "@fieldvantage/shared";
+import type {
+  Employee,
+  EmployeeRole,
+  EmployeeStatus,
+  NavigationPreference
+} from "@fieldvantage/shared";
 
 type EmployeeRow = {
   id: string;
@@ -19,6 +24,7 @@ type EmployeeRow = {
   state: string | null;
   zip_code: string | null;
   country: string | null;
+  preferred_navigation_app: NavigationPreference | null;
   role: EmployeeRole;
   is_active: boolean;
   created_at: string;
@@ -40,6 +46,7 @@ export type CreateEmployeeInput = {
   state?: string | null;
   zip_code?: string | null;
   country?: string | null;
+  preferred_navigation_app?: NavigationPreference | null;
   role: EmployeeRole;
   status: EmployeeStatus;
 };
@@ -63,6 +70,7 @@ const toEmployee = (row: EmployeeRow): Employee => ({
   state: row.state,
   zip_code: row.zip_code,
   country: row.country,
+  preferred_navigation_app: row.preferred_navigation_app,
   role: row.role,
   status: row.is_active ? "active" : "inactive",
   created_at: row.created_at,
@@ -76,7 +84,7 @@ export async function listEmployees(
   const { data, error } = await supabase
     .from("employees")
     .select(
-      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, role, is_active, created_at, updated_at"
+      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, preferred_navigation_app, role, is_active, created_at, updated_at"
     )
     .eq("company_id", companyId)
     .order("full_name");
@@ -96,7 +104,7 @@ export async function getEmployeeById(
   const { data, error } = await supabase
     .from("employees")
     .select(
-      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, role, is_active, created_at, updated_at"
+      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, preferred_navigation_app, role, is_active, created_at, updated_at"
     )
     .eq("company_id", companyId)
     .eq("id", id)
@@ -130,6 +138,7 @@ export async function createEmployee(
     state: input.state ?? null,
     zip_code: input.zip_code ?? null,
     country: input.country ?? null,
+    preferred_navigation_app: input.preferred_navigation_app ?? null,
     role: input.role,
     is_active: input.status === "active"
   };
@@ -138,7 +147,7 @@ export async function createEmployee(
     .from("employees")
     .insert(payload)
     .select(
-      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, role, is_active, created_at, updated_at"
+      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, preferred_navigation_app, role, is_active, created_at, updated_at"
     )
     .single();
 
@@ -170,6 +179,7 @@ export async function updateEmployee(
     state: input.state ?? null,
     zip_code: input.zip_code ?? null,
     country: input.country ?? null,
+    preferred_navigation_app: input.preferred_navigation_app ?? null,
     role: input.role,
     is_active: input.status ? input.status === "active" : undefined
   };
@@ -180,7 +190,7 @@ export async function updateEmployee(
     .eq("company_id", companyId)
     .eq("id", id)
     .select(
-      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, role, is_active, created_at, updated_at"
+      "id, company_id, first_name, last_name, full_name, avatar_url, email, phone, job_title, notes, address_line1, address_line2, city, state, zip_code, country, preferred_navigation_app, role, is_active, created_at, updated_at"
     )
     .maybeSingle();
 

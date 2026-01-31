@@ -11,6 +11,18 @@
     "label": "Language",
     "helper": "Your choice is saved for this device."
   },
+  "navigation": {
+    "title": "Navigation",
+    "subtitle": "Choose the preferred app for addresses.",
+    "label": "Navigation app",
+    "helper": "You can keep it on auto and change it anytime.",
+    "options": {
+      "auto": "Auto (recommended)",
+      "google": "Google Maps",
+      "apple": "Apple Maps (iOS)",
+      "waze": "Waze"
+    }
+  },
   "roles": {
     "title": "Available roles",
     "subtitle": "Default roles for employees.",
