@@ -26,6 +26,7 @@ export default function AppShell({ children }: AppShellProps) {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [userEmployeeId, setUserEmployeeId] = useState<string | null>(null);
+  const [userCompanyId, setUserCompanyId] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -82,61 +83,42 @@ export default function AppShell({ children }: AppShellProps) {
       try {
         const supabase = createSupabaseBrowserClient();
         const { data } = await supabase.auth.getUser();
-        const userEmail = data.user?.email ?? null;
         const meta = data.user?.user_metadata as Record<string, string> | undefined;
-        const resolvedName =
+
+        const meResponse = await fetch("/api/employees/me", {
+          cache: "no-store"
+        });
+        if (meResponse.ok) {
+          const payload = (await meResponse.json()) as {
+            data?: {
+              id: string;
+              company_id: string;
+              full_name: string;
+              role: string;
+              avatar_signed_url?: string | null;
+              avatar_url?: string | null;
+            };
+          };
+          const me = payload.data;
+          if (me && isMounted) {
+            setUserEmployeeId(me.id);
+            setUserCompanyId(me.company_id);
+            setUserName(me.full_name);
+            setUserRole(me.role);
+            setUserAvatarUrl(me.avatar_signed_url ?? me.avatar_url ?? null);
+            return;
+          }
+        }
+
+        const fallbackName =
           meta?.owner_name ||
           meta?.full_name ||
           meta?.name ||
-          userEmail ||
+          data.user?.email ||
           null;
-        const resolvedRole = meta?.role ?? null;
         if (isMounted) {
-          setUserName(resolvedName);
-          setUserRole(resolvedRole);
-        }
-
-        if (userEmail) {
-          const response = await fetch("/api/employees", { cache: "no-store" });
-          if (response.ok) {
-            const payload = (await response.json()) as {
-              data?: Array<{
-                id: string;
-                email?: string | null;
-                full_name: string;
-              }>;
-            };
-            const employees = payload.data ?? [];
-            const match =
-              employees.find(
-                (employee) =>
-                  employee.email?.toLowerCase() === userEmail.toLowerCase()
-              ) ??
-              employees.find(
-                (employee) =>
-                  resolvedName &&
-                  employee.full_name?.toLowerCase() === resolvedName.toLowerCase()
-              );
-            if (match?.id && isMounted) {
-              setUserEmployeeId(match.id);
-              const detailResponse = await fetch(`/api/employees/${match.id}`, {
-                cache: "no-store"
-              });
-              if (detailResponse.ok) {
-                const detailPayload = (await detailResponse.json()) as {
-                  data?: {
-                    avatar_signed_url?: string | null;
-                    avatar_url?: string | null;
-                  };
-                };
-                const resolvedAvatar =
-                  detailPayload.data?.avatar_signed_url ??
-                  detailPayload.data?.avatar_url ??
-                  null;
-                setUserAvatarUrl(resolvedAvatar);
-              }
-            }
-          }
+          setUserName(fallbackName);
+          setUserRole(meta?.role ?? null);
         }
       } catch {
         if (isMounted) {
@@ -144,6 +126,7 @@ export default function AppShell({ children }: AppShellProps) {
           setUserRole(null);
           setUserAvatarUrl(null);
           setUserEmployeeId(null);
+          setUserCompanyId(null);
         }
       }
     };

@@ -4,7 +4,12 @@
   "actions": {
     "new": "New employee",
     "create": "Create employee",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "edit": "Edit",
+    "toggleStatus": "Change status",
+    "viewDetails": "View details",
+    "delete": "Delete user",
+    "changeStatusError": "Could not change status."
   },
   "new": {
     "title": "New employee",
@@ -27,11 +32,44 @@
       "subtitle": "Jobs this employee is assigned to.",
       "empty": "No jobs assigned to this employee.",
       "titleFallback": "Untitled job"
+    },
+    "invite": {
+      "title": "Invite",
+      "subtitle": "Manage this collaborator invite link.",
+      "statusLabel": "Invite status:",
+      "statusPending": "Pending",
+      "statusAccepted": "Accepted",
+      "statusRevoked": "Revoked",
+      "statusExpired": "Expired",
+      "expiresLabel": "Expires at:",
+      "linkLabel": "Invite link",
+      "regenerate": "Generate new link",
+      "regenerateSuccess": "New invite link generated.",
+      "regenerateError": "Could not generate the invite.",
+      "revoke": "Revoke invite",
+      "revokeSuccess": "Invite revoked.",
+      "revokeError": "Could not revoke the invite.",
+      "resend": "Send by email",
+      "resendError": "Could not send the email.",
+      "resendPlaceholder": "Email not configured; copy the link.",
+      "copy": "Copy invite link",
+      "copySuccess": "Invite link copied.",
+      "copyError": "Could not copy the link.",
+      "linkUnavailable": "For security, the previous link is not shown. Generate a new link."
     }
   },
   "list": {
     "title": "Active team",
     "description": "Up-to-date team list."
+  },
+  "table": {
+    "name": "Name",
+    "email": "Email",
+    "completedJobs": "Jobs completed",
+    "createdAt": "Created at",
+    "status": "Status",
+    "actions": "Actions",
+    "actionsMenu": "Employee actions"
   },
   "search": {
     "title": "Quick search",
@@ -51,6 +89,7 @@
     "lastName": "Last name",
     "avatar": "Employee photo",
     "email": "Email",
+    "emailOptional": "Email (optional — required to send invite)",
     "phone": "Phone",
     "jobTitle": "Job title",
     "addressLine1": "Address line 1",
@@ -62,6 +101,19 @@
     "notes": "Notes",
     "role": "Access role",
     "activeStatus": "Employee active"
+  },
+  "invite": {
+    "createdTitle": "Collaborator created",
+    "statusLabel": "Invite status:",
+    "pending": "Pending",
+    "expiresLabel": "Expires at:",
+    "linkLabel": "Invite link",
+    "copy": "Copy invite link",
+    "copied": "Invite link copied",
+    "copyError": "Could not copy the link.",
+    "sendEmail": "Send invite email",
+    "emailUnavailable": "Email sending not available yet — copy the link.",
+    "createAnother": "Create another collaborator"
   },
   "messages": {
     "created": "Employee created.",

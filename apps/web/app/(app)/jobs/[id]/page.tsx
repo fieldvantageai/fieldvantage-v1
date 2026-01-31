@@ -10,6 +10,7 @@ import { listEmployees } from "@/features/employees/service";
 import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -20,6 +21,16 @@ export default async function JobDetailPage({ params }: PageProps) {
   const locale = await getServerLocale();
   const t = await getT(locale, "jobs");
   const tCommon = await getT(locale, "common");
+  const supabase = await createSupabaseServerClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const { data: employeeRole } = authData?.user
+    ? await supabase
+        .from("employees")
+        .select("role")
+        .eq("user_id", authData.user.id)
+        .maybeSingle()
+    : { data: null };
+  const isCollaborator = employeeRole?.role === "employee";
   const job = await getJobById(id);
 
   if (!job) {
@@ -91,9 +102,11 @@ export default async function JobDetailPage({ params }: PageProps) {
             )}
           </p>
         </div>
-        <Link href={`/jobs/${job.id}/edit`}>
-          <Button>{t("detail.edit")}</Button>
-        </Link>
+        {isCollaborator ? null : (
+          <Link href={`/jobs/${job.id}/edit`}>
+            <Button>{t("detail.edit")}</Button>
+          </Link>
+        )}
       </header>
 
       <Section title={t("detail.summary.title")} description={t("detail.summary.subtitle")}>
@@ -147,6 +160,7 @@ export default async function JobDetailPage({ params }: PageProps) {
                 : null;
               const actorLabel =
                 event.actor_name || event.actor_email || t("detail.history.userFallback");
+              const note = event.note?.trim();
               return (
                 <div
                   key={event.id}
@@ -169,6 +183,14 @@ export default async function JobDetailPage({ params }: PageProps) {
                             })
                           : newStatusLabel}
                     </p>
+                    {note ? (
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold text-slate-700">
+                          {t("detail.history.noteLabel")}:
+                        </span>{" "}
+                        {note}
+                      </p>
+                    ) : null}
                     <div className="text-xs text-slate-400">
                       {actorLabel} · {formatDateTime(event.changed_at)}
                     </div>

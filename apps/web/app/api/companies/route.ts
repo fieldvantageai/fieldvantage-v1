@@ -9,7 +9,15 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
-  const company = await getMyCompany();
+  let company = await getMyCompany();
+  if (!company) {
+    const { data: employee } = await supabaseAdmin
+      .from("employees")
+      .select("company:company_id(id, name, logo_url)")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    company = (employee?.company as typeof company) ?? null;
+  }
   if (!company?.logo_url) {
     return NextResponse.json({ data: company });
   }

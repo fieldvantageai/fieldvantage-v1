@@ -117,6 +117,39 @@ export async function DELETE(_: Request, { params }: RouteParams) {
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
+  const current = await getEmployeeById(id);
+  if (!current) {
+    return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
+  }
+
+  if (current.user_id) {
+    const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(
+      current.user_id
+    );
+    if (authDeleteError) {
+      return NextResponse.json(
+        { error: authDeleteError.message },
+        { status: 400 }
+      );
+    }
+  } else if (current.email) {
+    const { data } = await supabaseAdmin.auth.admin.listUsers();
+    const authUser = data?.users?.find(
+      (item) => item.email?.toLowerCase() === current.email?.toLowerCase()
+    );
+    if (authUser?.id) {
+      const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(
+        authUser.id
+      );
+      if (authDeleteError) {
+        return NextResponse.json(
+          { error: authDeleteError.message },
+          { status: 400 }
+        );
+      }
+    }
+  }
+
   const deleted = await deleteEmployee(id);
   if (!deleted) {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });

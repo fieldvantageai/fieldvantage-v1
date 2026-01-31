@@ -35,9 +35,14 @@ export default function OrderStatusControl({ orderId, status }: OrderStatusContr
   const [open, setOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<JobStatus>(status);
   const [changedAt, setChangedAt] = useState(toDateTimeLocalValue(new Date()));
+  const [note, setNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = async (nextStatus: JobStatus, nextChangedAt: string) => {
+  const handleSave = async (
+    nextStatus: JobStatus,
+    nextChangedAt: string,
+    nextNote: string
+  ) => {
     if (!nextChangedAt || isSaving) {
       return;
     }
@@ -47,12 +52,14 @@ export default function OrderStatusControl({ orderId, status }: OrderStatusContr
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         status: nextStatus,
-        changedAt: new Date(nextChangedAt).toISOString()
+        changedAt: new Date(nextChangedAt).toISOString(),
+        note: nextNote?.trim() || null
       })
     });
 
     if (response.ok) {
       setCurrentStatus(nextStatus);
+      setNote("");
       setOpen(false);
       router.refresh();
     }
@@ -65,6 +72,7 @@ export default function OrderStatusControl({ orderId, status }: OrderStatusContr
         type="button"
         onClick={() => {
           setChangedAt(toDateTimeLocalValue(new Date()));
+          setNote("");
           setOpen(true);
         }}
         className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-2 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
@@ -87,6 +95,7 @@ export default function OrderStatusControl({ orderId, status }: OrderStatusContr
         open={open}
         status={currentStatus}
         changedAt={changedAt}
+        note={note}
         onCancel={() => setOpen(false)}
         onSave={handleSave}
       />

@@ -51,6 +51,7 @@ export default function NewEmployeeForm() {
     try {
       const response = await fetch("/api/employees", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });
@@ -60,8 +61,12 @@ export default function NewEmployeeForm() {
         throw new Error(data?.error ?? t("messages.createError"));
       }
 
-      reset();
-      router.push("/employees");
+      const payload = (await response.json()) as {
+        employee: {
+          id: string;
+        };
+      };
+      router.push(`/employees/${payload.employee.id}`);
       router.refresh();
     } catch (error) {
       setToast({
@@ -92,6 +97,7 @@ export default function NewEmployeeForm() {
           formData.append("file", file);
           const response = await fetch("/api/employees/avatar", {
             method: "POST",
+            credentials: "include",
             body: formData
           });
           if (!response.ok) {
@@ -126,7 +132,7 @@ export default function NewEmployeeForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
-          label={t("fields.email")}
+          label={t("fields.emailOptional")}
           type="email"
           error={errors.email?.message}
           {...register("email")}

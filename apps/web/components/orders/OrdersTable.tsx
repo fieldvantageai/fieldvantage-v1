@@ -16,6 +16,7 @@ type OrdersTableProps = {
   locale: string;
   emptyMessage: string;
   isLoading: boolean;
+  canEdit: boolean;
   sortKey: SortKey;
   sortDir: "asc" | "desc";
   onSort: (key: SortKey) => void;
@@ -28,6 +29,7 @@ export default function OrdersTable({
   locale,
   emptyMessage,
   isLoading,
+  canEdit,
   sortKey,
   sortDir,
   onSort,
@@ -167,17 +169,19 @@ export default function OrdersTable({
                     </button>
                     {openMenuId === job.id ? (
                       <div className="absolute right-0 top-11 z-20 w-44 rounded-2xl border border-slate-200/70 bg-white/95 p-2 text-sm text-slate-700 shadow-lg">
-                        <button
-                          type="button"
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setOpenMenuId(null);
-                            router.push(`/jobs/${job.id}/edit`);
-                          }}
-                        >
-                          {t("actions.edit")}
-                        </button>
+                        {canEdit ? (
+                          <button
+                            type="button"
+                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setOpenMenuId(null);
+                              router.push(`/jobs/${job.id}/edit`);
+                            }}
+                          >
+                            {t("actions.edit")}
+                          </button>
+                        ) : null}
                         <button
                           type="button"
                           className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition hover:bg-slate-50"

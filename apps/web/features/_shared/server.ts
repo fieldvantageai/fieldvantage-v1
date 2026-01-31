@@ -10,10 +10,24 @@ export async function getSupabaseAuthUser() {
   if (error) {
     return null;
   }
-  if (data.user?.user_metadata?.is_active === false) {
+  if (!data.user) {
     return null;
   }
-  return data.user ?? null;
+
+  const { data: employee, error: employeeError } = await supabase
+    .from("employees")
+    .select("id, is_active")
+    .eq("user_id", data.user.id)
+    .maybeSingle();
+
+  if (employeeError || !employee) {
+    return null;
+  }
+  if (!employee.is_active) {
+    return null;
+  }
+
+  return data.user;
 }
 
 export async function getOwnerCompanyId() {

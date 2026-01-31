@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { useClientT } from "@/lib/i18n/useClientT";
 import type { Job } from "@fieldvantage/shared";
 
@@ -12,8 +13,9 @@ type StatusUpdateDialogProps = {
   open: boolean;
   status: Job["status"];
   changedAt: string;
+  note?: string;
   onCancel: () => void;
-  onSave: (status: Job["status"], changedAt: string) => void;
+  onSave: (status: Job["status"], changedAt: string, note: string) => void;
 };
 
 const toDateTimeLocalValue = (value?: string | null) => {
@@ -34,6 +36,7 @@ export default function StatusUpdateDialog({
   open,
   status,
   changedAt,
+  note = "",
   onCancel,
   onSave
 }: StatusUpdateDialogProps) {
@@ -43,13 +46,15 @@ export default function StatusUpdateDialog({
   const [draftChangedAt, setDraftChangedAt] = useState(
     toDateTimeLocalValue(changedAt)
   );
+  const [draftNote, setDraftNote] = useState(note);
 
   useEffect(() => {
     if (open) {
       setDraftStatus(status);
       setDraftChangedAt(toDateTimeLocalValue(changedAt));
+      setDraftNote(note);
     }
-  }, [open, status, changedAt]);
+  }, [open, status, changedAt, note]);
 
   if (!open) {
     return null;
@@ -102,6 +107,13 @@ export default function StatusUpdateDialog({
             value={draftChangedAt}
             onChange={(event) => setDraftChangedAt(event.target.value)}
           />
+          <Textarea
+            label={t("statusUpdate.noteLabel")}
+            placeholder={t("statusUpdate.notePlaceholder")}
+            value={draftNote}
+            onChange={(event) => setDraftNote(event.target.value)}
+            maxLength={500}
+          />
         </div>
         <div className="mt-6 flex items-center justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onCancel}>
@@ -109,7 +121,7 @@ export default function StatusUpdateDialog({
           </Button>
           <Button
             type="button"
-            onClick={() => onSave(draftStatus, draftChangedAt)}
+            onClick={() => onSave(draftStatus, draftChangedAt, draftNote)}
             disabled={!draftChangedAt}
           >
             {tCommon("actions.save")}

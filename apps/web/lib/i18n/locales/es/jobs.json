@@ -6,7 +6,7 @@
     "delete": "Eliminar trabajo",
     "edit": "Editar",
     "changeStatus": "Cambiar estado",
-    "viewHistory": "Ver historial"
+    "viewHistory": "Detalles"
   },
   "new": {
     "title": "Nuevo trabajo",
@@ -55,7 +55,9 @@
   "statusUpdate": {
     "title": "Actualizar estado",
     "statusLabel": "Estado",
-    "changedAtLabel": "Fecha y hora del cambio"
+    "changedAtLabel": "Fecha y hora del cambio",
+    "noteLabel": "Nota",
+    "notePlaceholder": "Agrega una nota opcional"
   },
   "empty": {
     "title": "Aun no hay trabajos",
@@ -102,6 +104,7 @@
       "eventFallback": "Actualizacion registrada",
       "emptyStatus": "No hay cambios de estado registrados.",
       "fromTo": "De {from} a {to}",
+      "noteLabel": "Nota",
       "userLabel": "Por",
       "userFallback": "Sistema",
       "updateStatus": "Actualizar estado"

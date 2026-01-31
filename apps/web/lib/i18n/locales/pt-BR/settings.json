@@ -1,6 +1,6 @@
 {
-  "title": "Configuracoes",
-  "subtitle": "Ajuste preferencias do app e da empresa.",
+  "title": "Configurações",
+  "subtitle": "Ajuste preferências do app e da empresa.",
   "tabs": {
     "app": "Geral do app",
     "company": "Empresa"
@@ -12,40 +12,40 @@
     "helper": "A escolha fica salva para este dispositivo."
   },
   "navigation": {
-    "title": "Navegacao",
-    "subtitle": "Defina o app preferido para abrir enderecos.",
-    "label": "App de navegacao",
-    "helper": "Voce pode deixar em automatico e trocar quando quiser.",
+    "title": "Navegação",
+    "subtitle": "Defina o app preferido para abrir endereços.",
+    "label": "App de navegação",
+    "helper": "Você pode deixar em automático e trocar quando quiser.",
     "options": {
-      "auto": "Automatico (recomendado)",
+      "auto": "Automático (recomendado)",
       "google": "Google Maps",
       "apple": "Apple Maps (iOS)",
       "waze": "Waze"
     }
   },
   "roles": {
-    "title": "Cargos disponiveis",
-    "subtitle": "Papeis padrao para colaboradores.",
+    "title": "Cargos disponíveis",
+    "subtitle": "Papéis padrão para colaboradores.",
     "newLabel": "Novo cargo",
     "add": "Adicionar cargo",
     "empty": "Nenhum cargo configurado. Use o campo acima para adicionar."
   },
   "companyProfile": {
     "title": "Perfil da empresa",
-    "subtitle": "Atualize informacoes e logo da sua empresa.",
+    "subtitle": "Atualize informações e logo da sua empresa.",
     "cardTitle": "Perfil da empresa",
     "cardSubtitle": "Edite dados cadastrais e o logotipo.",
     "action": "Abrir perfil"
   },
   "localePrompt": {
     "title": "Escolha o idioma do sistema",
-    "subtitle": "Voce pode alterar a qualquer momento em Configuracoes.",
+    "subtitle": "Você pode alterar a qualquer momento em Configurações.",
     "selected": "Selecionado",
     "confirm": "Confirmar idioma"
   },
   "locales": {
-    "pt-BR": "Portugues (Brasil)",
-    "en": "Ingles",
+    "pt-BR": "Português (Brasil)",
+    "en": "Inglês",
     "es": "Espanhol"
   }
 }

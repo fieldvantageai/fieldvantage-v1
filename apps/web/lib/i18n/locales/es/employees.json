@@ -4,7 +4,12 @@
   "actions": {
     "new": "Nuevo empleado",
     "create": "Crear empleado",
-    "saveChanges": "Guardar cambios"
+    "saveChanges": "Guardar cambios",
+    "edit": "Editar",
+    "toggleStatus": "Cambiar estado",
+    "viewDetails": "Ver detalles",
+    "delete": "Eliminar usuario",
+    "changeStatusError": "No se pudo cambiar el estado."
   },
   "new": {
     "title": "Nuevo empleado",
@@ -27,11 +32,44 @@
       "subtitle": "Trabajos en los que este empleado esta asignado.",
       "empty": "No hay trabajos asignados a este empleado.",
       "titleFallback": "Trabajo sin titulo"
+    },
+    "invite": {
+      "title": "Invitacion",
+      "subtitle": "Administra el link de invitacion de este colaborador.",
+      "statusLabel": "Estado de invitacion:",
+      "statusPending": "Pendiente",
+      "statusAccepted": "Aceptado",
+      "statusRevoked": "Revocado",
+      "statusExpired": "Expirado",
+      "expiresLabel": "Expira en:",
+      "linkLabel": "Link de invitacion",
+      "regenerate": "Generar nuevo link",
+      "regenerateSuccess": "Nuevo link de invitacion generado.",
+      "regenerateError": "No se pudo generar la invitacion.",
+      "revoke": "Revocar invitacion",
+      "revokeSuccess": "Invitacion revocada.",
+      "revokeError": "No se pudo revocar la invitacion.",
+      "resend": "Enviar por email",
+      "resendError": "No se pudo enviar el email.",
+      "resendPlaceholder": "Email no configurado; copia el link.",
+      "copy": "Copiar link de invitacion",
+      "copySuccess": "Link de invitacion copiado.",
+      "copyError": "No se pudo copiar el link.",
+      "linkUnavailable": "Por seguridad, el link anterior no se muestra. Genera un nuevo link."
     }
   },
   "list": {
     "title": "Equipo activo",
     "description": "Lista actualizada del equipo."
+  },
+  "table": {
+    "name": "Nombre",
+    "email": "Email",
+    "completedJobs": "Trabajos completados",
+    "createdAt": "Fecha de alta",
+    "status": "Estado",
+    "actions": "Acciones",
+    "actionsMenu": "Acciones del empleado"
   },
   "search": {
     "title": "Busqueda rapida",
@@ -51,6 +89,7 @@
     "lastName": "Apellido",
     "avatar": "Foto del empleado",
     "email": "Email",
+    "emailOptional": "Email (opcional — necesario para enviar invitacion)",
     "phone": "Telefono",
     "jobTitle": "Cargo",
     "addressLine1": "Direccion",
@@ -62,6 +101,19 @@
     "notes": "Notas",
     "role": "Rol de acceso",
     "activeStatus": "Empleado activo"
+  },
+  "invite": {
+    "createdTitle": "Colaborador creado",
+    "statusLabel": "Estado de invitacion:",
+    "pending": "Pendiente",
+    "expiresLabel": "Expira en:",
+    "linkLabel": "Link de invitacion",
+    "copy": "Copiar link de invitacion",
+    "copied": "Link de invitacion copiado",
+    "copyError": "No se pudo copiar el link.",
+    "sendEmail": "Enviar invitacion por email",
+    "emailUnavailable": "Envio de email no disponible todavia — copia el link.",
+    "createAnother": "Crear otro colaborador"
   },
   "messages": {
     "created": "Empleado creado.",

@@ -37,14 +37,20 @@ export default function Sidebar({
     employee: t("roles.employee")
   };
   const roleLabel =
-    (userRole && roleLabelMap[userRole]) || userRole || t("roles.owner");
+    (userRole && roleLabelMap[userRole]) || userRole || t("status.loading");
 
-  const navItems = [
-    { label: t("nav.dashboard"), href: "/dashboard" },
-    { label: t("nav.jobs"), href: "/jobs" },
-    { label: t("nav.customers"), href: "/customers" },
-    { label: t("nav.employees"), href: "/employees" }
-  ];
+  const navItems =
+    userRole === "employee" || !userRole
+      ? [
+          { label: t("nav.dashboard"), href: "/dashboard" },
+          { label: t("nav.jobs"), href: "/jobs" }
+        ]
+      : [
+          { label: t("nav.dashboard"), href: "/dashboard" },
+          { label: t("nav.jobs"), href: "/jobs" },
+          { label: t("nav.customers"), href: "/customers" },
+          { label: t("nav.employees"), href: "/employees" }
+        ];
   const settingsItem = { label: t("nav.settings"), href: "/settings" };
 
   const profileHref = userEmployeeId

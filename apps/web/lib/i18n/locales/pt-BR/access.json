@@ -1,0 +1,13 @@
+{
+  "notMember": {
+    "title": "Sem acesso à empresa",
+    "description": "Peça ao administrador um link de convite para entrar."
+  },
+  "inactive": {
+    "title": "Sua conta está desativada",
+    "description": "Entre em contato com o administrador para reativação."
+  },
+  "actions": {
+    "signOut": "Sair"
+  }
+}

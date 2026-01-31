@@ -1,0 +1,42 @@
+{
+  "page": {
+    "invalidTitle": "Invalid invite",
+    "invalidDescription": "This link is no longer valid.",
+    "invalidHint": "Check the link or ask for a new invite.",
+    "errorTitle": "Could not validate the invite",
+    "errors": {
+      "expired": "Invite expired or revoked.",
+      "accepted": "Invite already accepted.",
+      "notFound": "Invite not found.",
+      "invalid": "Invalid invite."
+    },
+    "companyFallback": "Company",
+    "title": "{company} invited you",
+    "subtitle": "You have been invited to join the team."
+  },
+  "form": {
+    "expires": "This link expires on {date}.",
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "actions": {
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "submit": "Activate account",
+    "successTitle": "Account activated successfully.",
+    "successSubtitle": "You can sign in now.",
+    "loginCta": "Go to login",
+    "errors": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Invalid email.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "passwordRequired": "Password is required.",
+      "confirmRequired": "Confirmation is required.",
+      "confirmMatch": "Passwords must match."
+    },
+    "activateError": "Could not activate the account."
+  }
+}

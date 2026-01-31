@@ -1,10 +1,15 @@
 {
   "title": "Colaboradores",
-  "subtitle": "Convide colaboradores e organize permissoes.",
+  "subtitle": "Convide colaboradores e organize permissões.",
   "actions": {
     "new": "Novo colaborador",
     "create": "Criar colaborador",
-    "saveChanges": "Salvar alteracoes"
+    "saveChanges": "Salvar alterações",
+    "edit": "Editar",
+    "toggleStatus": "Alterar status",
+    "viewDetails": "Ver detalhes",
+    "delete": "Apagar usuário",
+    "changeStatusError": "Não foi possível alterar o status."
   },
   "new": {
     "title": "Novo colaborador",
@@ -12,29 +17,62 @@
   },
   "edit": {
     "title": "Editar colaborador",
-    "subtitle": "Atualize dados e permissoes."
+    "subtitle": "Atualize dados e permissões."
   },
   "detail": {
     "edit": "Editar colaborador",
     "summary": {
       "title": "Resumo",
-      "subtitle": "Informacoes do colaborador.",
+      "subtitle": "Informações do colaborador.",
       "contact": "Contato",
-      "phoneFallback": "Telefone nao informado"
+      "phoneFallback": "Telefone não informado"
     },
     "jobs": {
       "title": "Ordens alocadas",
       "subtitle": "Ordens em que este colaborador esta alocado.",
       "empty": "Nenhuma ordem alocada para este colaborador.",
-      "titleFallback": "Ordem sem titulo"
+      "titleFallback": "Ordem sem título"
+    },
+    "invite": {
+      "title": "Convite",
+      "subtitle": "Gerencie o link de convite deste colaborador.",
+      "statusLabel": "Status do convite:",
+      "statusPending": "Pendente",
+      "statusAccepted": "Aceito",
+      "statusRevoked": "Revogado",
+      "statusExpired": "Expirado",
+      "expiresLabel": "Expira em:",
+      "linkLabel": "Link do convite",
+      "regenerate": "Gerar novo link",
+      "regenerateSuccess": "Novo link de convite gerado.",
+      "regenerateError": "Não foi possível gerar o convite.",
+      "revoke": "Revogar convite",
+      "revokeSuccess": "Convite revogado.",
+      "revokeError": "Não foi possível revogar o convite.",
+      "resend": "Enviar por email",
+      "resendError": "Não foi possível enviar o email.",
+      "resendPlaceholder": "Envio de email não configurado; copie o link.",
+      "copy": "Copiar link do convite",
+      "copySuccess": "Link do convite copiado.",
+      "copyError": "Não foi possível copiar o link.",
+      "linkUnavailable": "Link gerado anteriormente não fica disponível por segurança. Gere um novo link."
     }
   },
   "list": {
     "title": "Equipe ativa",
     "description": "Lista atualizada de colaboradores."
   },
+  "table": {
+    "name": "Nome",
+    "email": "Email",
+    "completedJobs": "Jobs concluídos",
+    "createdAt": "Data de cadastro",
+    "status": "Status",
+    "actions": "Ações",
+    "actionsMenu": "Ações do colaborador"
+  },
   "search": {
-    "title": "Busca rapida",
+    "title": "Busca rápida",
     "description": "Encontre colaboradores por nome, email ou cargo.",
     "label": "Pesquisar",
     "placeholder": "Buscar colaboradores",
@@ -51,17 +89,31 @@
     "lastName": "Sobrenome",
     "avatar": "Foto do colaborador",
     "email": "Email",
+    "emailOptional": "Email (opcional — necessário para enviar convite)",
     "phone": "Telefone",
     "jobTitle": "Cargo",
-    "addressLine1": "Endereco",
+    "addressLine1": "Endereço",
     "addressLine2": "Complemento",
     "city": "Cidade",
     "state": "Estado",
     "zipCode": "CEP",
-    "country": "Pais",
-    "notes": "Observacoes",
+    "country": "País",
+    "notes": "Observações",
     "role": "Perfil de acesso",
     "activeStatus": "Colaborador ativo"
+  },
+  "invite": {
+    "createdTitle": "Colaborador criado",
+    "statusLabel": "Status do convite:",
+    "pending": "Pendente",
+    "expiresLabel": "Expira em:",
+    "linkLabel": "Link do convite",
+    "copy": "Copiar link do convite",
+    "copied": "Link do convite copiado",
+    "copyError": "Não foi possível copiar o link.",
+    "sendEmail": "Enviar convite por email",
+    "emailUnavailable": "Envio de email não disponível ainda — copie o link.",
+    "createAnother": "Criar outro colaborador"
   },
   "messages": {
     "created": "Colaborador criado.",
@@ -73,6 +125,6 @@
     "deleteConfirm": "Deseja remover este colaborador?",
     "deleteError": "Falha ao remover colaborador.",
     "deleteFallback": "Erro inesperado ao remover colaborador.",
-    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"
   }
 }

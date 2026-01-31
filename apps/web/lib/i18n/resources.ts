@@ -3,6 +3,8 @@ import commonEn from "./locales/en/common.json";
 import customersEn from "./locales/en/customers.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import employeesEn from "./locales/en/employees.json";
+import invitesEn from "./locales/en/invites.json";
+import accessEn from "./locales/en/access.json";
 import jobsEn from "./locales/en/jobs.json";
 import companiesEn from "./locales/en/companies.json";
 import settingsEn from "./locales/en/settings.json";
@@ -13,6 +15,8 @@ import commonEs from "./locales/es/common.json";
 import customersEs from "./locales/es/customers.json";
 import dashboardEs from "./locales/es/dashboard.json";
 import employeesEs from "./locales/es/employees.json";
+import invitesEs from "./locales/es/invites.json";
+import accessEs from "./locales/es/access.json";
 import jobsEs from "./locales/es/jobs.json";
 import companiesEs from "./locales/es/companies.json";
 import settingsEs from "./locales/es/settings.json";
@@ -23,6 +27,8 @@ import commonPt from "./locales/pt-BR/common.json";
 import customersPt from "./locales/pt-BR/customers.json";
 import dashboardPt from "./locales/pt-BR/dashboard.json";
 import employeesPt from "./locales/pt-BR/employees.json";
+import invitesPt from "./locales/pt-BR/invites.json";
+import accessPt from "./locales/pt-BR/access.json";
 import jobsPt from "./locales/pt-BR/jobs.json";
 import companiesPt from "./locales/pt-BR/companies.json";
 import settingsPt from "./locales/pt-BR/settings.json";
@@ -35,6 +41,8 @@ export const resources = {
     customers: customersEn,
     dashboard: dashboardEn,
     employees: employeesEn,
+    invites: invitesEn,
+    access: accessEn,
     jobs: jobsEn,
     companies: companiesEn,
     settings: settingsEn,
@@ -46,6 +54,8 @@ export const resources = {
     customers: customersPt,
     dashboard: dashboardPt,
     employees: employeesPt,
+    invites: invitesPt,
+    access: accessPt,
     jobs: jobsPt,
     companies: companiesPt,
     settings: settingsPt,
@@ -57,6 +67,8 @@ export const resources = {
     customers: customersEs,
     dashboard: dashboardEs,
     employees: employeesEs,
+    invites: invitesEs,
+    access: accessEs,
     jobs: jobsEs,
     companies: companiesEs,
     settings: settingsEs,

@@ -1,0 +1,42 @@
+{
+  "page": {
+    "invalidTitle": "Convite inválido",
+    "invalidDescription": "Este link não é mais válido.",
+    "invalidHint": "Verifique se o link está correto ou solicite um novo convite.",
+    "errorTitle": "Não foi possível validar o convite",
+    "errors": {
+      "expired": "Convite expirado ou revogado.",
+      "accepted": "Convite já foi aceito.",
+      "notFound": "Convite não encontrado.",
+      "invalid": "Convite inválido."
+    },
+    "companyFallback": "Empresa",
+    "title": "{company} convidou você",
+    "subtitle": "Você foi convidado para entrar na equipe."
+  },
+  "form": {
+    "expires": "Este link expira em {date}.",
+    "labels": {
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha"
+    },
+    "actions": {
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "submit": "Ativar conta",
+    "successTitle": "Conta ativada com sucesso.",
+    "successSubtitle": "Agora você pode entrar.",
+    "loginCta": "Ir para o login",
+    "errors": {
+      "emailRequired": "Email obrigatório.",
+      "emailInvalid": "Email inválido.",
+      "passwordMin": "A senha deve ter pelo menos 8 caracteres.",
+      "passwordRequired": "Senha obrigatória.",
+      "confirmRequired": "Confirmação obrigatória.",
+      "confirmMatch": "As senhas precisam coincidir."
+    },
+    "activateError": "Não foi possível ativar a conta."
+  }
+}

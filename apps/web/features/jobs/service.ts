@@ -27,7 +27,18 @@ const getCompanyId = async (
   if (error) {
     throw error;
   }
-  return data?.id ?? null;
+  if (data?.id) {
+    return data.id;
+  }
+  const { data: employeeData, error: employeeError } = await supabase
+    .from("employees")
+    .select("company_id")
+    .eq("user_id", authData.user.id)
+    .maybeSingle();
+  if (employeeError) {
+    throw employeeError;
+  }
+  return employeeData?.company_id ?? null;
 };
 
 export async function listJobs() {
@@ -132,6 +143,7 @@ export type OrderStatusEvent = {
   new_status: string;
   changed_at: string;
   changed_by: string | null;
+  note?: string | null;
   created_at: string;
 };
 
@@ -144,7 +156,7 @@ export async function listOrderStatusEvents(orderId: string) {
   const { data, error } = await supabase
     .from("order_status_events")
     .select(
-      "id, company_id, order_id, old_status, new_status, changed_at, changed_by, created_at"
+      "id, company_id, order_id, old_status, new_status, changed_at, changed_by, note, created_at"
     )
     .eq("company_id", companyId)
     .eq("order_id", orderId)

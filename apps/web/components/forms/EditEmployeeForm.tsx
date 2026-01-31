@@ -72,6 +72,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
     try {
       const response = await fetch(`/api/employees/${employee.id}`, {
         method: "PATCH",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });
@@ -100,7 +101,8 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
     setToast(null);
     try {
       const response = await fetch(`/api/employees/${employee.id}`, {
-        method: "DELETE"
+        method: "DELETE",
+        credentials: "include"
       });
 
       if (!response.ok) {
@@ -138,6 +140,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
           formData.append("file", file);
           const response = await fetch("/api/employees/avatar", {
             method: "POST",
+            credentials: "include",
             body: formData
           });
           if (!response.ok) {

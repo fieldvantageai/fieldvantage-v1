@@ -67,8 +67,10 @@ export async function POST(request: Request) {
         last_name: ownerLastName,
         full_name: input.ownerName,
         email: input.email,
+        user_id: userId,
         role: "owner",
-        is_active: true
+        is_active: true,
+        invitation_status: "accepted"
       });
 
     if (employeeError) {

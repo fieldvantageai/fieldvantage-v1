@@ -1,0 +1,42 @@
+{
+  "page": {
+    "invalidTitle": "Invitacion invalida",
+    "invalidDescription": "Este enlace ya no es valido.",
+    "invalidHint": "Verifica el enlace o solicita un nuevo convite.",
+    "errorTitle": "No fue posible validar la invitacion",
+    "errors": {
+      "expired": "Invitacion expirada o revocada.",
+      "accepted": "Invitacion ya aceptada.",
+      "notFound": "Invitacion no encontrada.",
+      "invalid": "Invitacion invalida."
+    },
+    "companyFallback": "Empresa",
+    "title": "{company} te invito",
+    "subtitle": "Has sido invitado a unirte al equipo."
+  },
+  "form": {
+    "expires": "Este enlace expira el {date}.",
+    "labels": {
+      "email": "Email",
+      "password": "Contrasena",
+      "confirmPassword": "Confirmar contrasena"
+    },
+    "actions": {
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "submit": "Activar cuenta",
+    "successTitle": "Cuenta activada con exito.",
+    "successSubtitle": "Ahora puedes iniciar sesion.",
+    "loginCta": "Ir al login",
+    "errors": {
+      "emailRequired": "Email obligatorio.",
+      "emailInvalid": "Email invalido.",
+      "passwordMin": "La contrasena debe tener al menos 8 caracteres.",
+      "passwordRequired": "Contrasena obligatoria.",
+      "confirmRequired": "Confirmacion obligatoria.",
+      "confirmMatch": "Las contrasenas deben coincidir."
+    },
+    "activateError": "No fue posible activar la cuenta."
+  }
+}

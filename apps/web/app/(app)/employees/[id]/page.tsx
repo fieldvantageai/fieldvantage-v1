@@ -3,11 +3,14 @@ import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
+import EmployeeInvitePanel from "@/components/employees/EmployeeInvitePanel";
+import DeleteEmployeeButton from "@/components/employees/DeleteEmployeeButton";
 import StatusBadge from "@/components/orders/StatusBadge";
 import { getEmployeeById, listEmployeeJobs } from "@/features/employees/service";
 import { getEmployeeRoleLabel } from "@/features/employees/roleLabels";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -24,6 +27,15 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
   if (!employee) {
     notFound();
   }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: pendingInvite } = await supabase
+    .from("invites")
+    .select("id, status, expires_at")
+    .eq("employee_id", employee.id)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .maybeSingle();
 
   const avatarLabel = employee.full_name?.trim() || "Colaborador";
   const avatarInitial = avatarLabel.charAt(0).toUpperCase();
@@ -60,9 +72,14 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
             </p>
           </div>
         </div>
-        <Link href={`/employees/${employee.id}/edit`}>
-          <Button>{t("detail.edit")}</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {employee.status === "inactive" && jobs.length === 0 ? (
+            <DeleteEmployeeButton employeeId={employee.id} />
+          ) : null}
+          <Link href={`/employees/${employee.id}/edit`}>
+            <Button>{t("detail.edit")}</Button>
+          </Link>
+        </div>
       </header>
 
       <Section title={t("detail.summary.title")} description={t("detail.summary.subtitle")}>
@@ -87,6 +104,17 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
             </p>
           </div>
         </div>
+      </Section>
+
+      <Section title={t("detail.invite.title")} description={t("detail.invite.subtitle")}>
+        <EmployeeInvitePanel
+          employeeId={employee.id}
+          email={employee.email ?? null}
+          invitationStatus={employee.invitation_status ?? null}
+          userId={employee.user_id ?? null}
+          initialInviteStatus={(pendingInvite?.status as "pending") ?? null}
+          initialInviteExpiresAt={pendingInvite?.expires_at ?? null}
+        />
       </Section>
 
       <Section title={t("detail.jobs.title")} description={t("detail.jobs.subtitle")}>

@@ -6,7 +6,7 @@
     "delete": "Excluir ordem",
     "edit": "Editar",
     "changeStatus": "Alterar status",
-    "viewHistory": "Ver historico"
+    "viewHistory": "Detalhes"
   },
   "new": {
     "title": "Nova ordem",
@@ -55,7 +55,9 @@
   "statusUpdate": {
     "title": "Atualizar status",
     "statusLabel": "Status",
-    "changedAtLabel": "Data e hora da alteracao"
+    "changedAtLabel": "Data e hora da alteracao",
+    "noteLabel": "Nota",
+    "notePlaceholder": "Adicione uma nota opcional"
   },
   "empty": {
     "title": "Nenhuma ordem ainda",
@@ -102,6 +104,7 @@
       "eventFallback": "Atualizacao registrada",
       "emptyStatus": "Nenhuma alteracao de status registrada.",
       "fromTo": "De {from} para {to}",
+      "noteLabel": "Nota",
       "userLabel": "Por",
       "userFallback": "Sistema",
       "updateStatus": "Atualizar status"

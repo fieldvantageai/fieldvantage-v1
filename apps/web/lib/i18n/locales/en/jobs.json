@@ -6,7 +6,7 @@
     "delete": "Delete job",
     "edit": "Edit",
     "changeStatus": "Change status",
-    "viewHistory": "View history"
+    "viewHistory": "Details"
   },
   "new": {
     "title": "New job",
@@ -55,7 +55,9 @@
   "statusUpdate": {
     "title": "Update status",
     "statusLabel": "Status",
-    "changedAtLabel": "Change date and time"
+    "changedAtLabel": "Change date and time",
+    "noteLabel": "Note",
+    "notePlaceholder": "Add an optional note"
   },
   "empty": {
     "title": "No jobs yet",
@@ -102,6 +104,7 @@
       "eventFallback": "Update recorded",
       "emptyStatus": "No status changes recorded.",
       "fromTo": "From {from} to {to}",
+      "noteLabel": "Note",
       "userLabel": "By",
       "userFallback": "System",
       "updateStatus": "Update status"

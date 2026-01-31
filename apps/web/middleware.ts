@@ -21,6 +21,13 @@ const AUTH_ONLY_PATHS = [
   "/forgot-password"
 ];
 
+const EMPLOYEE_ONLY_PATHS = ["/dashboard", "/jobs", "/settings"];
+
+const isEmployeeAllowedPath = (pathname: string) =>
+  EMPLOYEE_ONLY_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+
 const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
@@ -57,19 +64,6 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isInactive = Boolean(user && user.user_metadata?.is_active === false);
-
-  if (isInactive && !isPublicPath(pathname)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/entrar";
-    redirectUrl.search = "?inactive=1";
-    const redirectResponse = NextResponse.redirect(redirectUrl);
-    response.cookies.getAll().forEach((cookie) => {
-      redirectResponse.cookies.set(cookie);
-    });
-    return redirectResponse;
-  }
-
   if (!user && !isPublicPath(pathname)) {
     const nextPath = `${pathname}${request.nextUrl.search}`;
     const redirectUrl = request.nextUrl.clone();
@@ -82,7 +76,7 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  if (user && isAuthOnlyPath(pathname) && !isInactive) {
+  if (user && isAuthOnlyPath(pathname)) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/dashboard";
     redirectUrl.search = "";
@@ -91,6 +85,36 @@ export async function middleware(request: NextRequest) {
       redirectResponse.cookies.set(cookie);
     });
     return redirectResponse;
+  }
+
+  if (user && !isPublicPath(pathname)) {
+    const { data: employee } = await supabase
+      .from("employees")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (employee?.role === "employee" && !isEmployeeAllowedPath(pathname)) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/dashboard";
+      redirectUrl.search = "";
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
+    }
+
+    if (employee?.role === "employee" && pathname.startsWith("/settings/company")) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/settings";
+      redirectUrl.search = "";
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
+    }
   }
 
   return response;

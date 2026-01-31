@@ -11,6 +11,7 @@ import { useLocale } from "@/lib/i18n/localeClient";
 import { useClientT } from "@/lib/i18n/useClientT";
 
 type NavigationPreference = "auto" | "google_maps" | "apple_maps" | "waze";
+type EmployeeRole = "owner" | "admin" | "employee";
 
 const FlagIcon = ({ locale }: { locale: Locale }) => {
   if (locale === "pt-BR") {
@@ -53,6 +54,7 @@ export default function SettingsPanel() {
   const [pendingNavigationPreference, setPendingNavigationPreference] =
     useState<NavigationPreference>("auto");
   const [isLoadingNavigation, setIsLoadingNavigation] = useState(true);
+  const [userRole, setUserRole] = useState<EmployeeRole | null>(null);
 
   useEffect(() => {
     setPendingLocale(locale);
@@ -90,6 +92,37 @@ export default function SettingsPanel() {
     };
 
     loadPreference();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadRole = async () => {
+      try {
+        const response = await fetch("/api/employees/me", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as {
+          data?: { role?: EmployeeRole | null };
+        };
+        if (isMounted) {
+          setUserRole(payload.data?.role ?? null);
+          if (payload.data?.role === "employee") {
+            setActiveTab("app");
+          }
+        }
+      } catch {
+        if (isMounted) {
+          setUserRole(null);
+        }
+      }
+    };
+
+    loadRole();
 
     return () => {
       isMounted = false;
@@ -162,13 +195,15 @@ export default function SettingsPanel() {
         >
           {t("tabs.app")}
         </Button>
-        <Button
-          type="button"
-          variant={activeTab === "company" ? "primary" : "secondary"}
-          onClick={() => setActiveTab("company")}
-        >
-          {t("tabs.company")}
-        </Button>
+        {userRole && userRole !== "employee" ? (
+          <Button
+            type="button"
+            variant={activeTab === "company" ? "primary" : "secondary"}
+            onClick={() => setActiveTab("company")}
+          >
+            {t("tabs.company")}
+          </Button>
+        ) : null}
       </div>
 
       {activeTab === "app" ? (
@@ -247,7 +282,7 @@ export default function SettingsPanel() {
             </div>
           </Section>
         </div>
-      ) : (
+      ) : userRole && userRole !== "employee" ? (
         <Section
           title={t("companyProfile.title")}
           description={t("companyProfile.subtitle")}
@@ -285,7 +320,7 @@ export default function SettingsPanel() {
             </div>
           </div>
         </Section>
-      )}
+      ) : null}
 
       <div className="flex justify-end">
         <Button type="button" disabled={!hasChanges} onClick={handleApply}>

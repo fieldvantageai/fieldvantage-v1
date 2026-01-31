@@ -15,6 +15,32 @@ const allowedStatuses: JobStatus[] = [
   "canceled"
 ];
 
+const getCompanyIdForUser = async (
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  userId: string
+) => {
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .select("id")
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (companyError) {
+    throw companyError;
+  }
+  if (company?.id) {
+    return company.id;
+  }
+  const { data: employee, error: employeeError } = await supabase
+    .from("employees")
+    .select("company_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (employeeError) {
+    throw employeeError;
+  }
+  return employee?.company_id ?? null;
+};
+
 export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const user = await getSupabaseAuthUser();
@@ -25,6 +51,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const body = (await request.json()) as {
     status?: JobStatus;
     changedAt?: string;
+    note?: string | null;
   };
 
   if (!body?.status || !allowedStatuses.includes(body.status)) {
@@ -47,13 +74,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data: company, error: companyError } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("owner_id", user.id)
-    .maybeSingle();
-
-  if (companyError || !company?.id) {
+  const companyId = await getCompanyIdForUser(supabase, user.id);
+  if (!companyId) {
     return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
   }
 
@@ -61,7 +83,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     .from("jobs")
     .select("status")
     .eq("id", id)
-    .eq("company_id", company.id)
+    .eq("company_id", companyId)
     .maybeSingle();
 
   const { data, error } = await supabase
@@ -71,7 +93,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       status_changed_at: parsed.toISOString()
     })
     .eq("id", id)
-    .eq("company_id", company.id)
+    .eq("company_id", companyId)
     .select("id, status, status_changed_at")
     .maybeSingle();
 
@@ -81,12 +103,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   if (existingJob?.status && existingJob.status !== body.status) {
     await supabase.from("order_status_events").insert({
-      company_id: company.id,
+      company_id: companyId,
       order_id: id,
       old_status: existingJob.status,
       new_status: body.status,
       changed_at: parsed.toISOString(),
-      changed_by: user.id
+      changed_by: user.id,
+      note: body.note?.trim() || null
     });
   }
 

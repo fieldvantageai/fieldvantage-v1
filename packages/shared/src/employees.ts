@@ -5,6 +5,7 @@ import type { BaseEntity } from "./base";
 export type EmployeeRole = "owner" | "admin" | "employee";
 export type EmployeeStatus = "active" | "inactive";
 export type NavigationPreference = "auto" | "google_maps" | "apple_maps" | "waze";
+export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired";
 
 export type Employee = BaseEntity & {
   first_name: string;
@@ -23,6 +24,8 @@ export type Employee = BaseEntity & {
   zip_code?: string | null;
   country?: string | null;
   preferred_navigation_app?: NavigationPreference | null;
+  invitation_status?: InvitationStatus | null;
+  user_id?: string | null;
   status: EmployeeStatus;
 };
 

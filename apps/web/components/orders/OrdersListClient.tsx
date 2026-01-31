@@ -81,12 +81,14 @@ export default function OrdersListClient({
   const [jobs, setJobs] = useState<Array<Job & { assigned_label: string }>>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [canEditOrders, setCanEditOrders] = useState(false);
   const [statusDialogJob, setStatusDialogJob] = useState<
     (Job & { assigned_label: string }) | null
   >(null);
   const [statusDialogChangedAt, setStatusDialogChangedAt] = useState(
     toDateTimeLocalValue(new Date())
   );
+  const [statusDialogNote, setStatusDialogNote] = useState("");
   const [isSavingStatus, setIsSavingStatus] = useState(false);
 
   useEffect(() => {
@@ -163,6 +165,41 @@ export default function OrdersListClient({
     fetchJobs();
   }, [filters, page, sortDir, sortKey]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const loadUserRole = async () => {
+      try {
+        const response = await fetch("/api/employees/me", {
+          cache: "no-store"
+        });
+        if (!isMounted) {
+          return;
+        }
+        if (response.ok) {
+          const payload = (await response.json()) as {
+            data?: { role?: string | null };
+          };
+          setCanEditOrders(payload.data?.role === "owner");
+          return;
+        }
+        if (response.status === 404) {
+          setCanEditOrders(true);
+          return;
+        }
+        setCanEditOrders(false);
+      } catch {
+        if (isMounted) {
+          setCanEditOrders(false);
+        }
+      }
+    };
+
+    loadUserRole();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const sortedJobs = useMemo(() => {
     if (sortKey !== "assigned") {
       return jobs;
@@ -208,6 +245,7 @@ export default function OrdersListClient({
         locale={locale}
         emptyMessage={t("filters.empty")}
         isLoading={isLoading}
+        canEdit={canEditOrders}
         sortKey={sortKey}
         sortDir={sortDir}
         onSort={(key) => {
@@ -222,6 +260,7 @@ export default function OrdersListClient({
         onStatusAction={(job) => {
           setStatusDialogJob(job);
           setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
+          setStatusDialogNote("");
         }}
         onHistoryAction={(job) => {
           router.push(`/jobs/${job.id}#history`);
@@ -231,15 +270,17 @@ export default function OrdersListClient({
         open={Boolean(statusDialogJob)}
         status={statusDialogJob?.status ?? "scheduled"}
         changedAt={statusDialogChangedAt}
+        note={statusDialogNote}
         onCancel={() => setStatusDialogJob(null)}
-        onSave={async (nextStatus, changedAt) => {
+        onSave={async (nextStatus, changedAt, note) => {
           if (!statusDialogJob || !changedAt || isSavingStatus) {
             return;
           }
           setIsSavingStatus(true);
           const payload = {
             status: nextStatus,
-            changedAt: new Date(changedAt).toISOString()
+            changedAt: new Date(changedAt).toISOString(),
+            note: note?.trim() || null
           };
           const response = await fetch(
             `/api/jobs/${statusDialogJob.id}/status`,
