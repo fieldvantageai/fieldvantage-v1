@@ -29,7 +29,18 @@ const getCompanyId = async (
   if (error) {
     throw error;
   }
-  return data?.id ?? null;
+  if (data?.id) {
+    return data.id;
+  }
+  const { data: employeeData, error: employeeError } = await supabase
+    .from("employees")
+    .select("company_id")
+    .eq("user_id", authData.user.id)
+    .maybeSingle();
+  if (employeeError) {
+    throw employeeError;
+  }
+  return employeeData?.company_id ?? null;
 };
 
 export async function listCustomers() {

@@ -115,7 +115,10 @@
     },
     "notes": {
       "title": "Notas",
-      "subtitle": "Notas registradas."
+      "subtitle": "Notas registradas.",
+      "jobLabel": "Nota del trabajo",
+      "customerLabel": "Nota del cliente",
+      "addressLabel": "Nota de la direccion"
     }
   },
   "status": {
@@ -128,6 +131,8 @@
     "title": "Titulo del trabajo",
     "customer": "Cliente",
     "customerPlaceholder": "Selecciona un cliente",
+    "customerAddress": "Direccion del cliente",
+    "customerAddressPlaceholder": "Selecciona una direccion",
     "scheduledFor": "Fecha programada",
     "expectedCompletion": "Prevision de finalizacion",
     "expectedCompletionDateOnly": "Prevision de finalizacion (fecha)",

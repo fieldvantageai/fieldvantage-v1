@@ -6,11 +6,11 @@ import { Section } from "@/components/ui/Section";
 import OrderStatusControl from "@/components/orders/OrderStatusControl";
 import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById } from "@/features/customers/service";
-import { listEmployees } from "@/features/employees/service";
 import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -26,7 +26,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const { data: employeeRole } = authData?.user
     ? await supabase
         .from("employees")
-        .select("role")
+        .select("role, company_id")
         .eq("user_id", authData.user.id)
         .maybeSingle()
     : { data: null };
@@ -36,12 +36,36 @@ export default async function JobDetailPage({ params }: PageProps) {
   if (!job) {
     notFound();
   }
-  const employees = await listEmployees();
-  const assignedEmployees = (job.assigned_employee_ids ?? []).map((employeeId) =>
-    employees.find((employee) => employee.id === employeeId)
+  const assignedEmployeeIds = job.assigned_employee_ids ?? [];
+  const companyIdForTeam = job.company_id ?? employeeRole?.company_id ?? null;
+  const assignedEmployees =
+    assignedEmployeeIds.length > 0
+      ? (
+          await (async () => {
+            let query = supabaseAdmin
+              .from("employees")
+              .select("id, full_name, email")
+              .in("id", assignedEmployeeIds);
+            if (companyIdForTeam) {
+              query = query.eq("company_id", companyIdForTeam);
+            }
+            const { data } = await query;
+            return data ?? [];
+          })()
+        )
+      : [];
+  const assignedEmployeesById = new Map(
+    assignedEmployees.map((employee) => [employee.id, employee])
+  );
+  const orderedAssignedEmployees = assignedEmployeeIds.map((employeeId) =>
+    assignedEmployeesById.get(employeeId)
   );
   const customer = job.customer_id ? await getCustomerById(job.customer_id) : null;
+  const selectedAddress = job.customer_address_id
+    ? customer?.addresses.find((address) => address.id === job.customer_address_id)
+    : null;
   const primaryAddress =
+    selectedAddress ??
     customer?.addresses.find((address) => address.is_primary) ??
     customer?.addresses[0];
   const statusEvents = await listOrderStatusEventsWithActors(job.id);
@@ -266,13 +290,13 @@ export default async function JobDetailPage({ params }: PageProps) {
         description={t("detail.team.subtitle")}
       >
         <p className="text-xs text-slate-500">{t("detail.team.manageHint")}</p>
-        {assignedEmployees.length === 0 ? (
+        {orderedAssignedEmployees.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-6 text-sm text-slate-500">
             {t("detail.team.empty")}
           </div>
         ) : (
           <div className="space-y-2">
-            {assignedEmployees.map((employee, index) => (
+            {orderedAssignedEmployees.map((employee, index) => (
               <div
                 key={employee?.id ?? `missing-${index}`}
                 className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
@@ -294,13 +318,37 @@ export default async function JobDetailPage({ params }: PageProps) {
         )}
       </Section>
 
-      {job.notes ? (
-        <Section title={t("detail.notes.title")} description={t("detail.notes.subtitle")}>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 text-sm text-slate-700">
-            {job.notes}
-          </div>
-        </Section>
-      ) : null}
+      {(() => {
+        const notes = [
+          { label: t("detail.notes.jobLabel"), value: job.notes },
+          { label: t("detail.notes.customerLabel"), value: customer?.notes },
+          { label: t("detail.notes.addressLabel"), value: primaryAddress?.note }
+        ]
+          .map((item) => ({ ...item, value: item.value?.trim() ?? "" }))
+          .filter((item) => item.value.length > 0);
+
+        if (notes.length === 0) {
+          return null;
+        }
+
+        return (
+          <Section title={t("detail.notes.title")} description={t("detail.notes.subtitle")}>
+            <div className="space-y-3">
+              {notes.map((note) => (
+                <div
+                  key={note.label}
+                  className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 text-sm text-slate-700"
+                >
+                  <p className="text-xs font-semibold uppercase text-slate-400">
+                    {note.label}
+                  </p>
+                  <p className="mt-2 whitespace-pre-line">{note.value}</p>
+                </div>
+              ))}
+            </div>
+          </Section>
+        );
+      })()}
     </div>
   );
 }

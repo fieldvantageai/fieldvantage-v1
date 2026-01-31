@@ -9,7 +9,7 @@ export type OrdersTableRow = Job & {
   assigned_label: string;
 };
 
-type SortKey = "title" | "customer" | "assigned" | "status" | "startDate";
+type SortKey = "title" | "customer" | "status" | "startDate";
 
 type OrdersTableProps = {
   orders: OrdersTableRow[];
@@ -71,14 +71,13 @@ export default function OrdersTable({
   const columns: Array<{ key: SortKey; label: string }> = [
     { key: "title", label: t("table.title") },
     { key: "customer", label: t("table.customer") },
-    { key: "assigned", label: t("table.assigned") },
     { key: "status", label: t("table.status") },
     { key: "startDate", label: t("table.startDate") }
   ];
 
   return (
     <div className="relative overflow-visible rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm">
-      <div className="hidden grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,0.5fr)] gap-4 border-b border-slate-200/70 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400 sm:grid">
+      <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.5fr)] gap-4 border-b border-slate-200/70 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400 sm:grid">
         {columns.map((column) => (
           <button
             key={column.key}
@@ -101,7 +100,7 @@ export default function OrdersTable({
           Array.from({ length: 6 }).map((_, index) => (
             <div
               key={`skeleton-${index}`}
-              className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,0.5fr)] sm:items-center"
+              className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.5fr)] sm:items-center"
             >
               {Array.from({ length: 6 }).map((__, colIndex) => (
                 <div
@@ -126,7 +125,7 @@ export default function OrdersTable({
               }}
               className="block px-4 py-4 transition hover:bg-slate-50/70"
             >
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,0.5fr)] sm:items-center">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.5fr)] sm:items-center">
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
                     {job.title ?? t("table.titleFallback")}
@@ -137,9 +136,6 @@ export default function OrdersTable({
                 </div>
                 <p className="text-sm text-slate-600">
                   {job.customer_name ?? t("detail.customerFallback")}
-                </p>
-                <p className="text-sm text-slate-600">
-                  {job.assigned_label || t("table.assignedFallback")}
                 </p>
                 <div>
                   <StatusBadge status={job.status} />

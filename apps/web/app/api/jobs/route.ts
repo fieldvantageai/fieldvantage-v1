@@ -237,6 +237,7 @@ export async function POST(request: Request) {
       estimated_end_at: input.estimatedEndAt,
       customer_name: input.customerName,
       customer_id: input.customerId || null,
+      customer_address_id: input.customerAddressId || null,
       assigned_employee_ids: input.assignedEmployeeIds ?? [],
       allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,

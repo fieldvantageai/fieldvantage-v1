@@ -4,6 +4,7 @@ export const newJobDefaults: NewJobFormValues = {
   title: "",
   customerName: "",
   customerId: "",
+  customerAddressId: "",
   scheduledFor: "",
   estimatedEndAt: "",
   status: "scheduled",

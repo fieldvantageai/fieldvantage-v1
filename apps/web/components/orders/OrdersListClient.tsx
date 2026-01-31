@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import OrdersFiltersBar from "./OrdersFiltersBar";
@@ -21,12 +21,10 @@ type FiltersState = {
   toDate?: Date | null;
 };
 
-type SortKey = "title" | "customer" | "assigned" | "status" | "startDate";
+type SortKey = "title" | "customer" | "status" | "startDate";
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 20;
-
-const normalize = (value: string) => value.trim().toLowerCase();
 
 const parseDate = (value: string | null) =>
   value ? new Date(value) : null;
@@ -200,20 +198,7 @@ export default function OrdersListClient({
     };
   }, []);
 
-  const sortedJobs = useMemo(() => {
-    if (sortKey !== "assigned") {
-      return jobs;
-    }
-    return [...jobs].sort((a, b) => {
-      const left = normalize(a.assigned_label);
-      const right = normalize(b.assigned_label);
-      if (left === right) {
-        return 0;
-      }
-      const order = left < right ? -1 : 1;
-      return sortDir === "asc" ? order : -order;
-    });
-  }, [jobs, sortDir, sortKey]);
+  const sortedJobs = jobs;
 
   return (
     <div className="space-y-4">

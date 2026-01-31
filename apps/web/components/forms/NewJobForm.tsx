@@ -13,7 +13,7 @@ import { ToastBanner } from "@/components/ui/Toast";
 import NotesDialog from "@/components/orders/NotesDialog";
 import RecurrenceModal from "@/components/orders/RecurrenceModal";
 import { formatRecurrenceSummary } from "@/components/orders/recurrenceSummary";
-import type { JobRecurrence } from "@fieldvantage/shared";
+import type { CustomerAddress, JobRecurrence } from "@fieldvantage/shared";
 import {
   newJobSchema,
   type NewJobFormValues
@@ -31,6 +31,8 @@ export default function NewJobForm() {
   } | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerAddresses, setCustomerAddresses] = useState<CustomerAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
   const [filter, setFilter] = useState("");
   const [showSelector, setShowSelector] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
@@ -55,6 +57,7 @@ export default function NewJobForm() {
   useEffect(() => {
     register("assignedEmployeeIds");
     register("customerId");
+    register("customerAddressId");
     register("isRecurring");
     register("recurrence");
     register("notes");
@@ -101,6 +104,7 @@ export default function NewJobForm() {
 
   const assignedEmployeeIds = watch("assignedEmployeeIds");
   const selectedCustomerId = watch("customerId");
+  const selectedCustomerAddressId = watch("customerAddressId");
   const selectedStatus = watch("status");
   const notesValue = watch("notes") ?? "";
   const isRecurring = watch("isRecurring");
@@ -123,6 +127,53 @@ export default function NewJobForm() {
       ),
     [employees, assignedEmployeeIds]
   );
+
+  const buildAddressLabel = (address: CustomerAddress) => {
+    const parts = [
+      address.label,
+      address.address_line1,
+      address.address_line2,
+      `${address.city}, ${address.state} ${address.zip_code}`,
+      address.country
+    ].filter(Boolean);
+    return parts.join(" · ");
+  };
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      if (!selectedCustomerId) {
+        setCustomerAddresses([]);
+        setValue("customerAddressId", "", { shouldDirty: true });
+        return;
+      }
+      setIsLoadingAddresses(true);
+      try {
+        const response = await fetch(`/api/customers/${selectedCustomerId}`, {
+          cache: "no-store"
+        });
+        if (!response.ok) {
+          setCustomerAddresses([]);
+          setValue("customerAddressId", "", { shouldDirty: true });
+          return;
+        }
+        const payload = (await response.json()) as {
+          data?: { addresses?: CustomerAddress[] };
+        };
+        const addresses = payload.data?.addresses ?? [];
+        setCustomerAddresses(addresses);
+        const preferred =
+          addresses.find((address) => address.is_primary)?.id ?? addresses[0]?.id ?? "";
+        setValue("customerAddressId", preferred, { shouldDirty: true });
+      } catch {
+        setCustomerAddresses([]);
+        setValue("customerAddressId", "", { shouldDirty: true });
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    loadAddresses();
+  }, [selectedCustomerId, setValue]);
 
   const filteredEmployees = useMemo(() => {
     const search = filter.trim().toLowerCase();
@@ -221,10 +272,34 @@ export default function NewJobForm() {
           const selected = customers.find((customer) => customer.id === id);
           setValue("customerId", id, { shouldDirty: true });
           setValue("customerName", selected?.name ?? "", { shouldDirty: true });
+          setValue("customerAddressId", "", { shouldDirty: true });
         }}
       />
       <input type="hidden" {...register("customerId")} />
       <input type="hidden" {...register("customerName")} />
+      <Select
+        label={t("fields.customerAddress")}
+        value={selectedCustomerAddressId ?? ""}
+        error={errors.customerAddressId?.message}
+        options={[
+          {
+            value: "",
+            label: isLoadingAddresses
+              ? tCommon("status.loading")
+              : t("fields.customerAddressPlaceholder")
+          },
+          ...customerAddresses.map((address) => ({
+            value: address.id,
+            label: buildAddressLabel(address)
+          }))
+        ]}
+        onChange={(event) => {
+          setValue("customerAddressId", event.target.value, {
+            shouldDirty: true
+          });
+        }}
+        disabled={!selectedCustomerId || isLoadingAddresses || customerAddresses.length === 0}
+      />
       <Select
         label={t("fields.status")}
         error={errors.status?.message}

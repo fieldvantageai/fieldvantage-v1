@@ -115,7 +115,10 @@
     },
     "notes": {
       "title": "Notes",
-      "subtitle": "Recorded notes."
+      "subtitle": "Recorded notes.",
+      "jobLabel": "Job note",
+      "customerLabel": "Customer note",
+      "addressLabel": "Address note"
     }
   },
   "status": {
@@ -128,6 +131,8 @@
     "title": "Job title",
     "customer": "Customer",
     "customerPlaceholder": "Select a customer",
+    "customerAddress": "Customer address",
+    "customerAddressPlaceholder": "Select an address",
     "scheduledFor": "Scheduled date",
     "expectedCompletion": "Expected completion",
     "expectedCompletionDateOnly": "Expected completion (date)",

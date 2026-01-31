@@ -18,7 +18,7 @@ import {
   type NewJobFormValues
 } from "@/features/jobs/forms/newJob/formSchema";
 import type { Customer, Employee, Job } from "@/features/_shared/types";
-import type { JobRecurrence } from "@fieldvantage/shared";
+import type { CustomerAddress, JobRecurrence } from "@fieldvantage/shared";
 import { useClientT } from "@/lib/i18n/useClientT";
 
 type EditJobFormProps = {
@@ -35,6 +35,8 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   } | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerAddresses, setCustomerAddresses] = useState<CustomerAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
   const [filter, setFilter] = useState("");
   const [showSelector, setShowSelector] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -68,6 +70,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
       title: job.title ?? "",
       customerName: job.customer_name ?? "",
       customerId: job.customer_id ?? "",
+      customerAddressId: job.customer_address_id ?? "",
       scheduledFor: toDateTimeLocalValue(job.scheduled_for),
       estimatedEndAt: toDateTimeLocalValue(job.estimated_end_at),
       status: job.status,
@@ -82,6 +85,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   useEffect(() => {
     register("assignedEmployeeIds");
     register("customerId");
+    register("customerAddressId");
     register("isRecurring");
     register("recurrence");
     register("notes");
@@ -117,6 +121,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
 
   const assignedEmployeeIds = watch("assignedEmployeeIds");
   const selectedCustomerId = watch("customerId");
+  const selectedCustomerAddressId = watch("customerAddressId");
   const selectedStatus = watch("status");
   const isRecurring = watch("isRecurring");
 
@@ -141,6 +146,56 @@ export default function EditJobForm({ job }: EditJobFormProps) {
       ),
     [employees, assignedEmployeeIds]
   );
+
+  const buildAddressLabel = (address: CustomerAddress) => {
+    const parts = [
+      address.label,
+      address.address_line1,
+      address.address_line2,
+      `${address.city}, ${address.state} ${address.zip_code}`,
+      address.country
+    ].filter(Boolean);
+    return parts.join(" · ");
+  };
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      if (!selectedCustomerId) {
+        setCustomerAddresses([]);
+        setValue("customerAddressId", "", { shouldDirty: true });
+        return;
+      }
+      setIsLoadingAddresses(true);
+      try {
+        const response = await fetch(`/api/customers/${selectedCustomerId}`, {
+          cache: "no-store"
+        });
+        if (!response.ok) {
+          setCustomerAddresses([]);
+          setValue("customerAddressId", "", { shouldDirty: true });
+          return;
+        }
+        const payload = (await response.json()) as {
+          data?: { addresses?: CustomerAddress[] };
+        };
+        const addresses = payload.data?.addresses ?? [];
+        setCustomerAddresses(addresses);
+        const preferred =
+          addresses.find((address) => address.id === selectedCustomerAddressId)?.id ??
+          addresses.find((address) => address.is_primary)?.id ??
+          addresses[0]?.id ??
+          "";
+        setValue("customerAddressId", preferred, { shouldDirty: true });
+      } catch {
+        setCustomerAddresses([]);
+        setValue("customerAddressId", "", { shouldDirty: true });
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    loadAddresses();
+  }, [selectedCustomerAddressId, selectedCustomerId, setValue]);
 
   const filteredEmployees = useMemo(() => {
     const search = filter.trim().toLowerCase();
@@ -260,10 +315,34 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           const selected = customers.find((customer) => customer.id === id);
           setValue("customerId", id, { shouldDirty: true });
           setValue("customerName", selected?.name ?? "", { shouldDirty: true });
+          setValue("customerAddressId", "", { shouldDirty: true });
         }}
       />
       <input type="hidden" {...register("customerId")} />
       <input type="hidden" {...register("customerName")} />
+      <Select
+        label={t("fields.customerAddress")}
+        value={selectedCustomerAddressId ?? ""}
+        error={errors.customerAddressId?.message}
+        options={[
+          {
+            value: "",
+            label: isLoadingAddresses
+              ? tCommon("status.loading")
+              : t("fields.customerAddressPlaceholder")
+          },
+          ...customerAddresses.map((address) => ({
+            value: address.id,
+            label: buildAddressLabel(address)
+          }))
+        ]}
+        onChange={(event) => {
+          setValue("customerAddressId", event.target.value, {
+            shouldDirty: true
+          });
+        }}
+        disabled={!selectedCustomerId || isLoadingAddresses || customerAddresses.length === 0}
+      />
       <Select
         label={t("fields.status")}
         error={errors.status?.message}
