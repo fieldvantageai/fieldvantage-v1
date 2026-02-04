@@ -199,6 +199,7 @@ export default function AppShell({ children }: AppShellProps) {
               className="w-full border-none p-0 shadow-none"
               onNavigate={() => setIsOpen(false)}
               showHeader={false}
+              userRole={userRole}
             />
           </div>
         </div>
