@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import type { JobStatus } from "@fieldvantage/shared";
 
 type RouteParams = {
@@ -14,32 +15,6 @@ const allowedStatuses: JobStatus[] = [
   "done",
   "canceled"
 ];
-
-const getCompanyIdForUser = async (
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
-  userId: string
-) => {
-  const { data: company, error: companyError } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("owner_id", userId)
-    .maybeSingle();
-  if (companyError) {
-    throw companyError;
-  }
-  if (company?.id) {
-    return company.id;
-  }
-  const { data: employee, error: employeeError } = await supabase
-    .from("employees")
-    .select("company_id")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (employeeError) {
-    throw employeeError;
-  }
-  return employee?.company_id ?? null;
-};
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
@@ -73,8 +48,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+  }
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyIdForUser(supabase, user.id);
+  const companyId = context.companyId;
   if (!companyId) {
     return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
   }

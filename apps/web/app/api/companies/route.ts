@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getMyCompany, upsertMyCompany } from "@/features/companies/service";
+import { getMyCompany, updateMyCompany } from "@/features/companies/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -27,17 +27,7 @@ export async function GET() {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
   const ownerCompany = await getMyCompany();
-  let company = toCompanySummary(ownerCompany);
-  if (!company) {
-    const { data: employee } = await supabaseAdmin
-      .from("employees")
-      .select("company:company_id(id, name, logo_url)")
-      .eq("user_id", user.id)
-      .maybeSingle<{
-        company: { id: string; name: string; logo_url: string | null } | null;
-      }>();
-    company = employee?.company ?? null;
-  }
+  const company = toCompanySummary(ownerCompany);
   if (!company?.logo_url) {
     return NextResponse.json({ data: company });
   }
@@ -82,7 +72,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const updated = await upsertMyCompany(body as { name: string });
+    const updated = await updateMyCompany(body);
     const company = toCompanySummary(updated);
 
     if (!company?.logo_url) {

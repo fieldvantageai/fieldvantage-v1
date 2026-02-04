@@ -1,56 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
-};
-
-type CompanyAuth = {
-  companyId: string;
-  role: "owner" | "admin";
-};
-
-const getCompanyForUser = async (user: { id: string; email?: string | null }) => {
-  const { data: ownedCompany, error: ownerError } = await supabaseAdmin
-    .from("companies")
-    .select("id, owner_id")
-    .eq("owner_id", user.id)
-    .maybeSingle();
-
-  if (ownerError) {
-    throw ownerError;
-  }
-
-  if (ownedCompany?.id) {
-    return { companyId: ownedCompany.id, role: "owner" as const };
-  }
-
-  const email = user.email?.trim();
-  if (!email) {
-    return null;
-  }
-
-  const { data: employee, error: employeeError } = await supabaseAdmin
-    .from("employees")
-    .select("company_id, role")
-    .ilike("email", email)
-    .in("role", ["owner", "admin"])
-    .maybeSingle();
-
-  if (employeeError) {
-    throw employeeError;
-  }
-
-  if (!employee?.company_id) {
-    return null;
-  }
-
-  return {
-    companyId: employee.company_id,
-    role: employee.role as "owner" | "admin"
-  } as CompanyAuth;
 };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
@@ -66,11 +21,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Status invalido." }, { status: 400 });
     }
 
-    const company = await getCompanyForUser({
-      id: user.id,
-      email: user.email ?? null
-    });
-    if (!company) {
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
       return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 
@@ -84,7 +39,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
     }
 
-    if (employee.company_id !== company.companyId) {
+    if (employee.company_id !== context.companyId) {
       return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 

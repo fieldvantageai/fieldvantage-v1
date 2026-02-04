@@ -281,6 +281,19 @@ export default function SettingsPanel() {
               <p className="text-xs text-slate-500">{t("navigation.helper")}</p>
             </div>
           </Section>
+
+          <Section
+            title={t("companySwitch.title")}
+            description={t("companySwitch.subtitle")}
+          >
+            <div className="flex justify-start">
+              <Link href="/select-company">
+                <Button type="button" variant="secondary">
+                  {t("companySwitch.action")}
+                </Button>
+              </Link>
+            </div>
+          </Section>
         </div>
       ) : userRole && userRole !== "employee" ? (
         <Section

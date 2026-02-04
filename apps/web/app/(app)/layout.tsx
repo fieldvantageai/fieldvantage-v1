@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import AccessBlocked from "@/components/common/AccessBlocked";
 import AppShell from "@/components/layout/AppShell";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -17,18 +17,9 @@ export default async function AppLayout({
     redirect("/entrar");
   }
 
-  const { data: employee, error } = await supabase
-    .from("employees")
-    .select("id, company_id, is_active")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error || !employee) {
-    return <AccessBlocked variant="not_member" autoSignOut />;
-  }
-
-  if (!employee.is_active) {
-    return <AccessBlocked variant="inactive" autoSignOut />;
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    redirect("/select-company");
   }
 
   return <AppShell>{children}</AppShell>;

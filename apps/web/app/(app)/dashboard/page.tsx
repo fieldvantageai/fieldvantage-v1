@@ -5,6 +5,7 @@ import { Section } from "@/components/ui/Section";
 import { getMyCompany } from "@/features/companies/service";
 import { listEmployees } from "@/features/employees/service";
 import { listJobs } from "@/features/jobs/service";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 
@@ -12,6 +13,8 @@ export default async function DashboardPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "dashboard");
   const tJobs = await getT(locale, "jobs");
+  const context = await getActiveCompanyContext();
+  const isMember = context?.role === "member";
   const company = await getMyCompany();
 
   if (!company) {
@@ -164,11 +167,13 @@ export default async function DashboardPage() {
                 <p className="mt-2 text-sm text-slate-500">
                   {t("today.emptySubtitle")}
                 </p>
-                <div className="mt-4 flex justify-center">
-                  <Link href="/jobs/new">
-                    <Button>{t("today.createJob")}</Button>
-                  </Link>
-                </div>
+                {isMember ? null : (
+                  <div className="mt-4 flex justify-center">
+                    <Link href="/jobs/new">
+                      <Button>{t("today.createJob")}</Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
@@ -251,23 +256,25 @@ export default async function DashboardPage() {
               </Section>
             ) : null}
 
-            <Section title={t("quick.title")} description={t("quick.subtitle")}>
-              <div className="flex flex-col gap-3">
-                <Link href="/jobs/new" className="w-full">
-                  <Button className="w-full">{t("quick.createJob")}</Button>
-                </Link>
-                <Link href="/employees/new" className="w-full">
-                  <Button variant="secondary" className="w-full">
-                    {t("quick.inviteEmployee")}
-                  </Button>
-                </Link>
-                <Link href="/customers/new" className="w-full">
-                  <Button variant="secondary" className="w-full">
-                    {t("quick.addCustomer")}
-                  </Button>
-                </Link>
-              </div>
-            </Section>
+            {isMember ? null : (
+              <Section title={t("quick.title")} description={t("quick.subtitle")}>
+                <div className="flex flex-col gap-3">
+                  <Link href="/jobs/new" className="w-full">
+                    <Button className="w-full">{t("quick.createJob")}</Button>
+                  </Link>
+                  <Link href="/employees/new" className="w-full">
+                    <Button variant="secondary" className="w-full">
+                      {t("quick.inviteEmployee")}
+                    </Button>
+                  </Link>
+                  <Link href="/customers/new" className="w-full">
+                    <Button variant="secondary" className="w-full">
+                      {t("quick.addCustomer")}
+                    </Button>
+                  </Link>
+                </div>
+              </Section>
+            )}
           </div>
         </div>
       </div>

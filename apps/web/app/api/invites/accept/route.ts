@@ -94,7 +94,7 @@ export async function POST(request: Request) {
           invitation_status: "accepted"
         })
         .eq("id", inviteData.employee_id)
-        .select("id, company_id")
+        .select("id, company_id, role")
         .maybeSingle();
 
     if (updateEmployeeError || !updatedEmployee) {
@@ -121,6 +121,23 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    await supabaseAdmin.from("company_memberships").insert({
+      company_id: updatedEmployee.company_id,
+      user_id: newUserId,
+      role:
+        updatedEmployee.role === "owner"
+          ? "owner"
+          : updatedEmployee.role === "admin"
+            ? "admin"
+            : "member",
+      status: "active"
+    });
+
+    await supabaseAdmin.from("user_profiles").upsert({
+      user_id: newUserId,
+      last_active_company_id: updatedEmployee.company_id
+    });
 
     await supabaseAdmin
       .from("invites")

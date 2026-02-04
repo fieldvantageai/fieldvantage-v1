@@ -82,6 +82,18 @@ export async function POST(request: Request) {
       );
     }
 
+    await supabaseAdmin.from("company_memberships").insert({
+      company_id: company.id,
+      user_id: userId,
+      role: "owner",
+      status: "active"
+    });
+
+    await supabaseAdmin.from("user_profiles").upsert({
+      user_id: userId,
+      last_active_company_id: company.id
+    });
+
     const supabase = await createSupabaseServerClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: input.email,

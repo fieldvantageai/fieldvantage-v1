@@ -3,38 +3,13 @@ import { NextResponse } from "next/server";
 import { newJobSchema } from "@/features/jobs/forms/newJob/formSchema";
 import { createJob } from "@/features/jobs/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const PAGE_SIZE = 20;
 
 const toScheduledFor = (date: string, time?: string | null) =>
   `${date}T${time?.slice(0, 5) ?? "00:00"}`;
-
-const getCompanyIdForUser = async (
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
-  userId: string
-) => {
-  const { data: company, error: companyError } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("owner_id", userId)
-    .maybeSingle();
-  if (companyError) {
-    throw companyError;
-  }
-  if (company?.id) {
-    return company.id;
-  }
-  const { data: employee, error: employeeError } = await supabase
-    .from("employees")
-    .select("company_id")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (employeeError) {
-    throw employeeError;
-  }
-  return employee?.company_id ?? null;
-};
 
 export async function GET(request: Request) {
   const user = await getSupabaseAuthUser();
@@ -52,16 +27,18 @@ export async function GET(request: Request) {
   const page = Number(searchParams.get("page") ?? "1");
   const safePage = Number.isNaN(page) || page < 1 ? 1 : page;
 
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ data: [], total: 0 }, { status: 200 });
+  }
   const supabase = await createSupabaseServerClient();
   const { data: employee } = await supabase
     .from("employees")
-    .select("id, role")
+    .select("id")
+    .eq("company_id", context.companyId)
     .eq("user_id", user.id)
     .maybeSingle();
-  const companyId = await getCompanyIdForUser(supabase, user.id);
-  if (!companyId) {
-    return NextResponse.json({ data: [], total: 0 }, { status: 200 });
-  }
+  const companyId = context.companyId;
 
   let jobIdsFromAssignments: string[] = [];
   if (query) {
@@ -91,10 +68,13 @@ export async function GET(request: Request) {
   }
 
   const baseSelect =
-    "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id, employees(full_name))";
+    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id, employees(full_name))";
   const employeeSelect =
-    "id, company_id, customer_id, customer_name, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments!inner(employee_id, employees(full_name))";
-  const isCollaborator = employee?.role === "employee" && employee.id;
+    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments!inner(employee_id, employees(full_name))";
+  const isCollaborator = context.role === "member" && employee?.id;
+  if (context.role === "member" && !employee?.id) {
+    return NextResponse.json({ data: [], total: 0 }, { status: 200 });
+  }
 
   let jobsQuery = supabase
     .from("jobs")
@@ -152,6 +132,7 @@ export async function GET(request: Request) {
       company_id: row.company_id,
       customer_id: row.customer_id,
       customer_name: row.customer_name,
+      customer_address_id: row.customer_address_id,
       title: row.title,
       status: row.status,
       scheduled_for: toScheduledFor(row.scheduled_date, row.scheduled_time),
@@ -180,6 +161,13 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
     }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
+    }
     const body = await request.json();
     const input = await newJobSchema.validate(body, {
       abortEarly: false,
@@ -187,15 +175,7 @@ export async function POST(request: Request) {
     });
 
     const supabase = await createSupabaseServerClient();
-    const { data: company } = await supabase
-      .from("companies")
-      .select("id, owner_id")
-      .eq("owner_id", user.id)
-      .maybeSingle();
-
-    if (!company?.id) {
-      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
-    }
+    const companyId = context.companyId;
 
     const inactiveIds =
       input.assignedEmployeeIds?.length
@@ -203,25 +183,14 @@ export async function POST(request: Request) {
             await supabase
               .from("employees")
               .select("id")
-              .eq("company_id", company.id)
+          .eq("company_id", companyId)
               .in("id", input.assignedEmployeeIds)
               .eq("is_active", false)
           ).data ?? []
         : [];
 
     const allowInactive = Boolean(input.allowInactive);
-    const isOwner = company.owner_id === user.id;
-    const isAdmin = !isOwner && user.email
-      ? (
-          await supabase
-            .from("employees")
-            .select("role")
-            .eq("company_id", company.id)
-            .eq("email", user.email)
-            .maybeSingle()
-        ).data?.role === "admin"
-      : false;
-    const canAllowInactive = isOwner || isAdmin;
+    const canAllowInactive = context.role === "owner" || context.role === "admin";
 
     if (inactiveIds.length > 0 && (!allowInactive || !canAllowInactive)) {
       return NextResponse.json(
@@ -245,9 +214,9 @@ export async function POST(request: Request) {
       notes: input.notes ?? null
     });
 
-    if (company?.id) {
+    if (companyId) {
       await supabase.from("job_events").insert({
-        company_id: company.id,
+        company_id: companyId,
         job_id: job.id,
         event_type: "created",
         event_label: "Order created",

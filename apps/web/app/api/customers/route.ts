@@ -6,6 +6,7 @@ import {
   replaceCustomerAddresses
 } from "@/features/customers/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { newCustomerSchema } from "@/features/customers/forms/newCustomer/formSchema";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -25,6 +26,13 @@ export async function POST(request: Request) {
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
     const input = await newCustomerSchema.validate(body, {
       abortEarly: false,

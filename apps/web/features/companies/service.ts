@@ -1,36 +1,43 @@
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  getMyCompany as getMyCompanyData,
-  updateMyCompany as updateMyCompanyData,
-  upsertMyCompany as upsertMyCompanyData,
-  type UpdateCompanyInput
-} from "@fieldvantage/data";
+import type { UpdateCompanyInput } from "@fieldvantage/data";
 
 export type { UpdateCompanyInput };
 
 export async function getMyCompany() {
   const supabase = await createSupabaseServerClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
     return null;
   }
-  return getMyCompanyData(supabase, authData.user.id);
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .eq("id", context.companyId)
+    .maybeSingle();
+  if (error) {
+    throw error;
+  }
+  return data ?? null;
 }
 
 export async function updateMyCompany(input: UpdateCompanyInput) {
   const supabase = await createSupabaseServerClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    throw new Error("Usuario nao autenticado.");
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    throw new Error("Empresa nao encontrada.");
   }
-  return updateMyCompanyData(supabase, authData.user.id, input);
-}
-
-export async function upsertMyCompany(input: UpdateCompanyInput & { name: string }) {
-  const supabase = await createSupabaseServerClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    throw new Error("Usuario nao autenticado.");
+  if (context.role === "member") {
+    throw new Error("Sem permissao para editar empresa.");
   }
-  return upsertMyCompanyData(supabase, authData.user.id, input);
+  const { data, error } = await supabase
+    .from("companies")
+    .update(input)
+    .eq("id", context.companyId)
+    .select("*")
+    .single();
+  if (error) {
+    throw error;
+  }
+  return data;
 }

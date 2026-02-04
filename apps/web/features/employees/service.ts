@@ -1,3 +1,4 @@
+import { getActiveCompanyId } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import {
@@ -11,38 +12,11 @@ import {
 } from "@fieldvantage/data";
 import type { Employee, JobStatus } from "@fieldvantage/shared";
 
-const getCompanyId = async (
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
-) => {
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    return null;
-  }
-  const { data, error } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("owner_id", authData.user.id)
-    .maybeSingle();
-  if (error) {
-    throw error;
-  }
-  if (data?.id) {
-    return data.id;
-  }
-  const { data: employeeData, error: employeeError } = await supabase
-    .from("employees")
-    .select("company_id")
-    .eq("user_id", authData.user.id)
-    .maybeSingle();
-  if (employeeError) {
-    throw employeeError;
-  }
-  return employeeData?.company_id ?? null;
-};
+const getCompanyId = async () => getActiveCompanyId();
 
 export async function listEmployees() {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     return [];
   }
@@ -96,7 +70,7 @@ export type EmployeeWithAvatar = Employee & {
 
 export async function getEmployeeById(id: string): Promise<EmployeeWithAvatar | null> {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     return null;
   }
@@ -119,7 +93,7 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithAvatar | 
 
 export async function createEmployee(input: CreateEmployeeInput) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     throw new Error("Empresa nao encontrada.");
   }
@@ -128,7 +102,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
 
 export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     throw new Error("Empresa nao encontrada.");
   }
@@ -137,7 +111,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
 
 export async function deleteEmployee(id: string) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     return false;
   }
@@ -157,7 +131,7 @@ const toScheduledFor = (date: string, time?: string | null) =>
 
 export async function listEmployeeJobs(employeeId: string) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await getCompanyId();
   if (!companyId) {
     return [];
   }

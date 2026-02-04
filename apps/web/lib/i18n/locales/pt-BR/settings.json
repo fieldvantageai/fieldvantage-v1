@@ -23,6 +23,11 @@
       "waze": "Waze"
     }
   },
+  "companySwitch": {
+    "title": "Trocar empresa",
+    "subtitle": "Altere a empresa ativa para continuar trabalhando.",
+    "action": "Escolher empresa"
+  },
   "roles": {
     "title": "Cargos disponíveis",
     "subtitle": "Papéis padrão para colaboradores.",

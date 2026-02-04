@@ -23,6 +23,20 @@
     "change": "Trocar logo"
   },
   "fallbackName": "Minha empresa",
+  "selectCompany": {
+    "title": "Escolha uma empresa",
+    "subtitle": "Selecione a empresa para continuar.",
+    "access": "Acessar",
+    "loading": "Carregando empresas...",
+    "empty": "Nenhuma empresa encontrada.",
+    "loadError": "Falha ao carregar empresas.",
+    "selectError": "Falha ao selecionar empresa.",
+    "roles": {
+      "owner": "Proprietario",
+      "admin": "Administrador",
+      "member": "Colaborador"
+    }
+  },
   "messages": {
     "updated": "Empresa atualizada.",
     "updateError": "Falha ao salvar empresa.",

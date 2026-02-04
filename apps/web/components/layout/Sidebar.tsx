@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useClientT } from "@/lib/i18n/useClientT";
+import SidebarUserHeader from "@/components/layout/SidebarUserHeader";
 
 type SidebarProps = {
   className?: string;
@@ -29,18 +30,8 @@ export default function Sidebar({
   const router = useRouter();
   const { t } = useClientT("common");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const firstName =
-    userName?.trim().split(" ").filter(Boolean)[0] ?? t("status.loading");
-  const roleLabelMap: Record<string, string> = {
-    owner: t("roles.owner"),
-    admin: t("roles.admin"),
-    employee: t("roles.employee")
-  };
-  const roleLabel =
-    (userRole && roleLabelMap[userRole]) || userRole || t("status.loading");
-
   const navItems =
-    userRole === "employee" || !userRole
+    userRole === "employee" || userRole === "member" || !userRole
       ? [
           { label: t("nav.dashboard"), href: "/dashboard" },
           { label: t("nav.jobs"), href: "/jobs" }
@@ -65,24 +56,15 @@ export default function Sidebar({
         <Link
           href={profileHref}
           onClick={onNavigate}
-          className="mb-6 flex items-center gap-3 rounded-2xl p-2 transition hover:bg-slate-50/70"
+          className="mb-6 block"
           aria-label={t("nav.employees")}
         >
-          <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-slate-200/70 bg-slate-100 text-xs font-semibold text-slate-500">
-            {userAvatarUrl ? (
-              <img
-                src={userAvatarUrl}
-                alt={firstName}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              firstName.charAt(0).toUpperCase()
-            )}
-          </span>
-          <div className="min-w-0">
-            <p className="text-lg font-semibold text-slate-900">{firstName}</p>
-            <p className="text-xs text-slate-500">{roleLabel}</p>
-          </div>
+          <SidebarUserHeader
+            userName={userName}
+            userRole={userRole}
+            userAvatarUrl={userAvatarUrl}
+            variant="desktop"
+          />
         </Link>
       ) : null}
       <nav className="space-y-2">

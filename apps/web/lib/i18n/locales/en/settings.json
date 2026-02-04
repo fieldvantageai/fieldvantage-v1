@@ -23,6 +23,11 @@
       "waze": "Waze"
     }
   },
+  "companySwitch": {
+    "title": "Switch company",
+    "subtitle": "Change the active company to continue.",
+    "action": "Choose company"
+  },
   "roles": {
     "title": "Available roles",
     "subtitle": "Default roles for employees.",

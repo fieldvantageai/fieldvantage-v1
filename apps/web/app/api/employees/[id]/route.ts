@@ -7,6 +7,7 @@ import {
   updateEmployee
 } from "@/features/employees/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type RouteParams = {
@@ -32,6 +33,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
     const current = await getEmployeeById(id);
     if (!current) {
@@ -116,6 +124,13 @@ export async function DELETE(_: Request, { params }: RouteParams) {
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+  }
+  if (context.role === "member") {
+    return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
   }
   const current = await getEmployeeById(id);
   if (!current) {

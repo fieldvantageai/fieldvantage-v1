@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -10,16 +11,27 @@ export async function GET() {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
   }
 
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+  }
+
   const supabase = await createSupabaseServerClient();
   const { data: employee, error } = await supabase
     .from("employees")
     .select(
       "id, company_id, user_id, full_name, email, role, is_active, avatar_url"
     )
+    .eq("company_id", context.companyId)
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (error || !employee) {
+  if (error) {
+    return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
+  }
+
+  const role = employee?.role ?? context.role;
+  if (!employee) {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
   }
 
@@ -34,6 +46,7 @@ export async function GET() {
   return NextResponse.json({
     data: {
       ...employee,
+      role,
       avatar_signed_url: avatarSignedUrl
     }
   });

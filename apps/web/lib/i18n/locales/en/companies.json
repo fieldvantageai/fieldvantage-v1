@@ -23,6 +23,20 @@
     "change": "Change logo"
   },
   "fallbackName": "My company",
+  "selectCompany": {
+    "title": "Choose a company",
+    "subtitle": "Select the company to continue.",
+    "access": "Access",
+    "loading": "Loading companies...",
+    "empty": "No companies found.",
+    "loadError": "Failed to load companies.",
+    "selectError": "Failed to select company.",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member"
+    }
+  },
   "messages": {
     "updated": "Company updated.",
     "updateError": "Failed to save company.",

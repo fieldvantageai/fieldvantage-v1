@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { newEmployeeSchema } from "@/features/employees/forms/newEmployee/formSchema";
 import { listEmployees } from "@/features/employees/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET() {
@@ -14,52 +15,6 @@ export async function GET() {
   const employees = await listEmployees();
   return NextResponse.json({ data: employees });
 }
-
-type CompanyAuth = {
-  companyId: string;
-  role: "owner" | "admin";
-};
-
-const getCompanyForUser = async (user: { id: string; email?: string | null }) => {
-  const { data: ownedCompany, error: ownerError } = await supabaseAdmin
-    .from("companies")
-    .select("id, owner_id")
-    .eq("owner_id", user.id)
-    .maybeSingle();
-
-  if (ownerError) {
-    throw ownerError;
-  }
-
-  if (ownedCompany?.id) {
-    return { companyId: ownedCompany.id, role: "owner" as const };
-  }
-
-  const email = user.email?.trim();
-  if (!email) {
-    return null;
-  }
-
-  const { data: employee, error: employeeError } = await supabaseAdmin
-    .from("employees")
-    .select("company_id, role")
-    .ilike("email", email)
-    .in("role", ["owner", "admin"])
-    .maybeSingle();
-
-  if (employeeError) {
-    throw employeeError;
-  }
-
-  if (!employee?.company_id) {
-    return null;
-  }
-
-  return {
-    companyId: employee.company_id,
-    role: employee.role as "owner" | "admin"
-  } as CompanyAuth;
-};
 
 const buildInviteLink = (request: Request, rawToken: string) => {
   const baseUrl =
@@ -75,12 +30,11 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
     }
-
-    const company = await getCompanyForUser({
-      id: user.id,
-      email: user.email ?? null
-    });
-    if (!company) {
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
       return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 
@@ -97,7 +51,7 @@ export async function POST(request: Request) {
     const { data: employee, error: employeeError } = await supabaseAdmin
       .from("employees")
       .insert({
-        company_id: company.companyId,
+        company_id: context.companyId,
         first_name: input.firstName,
         last_name: input.lastName,
         full_name: fullName,
@@ -142,7 +96,7 @@ export async function POST(request: Request) {
     const { data: invite, error: inviteError } = await supabaseAdmin
       .from("invites")
       .insert({
-        company_id: company.companyId,
+        company_id: context.companyId,
         employee_id: employee.id,
         token_hash: tokenHash,
         expires_at: expiresAt.toISOString(),

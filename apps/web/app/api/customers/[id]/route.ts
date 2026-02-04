@@ -7,6 +7,7 @@ import {
   updateCustomer
 } from "@/features/customers/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { newCustomerSchema } from "@/features/customers/forms/newCustomer/formSchema";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -33,6 +34,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
     const body = await request.json();
     const input = await newCustomerSchema.validate(body, {
@@ -89,6 +97,13 @@ export async function DELETE(_: Request, { params }: RouteParams) {
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+  }
+  if (context.role === "member") {
+    return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
   }
   const deleted = await deleteCustomer(id);
   if (!deleted) {

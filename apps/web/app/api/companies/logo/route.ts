@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
@@ -13,6 +14,13 @@ export async function POST(request: Request) {
     const user = await getSupabaseAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+    }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -39,21 +47,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: company, error: companyError } = await supabaseAdmin
-      .from("companies")
-      .select("id")
-      .eq("owner_id", user.id)
-      .maybeSingle();
-
-    if (companyError || !company?.id) {
-      return NextResponse.json(
-        { error: "Empresa nao encontrada." },
-        { status: 404 }
-      );
-    }
-
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-    const path = `${company.id}/logo.${ext}`;
+    const path = `${context.companyId}/logo.${ext}`;
 
     const { error: uploadError } = await supabaseAdmin.storage
       .from("company-logos")
@@ -72,7 +67,7 @@ export async function POST(request: Request) {
     const { error: updateError } = await supabaseAdmin
       .from("companies")
       .update({ logo_url: path })
-      .eq("id", company.id);
+      .eq("id", context.companyId);
 
     if (updateError) {
       return NextResponse.json(

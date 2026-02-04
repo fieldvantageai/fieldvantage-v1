@@ -9,6 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 import FloatingActionButton from "../ui/FloatingActionButton";
 import Sidebar from "./Sidebar";
+import SidebarUserHeader from "./SidebarUserHeader";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -170,24 +171,14 @@ export default function AppShell({ children }: AppShellProps) {
           />
           <div className="absolute inset-y-3 left-3 w-[85vw] max-w-sm rounded-r-3xl bg-white/95 px-4 pb-3 pt-4 shadow-2xl ring-1 ring-slate-200/70 motion-safe:animate-[drawer-in_220ms_ease-out]">
             <div className="mb-5 flex items-center justify-between">
-              <div className="flex min-w-0 items-center gap-3">
-                {companyLogoUrl ? (
-                  <img
-                    src={companyLogoUrl}
-                    alt={companyLabel}
-                    className="h-10 w-10 rounded-full border border-slate-200/70 object-cover shadow-sm"
-                  />
-                ) : (
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-sm font-semibold text-slate-700 shadow-sm">
-                    {companyInitial}
-                  </span>
-                )}
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-900">
-                    {isLoadingCompany ? t("status.loading") : companyLabel}
-                  </p>
-                </div>
-              </div>
+              <SidebarUserHeader
+                userName={userName}
+                userRole={userRole}
+                userAvatarUrl={userAvatarUrl}
+                companyName={isLoadingCompany ? null : companyLabel}
+                companyLogoUrl={companyLogoUrl ?? null}
+                variant="mobile"
+              />
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}

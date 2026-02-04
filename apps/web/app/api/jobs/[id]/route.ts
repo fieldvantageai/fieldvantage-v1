@@ -7,6 +7,7 @@ import {
   updateJob
 } from "@/features/jobs/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type RouteParams = {
@@ -33,21 +34,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
     }
+    const context = await getActiveCompanyContext();
+    if (!context) {
+      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+    }
+    if (context.role === "member") {
+      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
+    }
     const body = await request.json();
     const input = await newJobSchema.validate(body, {
       abortEarly: false,
       stripUnknown: true
     });
     const supabase = await createSupabaseServerClient();
-    const { data: company } = await supabase
-      .from("companies")
-      .select("id, owner_id")
-      .eq("owner_id", user.id)
-      .maybeSingle();
-
-    if (!company?.id) {
-      return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
-    }
+    const companyId = context.companyId;
 
     const inactiveIds =
       input.assignedEmployeeIds?.length
@@ -55,25 +55,14 @@ export async function PATCH(request: Request, { params }: RouteParams) {
             await supabase
               .from("employees")
               .select("id")
-              .eq("company_id", company.id)
+          .eq("company_id", companyId)
               .in("id", input.assignedEmployeeIds)
               .eq("is_active", false)
           ).data ?? []
         : [];
 
     const allowInactive = Boolean(input.allowInactive);
-    const isOwner = company.owner_id === user.id;
-    const isAdmin = !isOwner && user.email
-      ? (
-          await supabase
-            .from("employees")
-            .select("role")
-            .eq("company_id", company.id)
-            .eq("email", user.email)
-            .maybeSingle()
-        ).data?.role === "admin"
-      : false;
-    const canAllowInactive = isOwner || isAdmin;
+    const canAllowInactive = context.role === "owner" || context.role === "admin";
 
     if (inactiveIds.length > 0 && (!allowInactive || !canAllowInactive)) {
       return NextResponse.json(
@@ -120,6 +109,13 @@ export async function DELETE(_: Request, { params }: RouteParams) {
   const user = await getSupabaseAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
+  }
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return NextResponse.json({ error: "Empresa nao encontrada." }, { status: 404 });
+  }
+  if (context.role === "member") {
+    return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
   }
   const deleted = await deleteJob(id);
   if (!deleted) {
