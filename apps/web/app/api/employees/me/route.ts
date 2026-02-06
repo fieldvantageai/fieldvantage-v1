@@ -22,7 +22,6 @@ export async function GET() {
     .select(
       "id, company_id, user_id, full_name, email, role, is_active, avatar_url"
     )
-    .eq("company_id", context.companyId)
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -47,6 +46,7 @@ export async function GET() {
     data: {
       ...employee,
       role,
+      company_id: context.companyId,
       avatar_signed_url: avatarSignedUrl
     }
   });

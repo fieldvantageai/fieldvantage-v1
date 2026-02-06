@@ -23,12 +23,19 @@
     },
     "actions": {
       "show": "Mostrar",
-      "hide": "Ocultar"
+      "hide": "Ocultar",
+      "loading": "Processando..."
     },
-    "submit": "Ativar conta",
+    "submit": "Criar conta",
+    "acceptCta": "Aceitar convite",
     "successTitle": "Conta ativada com sucesso.",
     "successSubtitle": "Agora você pode entrar.",
     "loginCta": "Ir para o login",
+    "loginPrompt": "Já tem conta?",
+    "logoutCta": "Sair desta conta",
+    "wrongAccount": "Você entrou com outra conta. Faça login com o email convidado.",
+    "createHint": "Se o email já existe, faça login para aceitar.",
+    "loginRequired": "Faça login para aceitar o convite.",
     "errors": {
       "emailRequired": "Email obrigatório.",
       "emailInvalid": "Email inválido.",
@@ -37,6 +44,22 @@
       "confirmRequired": "Confirmação obrigatória.",
       "confirmMatch": "As senhas precisam coincidir."
     },
-    "activateError": "Não foi possível ativar a conta."
+    "activateError": "Não foi possível ativar a conta.",
+    "acceptError": "Não foi possível aceitar o convite."
+  },
+  "inbox": {
+    "title": "Convites pendentes",
+    "subtitle": "Aceite ou recuse convites de outras empresas.",
+    "empty": "Nenhum convite pendente no momento.",
+    "companyLabel": "Empresa",
+    "roleLabel": "Perfil",
+    "expiresLabel": "Expira em",
+    "createdLabel": "Enviado em",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "acceptSuccess": "Convite aceito.",
+    "declineSuccess": "Convite recusado.",
+    "loadError": "Não foi possível carregar os convites.",
+    "actionError": "Não foi possível atualizar o convite."
   }
 }

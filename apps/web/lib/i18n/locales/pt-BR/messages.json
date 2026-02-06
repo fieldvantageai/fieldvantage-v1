@@ -1,0 +1,14 @@
+{
+  "title": "Mensagens internas",
+  "subtitle": "Converse com sua equipe em tempo real.",
+  "searchLabel": "Buscar colaborador",
+  "searchPlaceholder": "Nome ou email",
+  "empty": "Nenhum colaborador disponível no momento.",
+  "thread": {
+    "title": "Conversa",
+    "back": "Voltar",
+    "send": "Enviar",
+    "placeholder": "Digite sua mensagem...",
+    "empty": "Nenhuma mensagem ainda."
+  }
+}

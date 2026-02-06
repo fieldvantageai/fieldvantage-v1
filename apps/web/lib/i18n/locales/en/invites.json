@@ -23,12 +23,19 @@
     },
     "actions": {
       "show": "Show",
-      "hide": "Hide"
+      "hide": "Hide",
+      "loading": "Processing..."
     },
-    "submit": "Activate account",
+    "submit": "Create account",
+    "acceptCta": "Accept invite",
     "successTitle": "Account activated successfully.",
     "successSubtitle": "You can sign in now.",
     "loginCta": "Go to login",
+    "loginPrompt": "Already have an account?",
+    "logoutCta": "Sign out of this account",
+    "wrongAccount": "You are signed in with a different account. Use the invited email.",
+    "createHint": "If the email already exists, sign in to accept.",
+    "loginRequired": "Sign in to accept the invite.",
     "errors": {
       "emailRequired": "Email is required.",
       "emailInvalid": "Invalid email.",
@@ -37,6 +44,22 @@
       "confirmRequired": "Confirmation is required.",
       "confirmMatch": "Passwords must match."
     },
-    "activateError": "Could not activate the account."
+    "activateError": "Could not activate the account.",
+    "acceptError": "Could not accept the invite."
+  },
+  "inbox": {
+    "title": "Pending invites",
+    "subtitle": "Accept or decline invites from other companies.",
+    "empty": "No pending invites right now.",
+    "companyLabel": "Company",
+    "roleLabel": "Role",
+    "expiresLabel": "Expires on",
+    "createdLabel": "Sent on",
+    "accept": "Accept",
+    "decline": "Decline",
+    "acceptSuccess": "Invite accepted.",
+    "declineSuccess": "Invite declined.",
+    "loadError": "Could not load invites.",
+    "actionError": "Could not update the invite."
   }
 }

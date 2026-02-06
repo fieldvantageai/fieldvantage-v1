@@ -37,6 +37,11 @@
       "member": "Colaborador"
     }
   },
+  "switcher": {
+    "label": "Trocar empresa",
+    "loading": "Carregando...",
+    "empty": "Nenhuma empresa vinculada."
+  },
   "messages": {
     "updated": "Empresa atualizada.",
     "updateError": "Falha ao salvar empresa.",

@@ -23,12 +23,19 @@
     },
     "actions": {
       "show": "Mostrar",
-      "hide": "Ocultar"
+      "hide": "Ocultar",
+      "loading": "Procesando..."
     },
-    "submit": "Activar cuenta",
+    "submit": "Crear cuenta",
+    "acceptCta": "Aceptar invitacion",
     "successTitle": "Cuenta activada con exito.",
     "successSubtitle": "Ahora puedes iniciar sesion.",
     "loginCta": "Ir al login",
+    "loginPrompt": "Ya tienes cuenta?",
+    "logoutCta": "Salir de esta cuenta",
+    "wrongAccount": "Iniciaste sesion con otra cuenta. Usa el email invitado.",
+    "createHint": "Si el email ya existe, inicia sesion para aceptar.",
+    "loginRequired": "Inicia sesion para aceptar la invitacion.",
     "errors": {
       "emailRequired": "Email obligatorio.",
       "emailInvalid": "Email invalido.",
@@ -37,6 +44,22 @@
       "confirmRequired": "Confirmacion obligatoria.",
       "confirmMatch": "Las contrasenas deben coincidir."
     },
-    "activateError": "No fue posible activar la cuenta."
+    "activateError": "No fue posible activar la cuenta.",
+    "acceptError": "No fue posible aceptar la invitacion."
+  },
+  "inbox": {
+    "title": "Invitaciones pendientes",
+    "subtitle": "Acepta o rechaza invitaciones de otras empresas.",
+    "empty": "No hay invitaciones pendientes por ahora.",
+    "companyLabel": "Empresa",
+    "roleLabel": "Rol",
+    "expiresLabel": "Expira el",
+    "createdLabel": "Enviado el",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "acceptSuccess": "Invitacion aceptada.",
+    "declineSuccess": "Invitacion rechazada.",
+    "loadError": "No fue posible cargar las invitaciones.",
+    "actionError": "No fue posible actualizar la invitacion."
   }
 }

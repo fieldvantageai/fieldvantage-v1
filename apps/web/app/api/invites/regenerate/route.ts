@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     const { data: employee, error: employeeError } = await supabaseAdmin
       .from("employees")
-      .select("id, company_id, invitation_status")
+      .select("id, company_id, invitation_status, email, full_name, role")
       .eq("id", employee_id)
       .maybeSingle();
 
@@ -65,7 +65,10 @@ export async function POST(request: Request) {
         token_hash: tokenHash,
         expires_at: expiresAt.toISOString(),
         status: "pending",
-        created_by: user.id
+        created_by: user.id,
+        email: employee.email ?? null,
+        full_name: employee.full_name ?? null,
+        role: employee.role ?? null
       })
       .select("id, status, expires_at")
       .single();
@@ -83,10 +86,60 @@ export async function POST(request: Request) {
       .eq("id", employee.id);
 
     const inviteLink = buildInviteLink(request, rawToken);
+    let existingUserNotice: string | null = null;
+
+    const findAuthUserIdByEmail = async (emailValue: string) => {
+      const normalized = emailValue.toLowerCase();
+      let page = 1;
+      const perPage = 200;
+      while (page <= 5) {
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+          page,
+          perPage
+        });
+        if (error || !data?.users?.length) {
+          return null;
+        }
+        const match = data.users.find(
+          (item) => item.email?.toLowerCase() === normalized
+        );
+        if (match?.id) {
+          return match.id;
+        }
+        if (data.users.length < perPage) {
+          break;
+        }
+        page += 1;
+      }
+      return null;
+    };
+
+    if (employee.email) {
+      const existingUserId = await findAuthUserIdByEmail(employee.email);
+      if (existingUserId) {
+        const { error: notifyError } = await supabaseAdmin
+          .from("user_notifications")
+          .upsert(
+            {
+              user_id: existingUserId,
+              type: "company_invite",
+              entity_id: invite.id,
+              company_id: context.companyId
+            },
+            { onConflict: "user_id,type,entity_id" }
+          );
+        if (!notifyError) {
+          existingUserNotice =
+            "Usuario ja possui conta. Ele sera notificado no app.";
+        }
+      }
+    }
 
     return NextResponse.json({
       invite,
-      invite_link: inviteLink
+      invite_link: inviteLink,
+      existing_user_notified: Boolean(existingUserNotice),
+      notice: existingUserNotice
     });
   } catch (error) {
     return NextResponse.json(

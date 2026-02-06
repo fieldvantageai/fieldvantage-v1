@@ -31,6 +31,8 @@
   "nav": {
     "dashboard": "Painel",
     "jobs": "Ordens",
+    "invites": "Convites",
+    "messages": "Mensagens",
     "customers": "Clientes",
     "employees": "Colaboradores",
     "teams": "Times",

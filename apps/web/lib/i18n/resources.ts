@@ -9,6 +9,7 @@ import jobsEn from "./locales/en/jobs.json";
 import companiesEn from "./locales/en/companies.json";
 import settingsEn from "./locales/en/settings.json";
 import teamsEn from "./locales/en/teams.json";
+import messagesEn from "./locales/en/messages.json";
 
 import authEs from "./locales/es/auth.json";
 import commonEs from "./locales/es/common.json";
@@ -21,6 +22,7 @@ import jobsEs from "./locales/es/jobs.json";
 import companiesEs from "./locales/es/companies.json";
 import settingsEs from "./locales/es/settings.json";
 import teamsEs from "./locales/es/teams.json";
+import messagesEs from "./locales/es/messages.json";
 
 import authPt from "./locales/pt-BR/auth.json";
 import commonPt from "./locales/pt-BR/common.json";
@@ -33,6 +35,7 @@ import jobsPt from "./locales/pt-BR/jobs.json";
 import companiesPt from "./locales/pt-BR/companies.json";
 import settingsPt from "./locales/pt-BR/settings.json";
 import teamsPt from "./locales/pt-BR/teams.json";
+import messagesPt from "./locales/pt-BR/messages.json";
 
 export const resources = {
   en: {
@@ -46,7 +49,8 @@ export const resources = {
     jobs: jobsEn,
     companies: companiesEn,
     settings: settingsEn,
-    teams: teamsEn
+    teams: teamsEn,
+    messages: messagesEn
   },
   "pt-BR": {
     auth: authPt,
@@ -59,7 +63,8 @@ export const resources = {
     jobs: jobsPt,
     companies: companiesPt,
     settings: settingsPt,
-    teams: teamsPt
+    teams: teamsPt,
+    messages: messagesPt
   },
   es: {
     auth: authEs,
@@ -72,6 +77,7 @@ export const resources = {
     jobs: jobsEs,
     companies: companiesEs,
     settings: settingsEs,
-    teams: teamsEs
+    teams: teamsEs,
+    messages: messagesEs
   }
 } as const;

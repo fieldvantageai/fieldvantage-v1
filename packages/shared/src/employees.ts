@@ -36,19 +36,19 @@ const optionalText = () =>
     .nullable()
     .optional();
 
-const optionalEmail = () =>
+const requiredEmail = () =>
   yup
     .string()
     .transform((value) => (value?.trim() === "" ? null : value))
     .nullable()
     .email("Informe um email valido.")
-    .optional();
+    .required("Email obrigatorio.");
 
 export const newEmployeeSchema = yup.object({
   firstName: yup.string().required("Nome obrigatorio."),
   lastName: yup.string().required("Sobrenome obrigatorio."),
   avatarUrl: optionalText(),
-  email: optionalEmail(),
+  email: requiredEmail(),
   phone: optionalText(),
   jobTitle: optionalText(),
   notes: optionalText(),

@@ -16,13 +16,14 @@ export async function GET(request: Request) {
   const { data, error } = await supabaseAdmin
     .from("invites")
     .select(
-      "id, expires_at, status, employee:employee_id(id, first_name, last_name, email, user_id), company:company_id(id, name, logo_url)"
+      "id, expires_at, status, email, employee:employee_id(id, first_name, last_name, email, user_id), company:company_id(id, name, logo_url)"
     )
     .eq("token_hash", tokenHash)
     .maybeSingle<{
       id: string;
       expires_at: string;
       status: string;
+      email: string | null;
       employee: {
         id: string;
         first_name: string | null;
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
           id: data.employee.id,
           first_name: data.employee.first_name,
           last_name: data.employee.last_name,
-          email: data.employee.email ?? null
+          email: data.email ?? data.employee.email ?? null
         }
       : null,
     invite: {

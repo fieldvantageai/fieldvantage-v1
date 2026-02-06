@@ -48,33 +48,71 @@ export async function POST(request: Request) {
       value && value.trim().length > 0 ? value : null;
     const fullName = `${input.firstName} ${input.lastName}`.trim();
 
-    const { data: employee, error: employeeError } = await supabaseAdmin
-      .from("employees")
-      .insert({
-        company_id: context.companyId,
-        first_name: input.firstName,
-        last_name: input.lastName,
-        full_name: fullName,
-        avatar_url: normalizeOptional(input.avatarUrl),
-        email: normalizeOptional(input.email),
-        phone: normalizeOptional(input.phone),
-        job_title: normalizeOptional(input.jobTitle),
-        notes: normalizeOptional(input.notes),
-        address_line1: normalizeOptional(input.addressLine1),
-        address_line2: normalizeOptional(input.addressLine2),
-        city: normalizeOptional(input.city),
-        state: normalizeOptional(input.state),
-        zip_code: normalizeOptional(input.zipCode),
-        country: normalizeOptional(input.country) ?? "USA",
-        role: input.role,
-        is_active: input.status === "active",
-        user_id: null,
-        invitation_status: "pending"
-      })
-      .select(
-        "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status"
-      )
-      .single();
+    const normalizedEmail = normalizeOptional(input.email);
+    const existingEmployee = normalizedEmail
+      ? (
+          await supabaseAdmin
+            .from("employees")
+            .select(
+              "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
+            )
+            .ilike("email", normalizedEmail)
+            .maybeSingle()
+        ).data
+      : null;
+
+    const { data: employee, error: employeeError } = existingEmployee
+      ? existingEmployee.user_id
+        ? { data: existingEmployee, error: null }
+        : await supabaseAdmin
+            .from("employees")
+            .update({
+              first_name: input.firstName,
+              last_name: input.lastName,
+              full_name: fullName,
+              avatar_url: normalizeOptional(input.avatarUrl),
+              phone: normalizeOptional(input.phone),
+              job_title: normalizeOptional(input.jobTitle),
+              notes: normalizeOptional(input.notes),
+              address_line1: normalizeOptional(input.addressLine1),
+              address_line2: normalizeOptional(input.addressLine2),
+              city: normalizeOptional(input.city),
+              state: normalizeOptional(input.state),
+              zip_code: normalizeOptional(input.zipCode),
+              country: normalizeOptional(input.country) ?? "USA"
+            })
+            .eq("id", existingEmployee.id)
+            .select(
+              "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
+            )
+            .single()
+      : await supabaseAdmin
+          .from("employees")
+          .insert({
+            company_id: context.companyId,
+            first_name: input.firstName,
+            last_name: input.lastName,
+            full_name: fullName,
+            avatar_url: normalizeOptional(input.avatarUrl),
+            email: normalizedEmail,
+            phone: normalizeOptional(input.phone),
+            job_title: normalizeOptional(input.jobTitle),
+            notes: normalizeOptional(input.notes),
+            address_line1: normalizeOptional(input.addressLine1),
+            address_line2: normalizeOptional(input.addressLine2),
+            city: normalizeOptional(input.city),
+            state: normalizeOptional(input.state),
+            zip_code: normalizeOptional(input.zipCode),
+            country: normalizeOptional(input.country) ?? "USA",
+            role: input.role,
+            is_active: input.status === "active",
+            user_id: null,
+            invitation_status: "pending"
+          })
+          .select(
+            "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
+          )
+          .single();
 
     if (employeeError || !employee) {
       return NextResponse.json(
@@ -101,7 +139,10 @@ export async function POST(request: Request) {
         token_hash: tokenHash,
         expires_at: expiresAt.toISOString(),
         status: "pending",
-        created_by: user.id
+        created_by: user.id,
+        email: employee.email ?? null,
+        full_name: employee.full_name ?? null,
+        role: employee.role ?? null
       })
       .select("id, status, expires_at")
       .single();
@@ -114,12 +155,62 @@ export async function POST(request: Request) {
     }
 
     const inviteLink = buildInviteLink(request, rawToken);
+    let existingUserNotice: string | null = null;
+
+    const findAuthUserIdByEmail = async (emailValue: string) => {
+      const normalized = emailValue.toLowerCase();
+      let page = 1;
+      const perPage = 200;
+      while (page <= 5) {
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+          page,
+          perPage
+        });
+        if (error || !data?.users?.length) {
+          return null;
+        }
+        const match = data.users.find(
+          (item) => item.email?.toLowerCase() === normalized
+        );
+        if (match?.id) {
+          return match.id;
+        }
+        if (data.users.length < perPage) {
+          break;
+        }
+        page += 1;
+      }
+      return null;
+    };
+
+    if (employee.email) {
+      const existingUserId = await findAuthUserIdByEmail(employee.email);
+      if (existingUserId) {
+        const { error: notifyError } = await supabaseAdmin
+          .from("user_notifications")
+          .upsert(
+            {
+              user_id: existingUserId,
+              type: "company_invite",
+              entity_id: invite.id,
+              company_id: context.companyId
+            },
+            { onConflict: "user_id,type,entity_id" }
+          );
+        if (!notifyError) {
+          existingUserNotice =
+            "Usuario ja possui conta. Ele sera notificado no app.";
+        }
+      }
+    }
 
     return NextResponse.json(
       {
         employee,
         invite,
-        invite_link: inviteLink
+        invite_link: inviteLink,
+        existing_user_notified: Boolean(existingUserNotice),
+        notice: existingUserNotice
       },
       { status: 201 }
     );

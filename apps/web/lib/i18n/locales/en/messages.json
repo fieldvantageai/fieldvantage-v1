@@ -1,0 +1,14 @@
+{
+  "title": "Internal messages",
+  "subtitle": "Chat with your team in real time.",
+  "searchLabel": "Search collaborator",
+  "searchPlaceholder": "Name or email",
+  "empty": "No collaborators available right now.",
+  "thread": {
+    "title": "Conversation",
+    "back": "Back",
+    "send": "Send",
+    "placeholder": "Type your message...",
+    "empty": "No messages yet."
+  }
+}

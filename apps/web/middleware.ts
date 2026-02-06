@@ -21,7 +21,13 @@ const AUTH_ONLY_PATHS = [
   "/forgot-password"
 ];
 
-const EMPLOYEE_ONLY_PATHS = ["/dashboard", "/jobs", "/settings"];
+const EMPLOYEE_ONLY_PATHS = [
+  "/dashboard",
+  "/jobs",
+  "/settings",
+  "/messages",
+  "/invites"
+];
 const ACTIVE_COMPANY_COOKIE = "fv_active_company";
 
 const isEmployeeAllowedPath = (pathname: string) =>

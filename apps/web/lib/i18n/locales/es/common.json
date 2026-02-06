@@ -31,6 +31,8 @@
   "nav": {
     "dashboard": "Panel",
     "jobs": "Trabajos",
+    "invites": "Invitaciones",
+    "messages": "Mensajes",
     "customers": "Clientes",
     "employees": "Empleados",
     "teams": "Equipos",

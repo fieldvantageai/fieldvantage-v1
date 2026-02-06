@@ -31,6 +31,8 @@
   "nav": {
     "dashboard": "Dashboard",
     "jobs": "Jobs",
+    "invites": "Invites",
+    "messages": "Messages",
     "customers": "Customers",
     "employees": "Employees",
     "teams": "Teams",

@@ -37,6 +37,11 @@
       "member": "Member"
     }
   },
+  "switcher": {
+    "label": "Switch company",
+    "loading": "Loading...",
+    "empty": "No linked companies."
+  },
   "messages": {
     "updated": "Company updated.",
     "updateError": "Failed to save company.",

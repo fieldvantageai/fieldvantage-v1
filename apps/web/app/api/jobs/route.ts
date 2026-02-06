@@ -35,18 +35,27 @@ export async function GET(request: Request) {
   const { data: employee } = await supabase
     .from("employees")
     .select("id")
-    .eq("company_id", context.companyId)
     .eq("user_id", user.id)
     .maybeSingle();
   const companyId = context.companyId;
 
   let jobIdsFromAssignments: string[] = [];
   if (query) {
-    const { data: matchedEmployees } = await supabase
-      .from("employees")
-      .select("id")
+    const { data: membershipUsers } = await supabase
+      .from("company_memberships")
+      .select("user_id")
       .eq("company_id", companyId)
-      .ilike("full_name", `%${query}%`);
+      .eq("status", "active");
+    const userIds =
+      membershipUsers?.map((item) => item.user_id as string).filter(Boolean) ??
+      [];
+    const { data: matchedEmployees } = userIds.length
+      ? await supabase
+          .from("employees")
+          .select("id")
+          .in("user_id", userIds)
+          .ilike("full_name", `%${query}%`)
+      : { data: [] };
     const employeeIds = (matchedEmployees ?? []).map((item) => item.id);
     if (employeeIds.length > 0) {
       const { data: assignments } = await supabase
@@ -177,17 +186,50 @@ export async function POST(request: Request) {
     const supabase = await createSupabaseServerClient();
     const companyId = context.companyId;
 
-    const inactiveIds =
-      input.assignedEmployeeIds?.length
-        ? (
-            await supabase
-              .from("employees")
-              .select("id")
-          .eq("company_id", companyId)
-              .in("id", input.assignedEmployeeIds)
-              .eq("is_active", false)
-          ).data ?? []
-        : [];
+    const assignedIds = input.assignedEmployeeIds ?? [];
+    const assignedEmployees = assignedIds.length
+      ? (
+          await supabase
+            .from("employees")
+            .select("id, user_id, is_active")
+            .in("id", assignedIds)
+        ).data ?? []
+      : [];
+
+    const assignedUserIds = assignedEmployees
+      .map((row) => row.user_id)
+      .filter(Boolean) as string[];
+
+    const memberships = assignedUserIds.length
+      ? (
+          await supabase
+            .from("company_memberships")
+            .select("user_id")
+            .eq("company_id", companyId)
+            .eq("status", "active")
+            .in("user_id", assignedUserIds)
+        ).data ?? []
+      : [];
+
+    const membershipUserIds = new Set(
+      memberships.map((item) => item.user_id as string)
+    );
+
+    const invalidAssignments = assignedEmployees.filter(
+      (employeeRow) =>
+        !employeeRow.user_id || !membershipUserIds.has(employeeRow.user_id)
+    );
+
+    if (invalidAssignments.length > 0) {
+      return NextResponse.json(
+        { error: "Colaboradores precisam estar na empresa ativa." },
+        { status: 400 }
+      );
+    }
+
+    const inactiveIds = assignedEmployees.filter(
+      (employeeRow) => employeeRow.is_active === false
+    );
 
     const allowInactive = Boolean(input.allowInactive);
     const canAllowInactive = context.role === "owner" || context.role === "admin";
