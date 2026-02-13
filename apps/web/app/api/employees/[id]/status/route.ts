@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -29,9 +29,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 
-    const { data: employee, error: employeeError } = await supabaseAdmin
+    const supabase = await createSupabaseServerClient();
+    const { data: employee, error: employeeError } = await supabase
       .from("employees")
-      .select("id, company_id, email, is_active")
+      .select("id, user_id")
       .eq("id", id)
       .maybeSingle();
 
@@ -39,32 +40,18 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
     }
 
-    if (employee.company_id !== context.companyId) {
-      return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
+    if (!employee.user_id) {
+      return NextResponse.json({ error: "Colaborador invalido." }, { status: 400 });
     }
 
-    const { error: updateError } = await supabaseAdmin
-      .from("employees")
-      .update({ is_active: body.status === "active" })
-      .eq("id", id);
+    const { error: updateError } = await supabase
+      .from("company_memberships")
+      .update({ status: body.status === "active" ? "active" : "inactive" })
+      .eq("company_id", context.companyId)
+      .eq("user_id", employee.user_id);
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 400 });
-    }
-
-    if (employee.email) {
-      const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
-      const authUser = authUsers?.users?.find(
-        (item) => item.email?.toLowerCase() === employee.email?.toLowerCase()
-      );
-      if (authUser?.id) {
-        await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
-          user_metadata: {
-            ...(authUser.user_metadata ?? {}),
-            is_active: body.status === "active"
-          }
-        });
-      }
     }
 
     return NextResponse.json({ success: true });

@@ -1,121 +1,185 @@
-import { getActiveCompanyId } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import {
-  createEmployee as createEmployeeData,
-  deleteEmployee as deleteEmployeeData,
-  getEmployeeById as getEmployeeByIdData,
-  listEmployees as listEmployeesData,
-  updateEmployee as updateEmployeeData,
-  type CreateEmployeeInput,
-  type UpdateEmployeeInput
-} from "@fieldvantage/data";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import type { Employee, JobStatus } from "@fieldvantage/shared";
 
-const getCompanyId = async () => getActiveCompanyId();
+type MembershipRow = {
+  id: string;
+  user_id: string;
+  role: string;
+  status: string;
+  created_at: string;
+};
+
+type EmployeeRow = Employee & { user_id?: string | null };
+
+const pickNewestEmployee = (rows: EmployeeRow[]) =>
+  rows.sort((a, b) => {
+    const aTime = new Date(a.updated_at ?? a.created_at).getTime();
+    const bTime = new Date(b.updated_at ?? b.created_at).getTime();
+    return bTime - aTime;
+  })[0];
 
 export async function listEmployees() {
-  const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
     return [];
   }
-  const employees = await listEmployeesData(supabase, companyId);
-  if (employees.length === 0) {
-    return employees;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: memberships, error } = await supabase
+    .from("company_memberships")
+    .select("id, user_id, role, status, created_at")
+    .eq("company_id", context.companyId);
+
+  if (error || !memberships?.length) {
+    return [];
   }
 
-  const employeeIds = employees.map((employee) => employee.id);
-  const { data: assignments, error } = await supabase
-    .from("job_assignments")
-    .select("employee_id")
-    .in("employee_id", employeeIds);
+  const membershipRows = memberships as MembershipRow[];
+  const userIds = membershipRows.map((item) => item.user_id).filter(Boolean);
 
-  if (error) {
-    return employees;
-  }
+  const { data: employees } = userIds.length
+    ? await supabase
+        .from("employees")
+        .select(
+          "id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
+        )
+        .in("user_id", userIds)
+    : { data: [] };
 
-  const counts = new Map<string, number>();
-  (assignments ?? []).forEach((row) => {
-    const id = row.employee_id as string;
-    counts.set(id, (counts.get(id) ?? 0) + 1);
+  const employeesByUser = new Map<string, EmployeeRow>();
+  (employees ?? []).forEach((row) => {
+    const userId = row.user_id ?? "";
+    if (!userId) {
+      return;
+    }
+    const existing = employeesByUser.get(userId);
+    if (!existing) {
+      employeesByUser.set(userId, row as EmployeeRow);
+      return;
+    }
+    employeesByUser.set(userId, pickNewestEmployee([existing, row as EmployeeRow]));
   });
 
+  const membershipIds = membershipRows.map((item) => item.id);
   const { data: completedAssignments } = await supabase
-    .from("jobs")
-    .select("id, job_assignments!inner(employee_id)")
-    .eq("company_id", companyId)
-    .eq("status", "done")
-    .in("job_assignments.employee_id", employeeIds);
+    .from("job_assignments")
+    .select("membership_id, jobs!inner(status)")
+    .eq("company_id", context.companyId)
+    .eq("jobs.status", "done")
+    .in("membership_id", membershipIds);
 
   const completedCounts = new Map<string, number>();
   (completedAssignments ?? []).forEach((row) => {
-    const assignments = row.job_assignments as Array<{ employee_id: string }>;
-    assignments.forEach((assignment) => {
-      const id = assignment.employee_id;
-      completedCounts.set(id, (completedCounts.get(id) ?? 0) + 1);
-    });
+    const membershipId = row.membership_id as string;
+    completedCounts.set(membershipId, (completedCounts.get(membershipId) ?? 0) + 1);
   });
 
-  return employees.map((employee) => ({
-    ...employee,
-    job_assignments_count: counts.get(employee.id) ?? 0,
-    completed_jobs_count: completedCounts.get(employee.id) ?? 0
-  }));
+  return membershipRows.map((membership) => {
+    const profile = employeesByUser.get(membership.user_id);
+    const status = membership.status === "active" ? "active" : "inactive";
+    return {
+      id: profile?.id ?? membership.id,
+      user_id: membership.user_id,
+      full_name: profile?.full_name ?? "",
+      first_name: profile?.first_name ?? "",
+      last_name: profile?.last_name ?? "",
+      email: profile?.email ?? null,
+      phone: profile?.phone ?? null,
+      avatar_url: profile?.avatar_url ?? null,
+      role: membership.role,
+      status,
+      membership_id: membership.id,
+      created_at: membership.created_at,
+      updated_at: profile?.updated_at ?? membership.created_at,
+      completed_jobs_count: completedCounts.get(membership.id) ?? 0
+    } as Employee & { completed_jobs_count?: number };
+  });
 }
 
 export type EmployeeWithAvatar = Employee & {
   avatar_signed_url?: string | null;
 };
 
-export async function getEmployeeById(id: string): Promise<EmployeeWithAvatar | null> {
+export type EmployeeWithJobs = EmployeeWithAvatar & {
+  jobs?: Array<{
+    id: string;
+    title: string | null;
+    status: JobStatus;
+    scheduled_for: string;
+    customer_name: string | null;
+  }>;
+};
+
+const toScheduledFor = (date: string, time?: string | null) =>
+  `${date}T${time?.slice(0, 5) ?? "00:00"}`;
+
+export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | null> {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      "id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) {
     return null;
   }
-  const employee = await getEmployeeByIdData(supabase, companyId, id);
-  if (!employee) {
-    return null;
+
+  const context = await getActiveCompanyContext();
+  if (!context || !data.user_id) {
+    return data as EmployeeWithJobs;
   }
+
+  const { data: membership } = await supabase
+    .from("company_memberships")
+    .select("id, role, status, created_at")
+    .eq("company_id", context.companyId)
+    .eq("user_id", data.user_id)
+    .maybeSingle();
+
+  const { data: assignmentRows } = await supabase
+    .from("job_assignments")
+    .select("job_id")
+    .eq("membership_id", membership?.id ?? "");
+
+  const { data: jobRows } = await supabase
+    .from("jobs")
+    .select("id, title, status, scheduled_date, scheduled_time, customer_name")
+    .eq("company_id", context.companyId)
+    .in(
+      "id",
+      (assignmentRows ?? []).map((row) => row.job_id)
+    );
+
   let avatarSignedUrl: string | null = null;
-  if (employee.avatar_url) {
-    const { data } = await supabaseAdmin.storage
+  if (data.avatar_url) {
+    const { data: signed } = await supabase.storage
       .from("customer-avatars")
-      .createSignedUrl(employee.avatar_url, 60 * 60);
-    avatarSignedUrl = data?.signedUrl ?? null;
+      .createSignedUrl(data.avatar_url, 60 * 60);
+    avatarSignedUrl = signed?.signedUrl ?? null;
   }
+
   return {
-    ...employee,
-    avatar_signed_url: avatarSignedUrl
+    ...(data as EmployeeWithJobs),
+    role: membership?.role ?? data.role,
+    status: membership?.status === "active" ? "active" : "inactive",
+    membership_id: membership?.id ?? null,
+    created_at: membership?.created_at ?? data.created_at,
+    avatar_signed_url: avatarSignedUrl,
+    jobs: (jobRows ?? []).map((row) => ({
+      id: row.id as string,
+      title: row.title as string | null,
+      status: row.status as JobStatus,
+      scheduled_for: toScheduledFor(
+        row.scheduled_date as string,
+        row.scheduled_time as string | null
+      ),
+      customer_name: row.customer_name as string | null
+    }))
   };
-}
-
-export async function createEmployee(input: CreateEmployeeInput) {
-  const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
-    throw new Error("Empresa nao encontrada.");
-  }
-  return createEmployeeData(supabase, companyId, input);
-}
-
-export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
-  const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
-    throw new Error("Empresa nao encontrada.");
-  }
-  return updateEmployeeData(supabase, companyId, id, input);
-}
-
-export async function deleteEmployee(id: string) {
-  const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
-    return false;
-  }
-  return deleteEmployeeData(supabase, companyId, id);
 }
 
 export type EmployeeJobSummary = {
@@ -126,23 +190,41 @@ export type EmployeeJobSummary = {
   scheduled_for: string;
 };
 
-const toScheduledFor = (date: string, time?: string | null) =>
-  `${date}T${time?.slice(0, 5) ?? "00:00"}`;
-
 export async function listEmployeeJobs(employeeId: string) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getCompanyId();
-  if (!companyId) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
+    return [];
+  }
+
+  const { data: employee } = await supabase
+    .from("employees")
+    .select("user_id")
+    .eq("id", employeeId)
+    .maybeSingle();
+
+  if (!employee?.user_id) {
+    return [];
+  }
+
+  const { data: membership } = await supabase
+    .from("company_memberships")
+    .select("id")
+    .eq("company_id", context.companyId)
+    .eq("user_id", employee.user_id)
+    .maybeSingle();
+
+  if (!membership?.id) {
     return [];
   }
 
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, title, customer_name, status, scheduled_date, scheduled_time, job_assignments!inner(employee_id)"
+      "id, title, customer_name, status, scheduled_date, scheduled_time, job_assignments!inner(membership_id)"
     )
-    .eq("company_id", companyId)
-    .eq("job_assignments.employee_id", employeeId)
+    .eq("company_id", context.companyId)
+    .eq("job_assignments.membership_id", membership.id)
     .order("scheduled_date", { ascending: false })
     .order("scheduled_time", { ascending: false });
 
@@ -160,4 +242,76 @@ export async function listEmployeeJobs(employeeId: string) {
       row.scheduled_time as string | null
     )
   }));
+}
+
+type UpdateEmployeeInput = Partial<Employee> & {
+  membership_role?: string;
+  membership_status?: "active" | "inactive";
+};
+
+export async function updateEmployee(
+  id: string,
+  input: UpdateEmployeeInput,
+  companyId: string
+) {
+  const supabase = await createSupabaseServerClient();
+  const { data: current } = await supabase
+    .from("employees")
+    .select("id, user_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!current) {
+    return null;
+  }
+
+  const { data: updated, error } = await supabase
+    .from("employees")
+    .update({
+      full_name: input.full_name ?? undefined,
+      first_name: input.first_name ?? undefined,
+      last_name: input.last_name ?? undefined,
+      email: input.email ?? undefined,
+      phone: input.phone ?? undefined,
+      avatar_url: input.avatar_url ?? undefined
+    })
+    .eq("id", id)
+    .select(
+      "id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
+    )
+    .maybeSingle();
+
+  if (error || !updated) {
+    return null;
+  }
+
+  if (current.user_id && (input.membership_role || input.membership_status)) {
+    await supabase
+      .from("company_memberships")
+      .update({
+        role: input.membership_role,
+        status: input.membership_status
+      })
+      .eq("company_id", companyId)
+      .eq("user_id", current.user_id);
+  }
+
+  return updated as Employee;
+}
+
+export async function deactivateEmployeeMembership(userId: string, companyId: string) {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("company_memberships")
+    .update({ status: "inactive" })
+    .eq("company_id", companyId)
+    .eq("user_id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return false;
+  }
+
+  return true;
 }

@@ -21,7 +21,8 @@ export type Job = BaseEntity & {
   scheduled_for: string;
   estimated_end_at?: string | null;
   notes?: string | null;
-  assigned_employee_ids?: string[];
+  assigned_membership_ids?: string[];
+  allow_inactive_assignments?: boolean;
   is_recurring?: boolean;
   recurrence?: JobRecurrence | null;
 };
@@ -73,7 +74,7 @@ export const newJobSchema = yup.object({
     .mixed<JobStatus>()
     .oneOf(["scheduled", "in_progress", "done", "canceled"])
     .required("Status obrigatorio."),
-  assignedEmployeeIds: yup.array().of(yup.string().required()).default([]),
+  assignedMembershipIds: yup.array().of(yup.string().required()).default([]),
   allowInactive: yup.boolean().default(false),
   isRecurring: yup.boolean().default(false),
   recurrence: yup

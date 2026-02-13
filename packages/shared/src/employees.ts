@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 import type { BaseEntity } from "./base";
 
-export type EmployeeRole = "owner" | "admin" | "employee";
+export type EmployeeRole = "owner" | "admin" | "employee" | "member";
 export type EmployeeStatus = "active" | "inactive";
 export type NavigationPreference = "auto" | "google_maps" | "apple_maps" | "waze";
 export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired";
@@ -26,6 +26,7 @@ export type Employee = BaseEntity & {
   preferred_navigation_app?: NavigationPreference | null;
   invitation_status?: InvitationStatus | null;
   user_id?: string | null;
+  membership_id?: string | null;
   status: EmployeeStatus;
 };
 

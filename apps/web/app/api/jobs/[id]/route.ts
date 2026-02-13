@@ -49,38 +49,19 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const supabase = await createSupabaseServerClient();
     const companyId = context.companyId;
 
-    const assignedIds = input.assignedEmployeeIds ?? [];
-    const assignedEmployees = assignedIds.length
+    const assignedIds = input.assignedMembershipIds ?? [];
+    const assignedMemberships = assignedIds.length
       ? (
           await supabase
-            .from("employees")
-            .select("id, user_id, is_active")
+            .from("company_memberships")
+            .select("id, user_id, status, company_id")
             .in("id", assignedIds)
         ).data ?? []
       : [];
 
-    const assignedUserIds = assignedEmployees
-      .map((row) => row.user_id)
-      .filter(Boolean) as string[];
-
-    const memberships = assignedUserIds.length
-      ? (
-          await supabase
-            .from("company_memberships")
-            .select("user_id")
-            .eq("company_id", companyId)
-            .eq("status", "active")
-            .in("user_id", assignedUserIds)
-        ).data ?? []
-      : [];
-
-    const membershipUserIds = new Set(
-      memberships.map((item) => item.user_id as string)
-    );
-
-    const invalidAssignments = assignedEmployees.filter(
-      (employeeRow) =>
-        !employeeRow.user_id || !membershipUserIds.has(employeeRow.user_id)
+    const invalidAssignments = assignedMemberships.filter(
+      (membership) =>
+        membership.company_id !== companyId || !membership.user_id
     );
 
     if (invalidAssignments.length > 0) {
@@ -90,8 +71,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
-    const inactiveIds = assignedEmployees.filter(
-      (employeeRow) => employeeRow.is_active === false
+    const inactiveIds = assignedMemberships.filter(
+      (membership) => membership.status !== "active"
     );
 
     const allowInactive = Boolean(input.allowInactive);
@@ -112,7 +93,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       customer_name: input.customerName,
       customer_id: input.customerId || null,
       customer_address_id: input.customerAddressId || null,
-      assigned_employee_ids: input.assignedEmployeeIds ?? [],
+      assigned_membership_ids: input.assignedMembershipIds ?? [],
       allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,
       recurrence: input.recurrence ?? null,

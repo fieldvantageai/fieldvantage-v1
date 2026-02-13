@@ -5,7 +5,7 @@ import { newEmployeeSchema } from "@/features/employees/forms/newEmployee/formSc
 import { listEmployees } from "@/features/employees/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET() {
   const user = await getSupabaseAuthUser();
@@ -48,10 +48,11 @@ export async function POST(request: Request) {
       value && value.trim().length > 0 ? value : null;
     const fullName = `${input.firstName} ${input.lastName}`.trim();
 
+    const supabase = await createSupabaseServerClient();
     const normalizedEmail = normalizeOptional(input.email);
     const existingEmployee = normalizedEmail
       ? (
-          await supabaseAdmin
+          await supabase
             .from("employees")
             .select(
               "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
@@ -62,31 +63,8 @@ export async function POST(request: Request) {
       : null;
 
     const { data: employee, error: employeeError } = existingEmployee
-      ? existingEmployee.user_id
-        ? { data: existingEmployee, error: null }
-        : await supabaseAdmin
-            .from("employees")
-            .update({
-              first_name: input.firstName,
-              last_name: input.lastName,
-              full_name: fullName,
-              avatar_url: normalizeOptional(input.avatarUrl),
-              phone: normalizeOptional(input.phone),
-              job_title: normalizeOptional(input.jobTitle),
-              notes: normalizeOptional(input.notes),
-              address_line1: normalizeOptional(input.addressLine1),
-              address_line2: normalizeOptional(input.addressLine2),
-              city: normalizeOptional(input.city),
-              state: normalizeOptional(input.state),
-              zip_code: normalizeOptional(input.zipCode),
-              country: normalizeOptional(input.country) ?? "USA"
-            })
-            .eq("id", existingEmployee.id)
-            .select(
-              "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
-            )
-            .single()
-      : await supabaseAdmin
+      ? { data: existingEmployee, error: null }
+      : await supabase
           .from("employees")
           .insert({
             company_id: context.companyId,
@@ -125,13 +103,13 @@ export async function POST(request: Request) {
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await supabaseAdmin
+    await supabase
       .from("invites")
       .update({ status: "revoked", revoked_at: new Date().toISOString() })
       .eq("employee_id", employee.id)
       .eq("status", "pending");
 
-    const { data: invite, error: inviteError } = await supabaseAdmin
+    const { data: invite, error: inviteError } = await supabase
       .from("invites")
       .insert({
         company_id: context.companyId,
@@ -156,52 +134,9 @@ export async function POST(request: Request) {
 
     const inviteLink = buildInviteLink(request, rawToken);
     let existingUserNotice: string | null = null;
-
-    const findAuthUserIdByEmail = async (emailValue: string) => {
-      const normalized = emailValue.toLowerCase();
-      let page = 1;
-      const perPage = 200;
-      while (page <= 5) {
-        const { data, error } = await supabaseAdmin.auth.admin.listUsers({
-          page,
-          perPage
-        });
-        if (error || !data?.users?.length) {
-          return null;
-        }
-        const match = data.users.find(
-          (item) => item.email?.toLowerCase() === normalized
-        );
-        if (match?.id) {
-          return match.id;
-        }
-        if (data.users.length < perPage) {
-          break;
-        }
-        page += 1;
-      }
-      return null;
-    };
-
-    if (employee.email) {
-      const existingUserId = await findAuthUserIdByEmail(employee.email);
-      if (existingUserId) {
-        const { error: notifyError } = await supabaseAdmin
-          .from("user_notifications")
-          .upsert(
-            {
-              user_id: existingUserId,
-              type: "company_invite",
-              entity_id: invite.id,
-              company_id: context.companyId
-            },
-            { onConflict: "user_id,type,entity_id" }
-          );
-        if (!notifyError) {
-          existingUserNotice =
-            "Usuario ja possui conta. Ele sera notificado no app.";
-        }
-      }
+    if (employee.user_id) {
+      existingUserNotice =
+        "Usuario ja possui conta. Ele sera notificado no app.";
     }
 
     return NextResponse.json(

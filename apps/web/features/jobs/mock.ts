@@ -13,7 +13,7 @@ const seedJobs: Job[] = [
     status: "scheduled",
     scheduled_for: "2026-01-20T09:00:00.000Z",
     estimated_end_at: "2026-01-22T18:00:00.000Z",
-    assigned_employee_ids: ["eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"],
+    assigned_membership_ids: ["eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"],
     is_recurring: false,
     recurrence: null,
     notes: null,
@@ -29,7 +29,7 @@ const seedJobs: Job[] = [
     status: "in_progress",
     scheduled_for: "2026-01-18T13:30:00.000Z",
     estimated_end_at: "2026-01-19T16:00:00.000Z",
-    assigned_employee_ids: [
+    assigned_membership_ids: [
       "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
       "ffffffff-ffff-ffff-ffff-ffffffffffff"
     ],
@@ -48,7 +48,7 @@ const seedJobs: Job[] = [
     status: "done",
     scheduled_for: "2026-01-15T10:00:00.000Z",
     estimated_end_at: "2026-01-16T15:00:00.000Z",
-    assigned_employee_ids: ["11111111-2222-3333-4444-555555555555"],
+    assigned_membership_ids: ["11111111-2222-3333-4444-555555555555"],
     is_recurring: false,
     recurrence: null,
     notes: null,
@@ -65,7 +65,7 @@ export type CreateJobInput = Pick<
   | "customer_id"
   | "customer_name"
   | "estimated_end_at"
-  | "assigned_employee_ids"
+  | "assigned_membership_ids"
   | "is_recurring"
   | "recurrence"
   | "notes"

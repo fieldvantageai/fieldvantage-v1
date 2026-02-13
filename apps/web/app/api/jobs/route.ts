@@ -32,18 +32,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ data: [], total: 0 }, { status: 200 });
   }
   const supabase = await createSupabaseServerClient();
-  const { data: employee } = await supabase
-    .from("employees")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
   const companyId = context.companyId;
+  const { data: membership } = await supabase
+    .from("company_memberships")
+    .select("id")
+    .eq("company_id", companyId)
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .maybeSingle();
 
   let jobIdsFromAssignments: string[] = [];
   if (query) {
     const { data: membershipUsers } = await supabase
       .from("company_memberships")
-      .select("user_id")
+      .select("id, user_id")
       .eq("company_id", companyId)
       .eq("status", "active");
     const userIds =
@@ -52,16 +54,22 @@ export async function GET(request: Request) {
     const { data: matchedEmployees } = userIds.length
       ? await supabase
           .from("employees")
-          .select("id")
+          .select("user_id")
           .in("user_id", userIds)
           .ilike("full_name", `%${query}%`)
       : { data: [] };
-    const employeeIds = (matchedEmployees ?? []).map((item) => item.id);
-    if (employeeIds.length > 0) {
+    const matchedUserIds = (matchedEmployees ?? [])
+      .map((item) => item.user_id as string)
+      .filter(Boolean);
+    const membershipIds =
+      membershipUsers
+        ?.filter((row) => matchedUserIds.includes(row.user_id as string))
+        .map((row) => row.id as string) ?? [];
+    if (membershipIds.length > 0) {
       const { data: assignments } = await supabase
         .from("job_assignments")
         .select("job_id")
-        .in("employee_id", employeeIds);
+        .in("membership_id", membershipIds);
       jobIdsFromAssignments = (assignments ?? []).map(
         (item) => item.job_id as string
       );
@@ -77,11 +85,11 @@ export async function GET(request: Request) {
   }
 
   const baseSelect =
-    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id, employees(full_name))";
+    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id)";
   const employeeSelect =
-    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments!inner(employee_id, employees(full_name))";
-  const isCollaborator = context.role === "member" && employee?.id;
-  if (context.role === "member" && !employee?.id) {
+    "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments!inner(membership_id)";
+  const isCollaborator = context.role === "member" && membership?.id;
+  if (context.role === "member" && !membership?.id) {
     return NextResponse.json({ data: [], total: 0 }, { status: 200 });
   }
 
@@ -89,8 +97,8 @@ export async function GET(request: Request) {
     .from("jobs")
     .select(isCollaborator ? employeeSelect : baseSelect, { count: "exact" })
     .eq("company_id", companyId);
-  if (isCollaborator) {
-    jobsQuery = jobsQuery.eq("job_assignments.employee_id", employee.id);
+  if (isCollaborator && membership?.id) {
+    jobsQuery = jobsQuery.eq("job_assignments.membership_id", membership.id);
   }
 
   if (status !== "all") {
@@ -126,13 +134,55 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  const assignmentMembershipIds = Array.from(
+    new Set(
+      (data ?? [])
+        .flatMap((row) =>
+          ((row as { job_assignments?: Array<{ membership_id: string }> })
+            .job_assignments ?? [])
+            .map((assignment) => assignment.membership_id)
+        )
+        .filter(Boolean)
+    )
+  );
+  const { data: membershipRows } =
+    assignmentMembershipIds.length > 0
+      ? await supabase
+          .from("company_memberships")
+          .select("id, user_id")
+          .in("id", assignmentMembershipIds)
+      : { data: [] };
+  const userIds = (membershipRows ?? [])
+    .map((row) => row.user_id as string)
+    .filter(Boolean);
+  const { data: employeeRows } =
+    userIds.length > 0
+      ? await supabase
+          .from("employees")
+          .select("user_id, full_name")
+          .in("user_id", userIds)
+      : { data: [] };
+  const nameByUserId = new Map<string, string>();
+  (employeeRows ?? []).forEach((row) => {
+    if (row.user_id && row.full_name) {
+      nameByUserId.set(row.user_id as string, row.full_name as string);
+    }
+  });
+  const nameByMembershipId = new Map<string, string>();
+  (membershipRows ?? []).forEach((row) => {
+    const name = nameByUserId.get(row.user_id as string);
+    if (name) {
+      nameByMembershipId.set(row.id as string, name);
+    }
+  });
+
   const jobs = (data ?? []).map((row) => {
     const assignments = (row as {
-      job_assignments?: Array<{ employee_id: string; employees?: { full_name?: string | null } }>;
+      job_assignments?: Array<{ membership_id: string }>;
     }).job_assignments ?? [];
-    const assignedIds = assignments.map((assignment) => assignment.employee_id);
-    const assignedNames = assignments
-      .map((assignment) => assignment.employees?.full_name)
+    const assignedIds = assignments.map((assignment) => assignment.membership_id);
+    const assignedNames = assignedIds
+      .map((id) => nameByMembershipId.get(id))
       .filter(Boolean)
       .join(", ");
 
@@ -149,7 +199,7 @@ export async function GET(request: Request) {
       notes: row.notes,
       is_recurring: row.is_recurring,
       recurrence: row.recurrence,
-      assigned_employee_ids: assignedIds,
+      assigned_membership_ids: assignedIds,
       assigned_label: assignedNames,
       created_at: row.created_at,
       updated_at: row.updated_at
@@ -186,38 +236,19 @@ export async function POST(request: Request) {
     const supabase = await createSupabaseServerClient();
     const companyId = context.companyId;
 
-    const assignedIds = input.assignedEmployeeIds ?? [];
-    const assignedEmployees = assignedIds.length
+    const assignedIds = input.assignedMembershipIds ?? [];
+    const assignedMemberships = assignedIds.length
       ? (
           await supabase
-            .from("employees")
-            .select("id, user_id, is_active")
+            .from("company_memberships")
+            .select("id, user_id, status, company_id")
             .in("id", assignedIds)
         ).data ?? []
       : [];
 
-    const assignedUserIds = assignedEmployees
-      .map((row) => row.user_id)
-      .filter(Boolean) as string[];
-
-    const memberships = assignedUserIds.length
-      ? (
-          await supabase
-            .from("company_memberships")
-            .select("user_id")
-            .eq("company_id", companyId)
-            .eq("status", "active")
-            .in("user_id", assignedUserIds)
-        ).data ?? []
-      : [];
-
-    const membershipUserIds = new Set(
-      memberships.map((item) => item.user_id as string)
-    );
-
-    const invalidAssignments = assignedEmployees.filter(
-      (employeeRow) =>
-        !employeeRow.user_id || !membershipUserIds.has(employeeRow.user_id)
+    const invalidAssignments = assignedMemberships.filter(
+      (membership) =>
+        membership.company_id !== companyId || !membership.user_id
     );
 
     if (invalidAssignments.length > 0) {
@@ -227,8 +258,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const inactiveIds = assignedEmployees.filter(
-      (employeeRow) => employeeRow.is_active === false
+    const inactiveIds = assignedMemberships.filter(
+      (membership) => membership.status !== "active"
     );
 
     const allowInactive = Boolean(input.allowInactive);
@@ -249,7 +280,7 @@ export async function POST(request: Request) {
       customer_name: input.customerName,
       customer_id: input.customerId || null,
       customer_address_id: input.customerAddressId || null,
-      assigned_employee_ids: input.assignedEmployeeIds ?? [],
+      assigned_membership_ids: input.assignedMembershipIds ?? [],
       allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,
       recurrence: input.recurrence ?? null,
