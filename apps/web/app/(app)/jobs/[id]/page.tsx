@@ -7,10 +7,10 @@ import OrderStatusControl from "@/components/orders/OrderStatusControl";
 import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById } from "@/features/customers/service";
 import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { getT } from "@/lib/i18n/server";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -22,43 +22,46 @@ export default async function JobDetailPage({ params }: PageProps) {
   const t = await getT(locale, "jobs");
   const tCommon = await getT(locale, "common");
   const supabase = await createSupabaseServerClient();
-  const { data: authData } = await supabase.auth.getUser();
-  const { data: employeeRole } = authData?.user
-    ? await supabase
-        .from("employees")
-        .select("role, company_id")
-        .eq("user_id", authData.user.id)
-        .maybeSingle()
-    : { data: null };
-  const isCollaborator = employeeRole?.role === "employee";
+  const context = await getActiveCompanyContext();
+  const isCollaborator = context?.role === "member";
   const job = await getJobById(id);
 
   if (!job) {
     notFound();
   }
-  const assignedEmployeeIds = job.assigned_employee_ids ?? [];
-  const companyIdForTeam = job.company_id ?? employeeRole?.company_id ?? null;
+  const assignedMembershipIds = job.assigned_membership_ids ?? [];
   const assignedEmployees =
-    assignedEmployeeIds.length > 0
+    assignedMembershipIds.length > 0
       ? (
           await (async () => {
-            let query = supabaseAdmin
-              .from("employees")
-              .select("id, full_name, email")
-              .in("id", assignedEmployeeIds);
-            if (companyIdForTeam) {
-              query = query.eq("company_id", companyIdForTeam);
-            }
-            const { data } = await query;
-            return data ?? [];
+            const { data: memberships } = await supabase
+              .from("company_memberships")
+              .select("id, user_id")
+              .in("id", assignedMembershipIds);
+            const userIds = (memberships ?? [])
+              .map((item) => item.user_id as string)
+              .filter(Boolean);
+            const { data: profiles } = userIds.length
+              ? await supabase
+                  .from("employees")
+                  .select("id, user_id, full_name, email")
+                  .in("user_id", userIds)
+              : { data: [] };
+            const profileByUserId = new Map(
+              (profiles ?? []).map((employee) => [employee.user_id, employee])
+            );
+            return (memberships ?? []).map((membership) => ({
+              membership_id: membership.id,
+              profile: profileByUserId.get(membership.user_id)
+            }));
           })()
         )
       : [];
-  const assignedEmployeesById = new Map(
-    assignedEmployees.map((employee) => [employee.id, employee])
+  const assignedEmployeesByMembershipId = new Map(
+    assignedEmployees.map((employee) => [employee.membership_id, employee.profile])
   );
-  const orderedAssignedEmployees = assignedEmployeeIds.map((employeeId) =>
-    assignedEmployeesById.get(employeeId)
+  const orderedAssignedEmployees = assignedMembershipIds.map((membershipId) =>
+    assignedEmployeesByMembershipId.get(membershipId)
   );
   const customer = job.customer_id ? await getCustomerById(job.customer_id) : null;
   const selectedAddress = job.customer_address_id

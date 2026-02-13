@@ -55,7 +55,7 @@ export default function NewJobForm() {
   });
 
   useEffect(() => {
-    register("assignedEmployeeIds");
+    register("assignedMembershipIds");
     register("customerId");
     register("customerAddressId");
     register("isRecurring");
@@ -102,7 +102,7 @@ export default function NewJobForm() {
     }
   }, [searchParams, setValue]);
 
-  const assignedEmployeeIds = watch("assignedEmployeeIds");
+  const assignedMembershipIds = watch("assignedMembershipIds");
   const selectedCustomerId = watch("customerId");
   const selectedCustomerAddressId = watch("customerAddressId");
   const selectedStatus = watch("status");
@@ -123,9 +123,9 @@ export default function NewJobForm() {
   const assignedEmployees = useMemo(
     () =>
       employees.filter((employee) =>
-        assignedEmployeeIds?.includes(employee.id)
+        assignedMembershipIds?.includes(employee.membership_id ?? "")
       ),
-    [employees, assignedEmployeeIds]
+    [employees, assignedMembershipIds]
   );
 
   const buildAddressLabel = (address: CustomerAddress) => {
@@ -188,26 +188,28 @@ export default function NewJobForm() {
     );
   }, [employees, filter, showInactive]);
 
-  const handleAddEmployee = (employeeId: string) => {
-    const current = assignedEmployeeIds ?? [];
-    if (current.includes(employeeId)) {
+  const handleAddEmployee = (membershipId: string) => {
+    const current = assignedMembershipIds ?? [];
+    if (current.includes(membershipId)) {
       return;
     }
-    const selected = employees.find((employee) => employee.id === employeeId);
+    const selected = employees.find(
+      (employee) => employee.membership_id === membershipId
+    );
     if (selected?.status === "inactive" && !allowInactive) {
       setToast({ message: t("assignment.inactiveError"), variant: "error" });
       return;
     }
-    setValue("assignedEmployeeIds", [...current, employeeId], {
+    setValue("assignedMembershipIds", [...current, membershipId], {
       shouldDirty: true
     });
   };
 
-  const handleRemoveEmployee = (employeeId: string) => {
-    const current = assignedEmployeeIds ?? [];
+  const handleRemoveEmployee = (membershipId: string) => {
+    const current = assignedMembershipIds ?? [];
     setValue(
-      "assignedEmployeeIds",
-      current.filter((id) => id !== employeeId),
+      "assignedMembershipIds",
+      current.filter((id) => id !== membershipId),
       { shouldDirty: true }
     );
   };
@@ -450,7 +452,9 @@ export default function NewJobForm() {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => handleRemoveEmployee(employee.id)}
+                    onClick={() =>
+                      handleRemoveEmployee(employee.membership_id ?? "")
+                    }
                   >
                     {tCommon("actions.remove")}
                   </Button>
@@ -475,14 +479,15 @@ export default function NewJobForm() {
             ) : (
               <div className="space-y-2">
                 {filteredEmployees.map((employee) => {
-                  const isSelected = assignedEmployeeIds?.includes(employee.id);
+                  const membershipId = employee.membership_id ?? "";
+                  const isSelected = assignedMembershipIds?.includes(membershipId);
                   const isInactive = employee.status === "inactive";
                   const disabled = isInactive && !allowInactive;
                   return (
                     <button
                       key={employee.id}
                       type="button"
-                      onClick={() => handleAddEmployee(employee.id)}
+                      onClick={() => handleAddEmployee(membershipId)}
                       className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition ${
                         isSelected
                           ? "border-brand-200 bg-brand-50 text-brand-700"

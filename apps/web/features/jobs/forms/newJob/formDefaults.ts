@@ -8,7 +8,7 @@ export const newJobDefaults: NewJobFormValues = {
   scheduledFor: "",
   estimatedEndAt: "",
   status: "scheduled",
-  assignedEmployeeIds: [],
+  assignedMembershipIds: [],
   allowInactive: false,
   isRecurring: false,
   recurrence: null,

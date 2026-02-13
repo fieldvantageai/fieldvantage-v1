@@ -40,7 +40,9 @@ export default async function DashboardPage() {
 
   const jobs = await listJobs();
   const employees = await listEmployees();
-  const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
+  const employeesByMembershipId = new Map(
+    employees.map((employee) => [employee.membership_id, employee])
+  );
 
   const now = new Date();
   const startOfDay = new Date(now);
@@ -85,7 +87,7 @@ export default async function DashboardPage() {
     .flatMap((job) => {
       const scheduled = new Date(job.scheduled_for);
       const isOverdue = scheduled < now && job.status !== "done";
-      const isUnassigned = !job.assigned_employee_ids?.length;
+      const isUnassigned = !job.assigned_membership_ids?.length;
       const shouldHaveStarted =
         scheduled < now && job.status === "scheduled";
       const reasons = [
@@ -184,9 +186,9 @@ export default async function DashboardPage() {
                     minute: "2-digit"
                   });
                   const assignees =
-                    job.assigned_employee_ids?.length
-                      ? job.assigned_employee_ids
-                          .map((id) => employeesById.get(id)?.full_name)
+                    job.assigned_membership_ids?.length
+                      ? job.assigned_membership_ids
+                          .map((id) => employeesByMembershipId.get(id)?.full_name)
                           .filter(Boolean)
                           .join(", ")
                       : t("today.noAssignees");
