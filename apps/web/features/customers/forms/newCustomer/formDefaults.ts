@@ -6,7 +6,6 @@ export const newCustomerDefaults: NewCustomerFormValues = {
   avatarUrl: "",
   email: "",
   phone: "",
-  companyName: "",
   notes: "",
   addresses: []
 };

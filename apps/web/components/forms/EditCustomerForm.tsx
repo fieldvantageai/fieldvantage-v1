@@ -167,11 +167,13 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label={t("fields.firstName")}
+          placeholder={t("placeholders.firstName")}
           error={errors.firstName?.message}
           {...register("firstName")}
         />
         <Input
           label={t("fields.lastName")}
+          placeholder={t("placeholders.lastName")}
           error={errors.lastName?.message}
           {...register("lastName")}
         />
@@ -180,25 +182,23 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label={t("fields.email")}
+          placeholder={t("placeholders.email")}
           type="email"
           error={errors.email?.message}
           {...register("email")}
         />
         <Input
           label={t("fields.phone")}
+          placeholder={t("placeholders.phone")}
+          helperText={t("helpers.phone")}
           error={errors.phone?.message}
           {...register("phone")}
         />
       </div>
 
-      <Input
-        label={t("fields.companyName")}
-        error={errors.companyName?.message}
-        {...register("companyName")}
-      />
-
       <Textarea
         label={t("fields.notes")}
+        placeholder={t("placeholders.notes")}
         error={errors.notes?.message}
         {...register("notes")}
       />
@@ -215,7 +215,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         }
         onAdd={() =>
           append({
-            type: "residential",
+            type: "",
             label: "",
             note: "",
             address_line1: "",

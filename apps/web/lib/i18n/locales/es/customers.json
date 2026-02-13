@@ -1,6 +1,6 @@
 {
   "title": "Clientes",
-  "subtitle": "Lista, busca y accede a detalles de clientes.",
+  "subtitle": "Gestiona clientes, sigue servicios y mantén todo organizado.",
   "actions": {
     "newJob": "Crear trabajo"
   },
@@ -53,7 +53,8 @@
   },
   "empty": {
     "title": "Aun no hay clientes",
-    "subtitle": "Agrega tu primer cliente para seguir los trabajos."
+    "subtitle": "Los clientes permiten crear trabajos, programar servicios y mantener historial.",
+    "cta": "Agregar primer cliente"
   },
   "fields": {
     "name": "Nombre del cliente",
@@ -62,19 +63,60 @@
     "avatar": "Foto del cliente",
     "email": "Email",
     "phone": "Telefono",
-    "companyName": "Empresa",
     "notes": "Notas",
     "address": "Direccion"
   },
+  "helpers": {
+    "phone": "Usado para contacto rapido"
+  },
   "placeholders": {
     "name": "Cliente Ejemplo",
-    "firstName": "Nombre",
-    "lastName": "Apellido",
-    "email": "cliente@empresa.com",
-    "phone": "+34 600 000 000",
-    "companyName": "Empresa (opcional)",
-    "notes": "Notas importantes sobre el cliente",
+    "firstName": "Nombre del cliente",
+    "lastName": "Apellido del cliente",
+    "email": "cliente@email.com",
+    "phone": "Ej: (555) 123-4567",
+    "notes": "Ej: prefiere contacto por la tarde, perro en el patio, porton azul",
     "address": "Calle, numero, ciudad"
+  },
+  "addresses": {
+    "title": "Direcciones",
+    "subtitle": "Las direcciones definen donde ocurren los servicios.",
+    "add": "Agregar direccion +",
+    "empty": "Agrega una direccion para crear ordenes y agendamientos.",
+    "card": {
+      "title": "Direccion",
+      "primary": "Direccion principal",
+      "optional": "Opcional",
+      "primaryLabel": "Principal",
+      "setPrimary": "Marcar como principal",
+      "remove": "Remover"
+    },
+    "fields": {
+      "type": "Tipo",
+      "label": "Etiqueta (opcional)",
+      "addressLine1": "Calle y numero",
+      "addressLine2": "Complemento",
+      "city": "Ciudad",
+      "state": "Estado",
+      "zip": "Codigo postal",
+      "country": "Pais",
+      "notes": "Notas de la direccion (opcional)"
+    },
+    "placeholders": {
+      "type": "Selecciona el tipo de direccion",
+      "label": "Ej: Casa, Oficina, Tienda",
+      "addressLine1": "Ej: 123 Main St",
+      "addressLine2": "Ej: Apartamento 2B, Sala 301",
+      "city": "Ej: Boston",
+      "state": "Ej: MA",
+      "zip": "Ej: 02118",
+      "country": "USA",
+      "notes": "Ej: Entrada por atras, tocar timbre"
+    },
+    "options": {
+      "residential": "Residencial",
+      "business": "Comercial"
+    }
   },
   "messages": {
     "created": "Cliente guardado con exito.",

@@ -41,7 +41,34 @@ export default function CustomersListClient({ customers }: CustomersListClientPr
       <EmptyState
         title={t("empty.title")}
         description={t("empty.subtitle")}
-        actionLabel={t("new.title")}
+        actionLabel={t("empty.cta")}
+        actionClassName="border border-slate-300/80 bg-slate-50/95 hover:bg-slate-100/80"
+        illustration={
+          <div className="-mb-1">
+            <svg
+              width="96"
+              height="64"
+              viewBox="0 0 96 64"
+              aria-hidden="true"
+              className="text-slate-300"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M10 28h76" />
+                <path d="M18 28V54h60V28" />
+                <path d="M24 54V38h20v16" />
+                <path d="M56 40h14v14H56z" />
+                <path d="M18 28l6-14h48l6 14" />
+                <path d="M34 14v-6h28v6" />
+              </g>
+            </svg>
+          </div>
+        }
       />
     );
   }

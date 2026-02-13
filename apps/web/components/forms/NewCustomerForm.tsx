@@ -153,17 +153,11 @@ export default function NewCustomerForm() {
         <Input
           label={t("fields.phone")}
           placeholder={t("placeholders.phone")}
+          helperText={t("helpers.phone")}
           error={errors.phone?.message}
           {...register("phone")}
         />
       </div>
-
-      <Input
-        label={t("fields.companyName")}
-        placeholder={t("placeholders.companyName")}
-        error={errors.companyName?.message}
-        {...register("companyName")}
-      />
 
       <Textarea
         label={t("fields.notes")}
@@ -184,7 +178,7 @@ export default function NewCustomerForm() {
         }
         onAdd={() =>
           append({
-            type: "residential",
+            type: "",
             label: "",
             note: "",
             address_line1: "",

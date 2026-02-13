@@ -1,6 +1,6 @@
 {
   "title": "Customers",
-  "subtitle": "List, search, and access customer details.",
+  "subtitle": "Manage customers, track services, and keep everything organized.",
   "actions": {
     "newJob": "Create job"
   },
@@ -53,7 +53,8 @@
   },
   "empty": {
     "title": "No customers yet",
-    "subtitle": "Add your first customer to start tracking jobs."
+    "subtitle": "Customers help you create orders, schedule services, and keep history.",
+    "cta": "Add first customer"
   },
   "fields": {
     "name": "Customer name",
@@ -62,19 +63,60 @@
     "avatar": "Customer photo",
     "email": "Email",
     "phone": "Phone",
-    "companyName": "Company",
     "notes": "Notes",
     "address": "Address"
   },
+  "helpers": {
+    "phone": "Used for quick contact"
+  },
   "placeholders": {
     "name": "Example Customer",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "email": "customer@company.com",
-    "phone": "+1 555 000 0000",
-    "companyName": "Company (optional)",
-    "notes": "Important notes about the customer",
+    "firstName": "Customer first name",
+    "lastName": "Customer last name",
+    "email": "customer@email.com",
+    "phone": "Ex: (555) 123-4567",
+    "notes": "Ex: prefers afternoon contact, dog in yard, blue gate",
     "address": "Street, number, city"
+  },
+  "addresses": {
+    "title": "Addresses",
+    "subtitle": "Addresses define where services happen.",
+    "add": "Add address +",
+    "empty": "Add an address to create orders and schedules.",
+    "card": {
+      "title": "Address",
+      "primary": "Primary address",
+      "optional": "Optional",
+      "primaryLabel": "Primary",
+      "setPrimary": "Set as primary",
+      "remove": "Remove"
+    },
+    "fields": {
+      "type": "Type",
+      "label": "Label (optional)",
+      "addressLine1": "Street and number",
+      "addressLine2": "Unit / Suite",
+      "city": "City",
+      "state": "State",
+      "zip": "Zip code",
+      "country": "Country",
+      "notes": "Address notes (optional)"
+    },
+    "placeholders": {
+      "type": "Select address type",
+      "label": "Ex: Home, Office, Store",
+      "addressLine1": "Ex: 123 Main St",
+      "addressLine2": "Ex: Apt 2B, Suite 301",
+      "city": "Ex: Boston",
+      "state": "Ex: MA",
+      "zip": "Ex: 02118",
+      "country": "USA",
+      "notes": "Ex: Back entrance, ring bell"
+    },
+    "options": {
+      "residential": "Residential",
+      "business": "Business"
+    }
   },
   "messages": {
     "created": "Customer saved successfully.",

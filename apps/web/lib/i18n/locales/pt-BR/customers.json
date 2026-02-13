@@ -1,6 +1,6 @@
 {
   "title": "Clientes",
-  "subtitle": "Liste, pesquise e acesse detalhes dos clientes.",
+  "subtitle": "Gerencie seus clientes, acompanhe servicos e mantenha tudo organizado.",
   "actions": {
     "newJob": "Criar ordem"
   },
@@ -53,7 +53,8 @@
   },
   "empty": {
     "title": "Nenhum cliente ainda",
-    "subtitle": "Adicione seu primeiro cliente para acompanhar ordens."
+    "subtitle": "Clientes permitem criar ordens, agendar servicos e acompanhar o historico.",
+    "cta": "Adicionar primeiro cliente"
   },
   "fields": {
     "name": "Nome do cliente",
@@ -62,19 +63,60 @@
     "avatar": "Foto do cliente",
     "email": "Email",
     "phone": "Telefone",
-    "companyName": "Empresa",
     "notes": "Observacoes",
     "address": "Endereco"
   },
+  "helpers": {
+    "phone": "Usado para contato rapido"
+  },
   "placeholders": {
     "name": "Cliente Exemplo",
-    "firstName": "Nome",
-    "lastName": "Sobrenome",
-    "email": "cliente@empresa.com",
-    "phone": "+55 11 90000-0000",
-    "companyName": "Empresa (opcional)",
-    "notes": "Anotacoes importantes sobre o cliente",
+    "firstName": "Nome do cliente",
+    "lastName": "Sobrenome do cliente",
+    "email": "cliente@email.com",
+    "phone": "Ex: (555) 123-4567",
+    "notes": "Ex: prefere contato a tarde, cachorro no quintal, portao azul",
     "address": "Rua, numero, cidade"
+  },
+  "addresses": {
+    "title": "Enderecos",
+    "subtitle": "Enderecos definem onde os servicos acontecem.",
+    "add": "Adicionar endereco +",
+    "empty": "Adicione um endereco para criar ordens e agendamentos.",
+    "card": {
+      "title": "Endereco",
+      "primary": "Endereco principal",
+      "optional": "Opcional",
+      "primaryLabel": "Principal",
+      "setPrimary": "Definir como principal",
+      "remove": "Remover"
+    },
+    "fields": {
+      "type": "Tipo",
+      "label": "Etiqueta (opcional)",
+      "addressLine1": "Rua e numero",
+      "addressLine2": "Complemento",
+      "city": "Cidade",
+      "state": "Estado",
+      "zip": "CEP",
+      "country": "Pais",
+      "notes": "Notas do endereco (opcional)"
+    },
+    "placeholders": {
+      "type": "Selecione o tipo de endereco",
+      "label": "Ex: Casa, Escritorio, Loja",
+      "addressLine1": "Ex: 123 Main St",
+      "addressLine2": "Ex: Apartamento 2B, Sala 301",
+      "city": "Ex: Boston",
+      "state": "Ex: MA",
+      "zip": "Ex: 02118",
+      "country": "USA",
+      "notes": "Ex: Entrada pelos fundos, tocar campainha"
+    },
+    "options": {
+      "residential": "Residencial",
+      "business": "Comercial"
+    }
   },
   "messages": {
     "created": "Cliente salvo com sucesso.",
