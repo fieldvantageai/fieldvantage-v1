@@ -6,7 +6,9 @@
     "delete": "Eliminar trabajo",
     "edit": "Editar",
     "changeStatus": "Cambiar estado",
-    "viewHistory": "Detalles"
+    "viewHistory": "Detalles",
+    "openMap": "Abrir en el mapa",
+    "cancel": "Cancelar trabajo"
   },
   "new": {
     "title": "Nuevo trabajo",
@@ -20,13 +22,18 @@
     "title": "Trabajos activos",
     "description": "Sigue los trabajos activos.",
     "allTitle": "Todos los trabajos",
-    "allDescription": "Ve todos los trabajos de tu operacion."
+    "allDescription": "Ve todos los trabajos de tu operacion.",
+    "viewLabel": "Vista",
+    "viewTable": "Lista",
+    "viewKanban": "Kanban"
   },
   "filters": {
     "searchLabel": "Buscar",
-    "searchPlaceholder": "Buscar por titulo, cliente o colaborador...",
+    "searchPlaceholder": "Buscar por trabajo, cliente o equipo...",
     "fromLabel": "Desde",
+    "fromPlaceholder": "Fecha inicial",
     "toLabel": "Hasta",
+    "toPlaceholder": "Fecha final",
     "statusLabel": "Estado",
     "statusAll": "Todos",
     "clear": "Limpiar filtros",
@@ -36,6 +43,8 @@
   },
   "pagination": {
     "showing": "Mostrando {from}–{to} de {total}",
+    "resultsSingle": "1 trabajo encontrado",
+    "resultsPlural": "{total} trabajos encontrados",
     "previous": "Anterior",
     "next": "Siguiente",
     "page": "Pagina {page} de {totalPages}"

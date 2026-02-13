@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import OrdersFiltersBar from "./OrdersFiltersBar";
+import OrdersKanban from "./OrdersKanban";
 import OrdersPagination from "./OrdersPagination";
 import OrdersTable from "./OrdersTable";
 import StatusUpdateDialog from "./StatusUpdateDialog";
@@ -21,7 +22,7 @@ type FiltersState = {
   toDate?: Date | null;
 };
 
-type SortKey = "title" | "customer" | "status" | "startDate";
+type SortKey = "title" | "status" | "startDate";
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 20;
@@ -47,6 +48,11 @@ const getParam = (params: URLSearchParams, key: string) =>
 
 const parseState = (params: URLSearchParams) => {
   const parsedPage = Number(getParam(params, "page") || "1");
+  const rawSort = getParam(params, "sort");
+  const sortKey =
+    rawSort === "title" || rawSort === "status" || rawSort === "startDate"
+      ? (rawSort as SortKey)
+      : "startDate";
   return {
     filters: {
       query: getParam(params, "q"),
@@ -54,7 +60,7 @@ const parseState = (params: URLSearchParams) => {
       fromDate: parseDate(params.get("from")),
       toDate: parseDate(params.get("to"))
     },
-    sortKey: (getParam(params, "sort") as SortKey) || "startDate",
+    sortKey,
     sortDir: (getParam(params, "dir") as SortDir) || "desc",
     page: Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage
   };
@@ -87,6 +93,10 @@ export default function OrdersListClient({
     toDateTimeLocalValue(new Date())
   );
   const [statusDialogNote, setStatusDialogNote] = useState("");
+  const [statusDialogPreset, setStatusDialogPreset] = useState<Job["status"] | null>(
+    null
+  );
+  const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
   const [isSavingStatus, setIsSavingStatus] = useState(false);
 
   useEffect(() => {
@@ -202,61 +212,120 @@ export default function OrdersListClient({
 
   return (
     <div className="space-y-4">
-      <OrdersFiltersBar
-        filters={filters}
-        locale={locale}
-        onChange={(next) => {
-          setFilters(next);
-          setPage(1);
-        }}
-        onClear={() => {
-          setFilters({ query: "", status: "all", fromDate: null, toDate: null });
-          setPage(1);
-        }}
-      />
-      <OrdersPagination
-        page={page}
-        total={total}
-        pageSize={PAGE_SIZE}
-        onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
-        onNext={() =>
-          setPage((prev) =>
-            prev * PAGE_SIZE >= total ? prev : prev + 1
-          )
-        }
-      />
-      <OrdersTable
-        orders={sortedJobs}
-        locale={locale}
-        emptyMessage={t("filters.empty")}
-        isLoading={isLoading}
-        canEdit={canEditOrders}
-        sortKey={sortKey}
-        sortDir={sortDir}
-        onSort={(key) => {
-          if (key === sortKey) {
-            setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
-          } else {
-            setSortKey(key);
-            setSortDir("asc");
+      <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-background/80 py-4 backdrop-blur-md">
+        <OrdersFiltersBar
+          filters={filters}
+          locale={locale}
+          onChange={(next) => {
+            setFilters(next);
+            setPage(1);
+          }}
+          onClear={() => {
+            setFilters({ query: "", status: "all", fromDate: null, toDate: null });
+            setPage(1);
+          }}
+        />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <OrdersPagination
+          page={page}
+          total={total}
+          pageSize={PAGE_SIZE}
+          onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+          onNext={() =>
+            setPage((prev) =>
+              prev * PAGE_SIZE >= total ? prev : prev + 1
+            )
           }
-          setPage(1);
-        }}
-        onStatusAction={(job) => {
-          setStatusDialogJob(job);
-          setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
-          setStatusDialogNote("");
-        }}
-        onHistoryAction={(job) => {
-          router.push(`/jobs/${job.id}#history`);
-        }}
-      />
+        />
+        <div className="flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-white/95 p-1 text-xs">
+          <span className="px-2 text-[11px] font-semibold text-slate-400">
+            {t("list.viewLabel")}
+          </span>
+          <button
+            type="button"
+            onClick={() => setViewMode("table")}
+            className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+              viewMode === "table"
+                ? "bg-slate-900 text-white"
+                : "text-slate-500 hover:bg-slate-100/80"
+            }`}
+          >
+            {t("list.viewTable")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("kanban")}
+            className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+              viewMode === "kanban"
+                ? "bg-slate-900 text-white"
+                : "text-slate-500 hover:bg-slate-100/80"
+            }`}
+          >
+            {t("list.viewKanban")}
+          </button>
+        </div>
+      </div>
+      {viewMode === "kanban" ? (
+        <OrdersKanban
+          orders={sortedJobs}
+          locale={locale}
+          isLoading={isLoading}
+          canEdit={canEditOrders}
+          onView={(job) => router.push(`/jobs/${job.id}`)}
+          onEdit={(job) => router.push(`/jobs/${job.id}/edit`)}
+          onChangeStatus={(job) => {
+            setStatusDialogPreset(null);
+            setStatusDialogJob(job);
+            setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
+            setStatusDialogNote("");
+          }}
+          onOpenMap={(job) => router.push(`/jobs/${job.id}`)}
+          onCancel={(job) => {
+            setStatusDialogPreset("canceled");
+            setStatusDialogJob(job);
+            setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
+            setStatusDialogNote("");
+          }}
+        />
+      ) : (
+        <OrdersTable
+          orders={sortedJobs}
+          locale={locale}
+          emptyMessage={t("filters.empty")}
+          isLoading={isLoading}
+          canEdit={canEditOrders}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          onSort={(key) => {
+            if (key === sortKey) {
+              setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+            } else {
+              setSortKey(key);
+              setSortDir("asc");
+            }
+            setPage(1);
+          }}
+          onStatusAction={(job) => {
+            setStatusDialogPreset(null);
+            setStatusDialogJob(job);
+            setStatusDialogChangedAt(toDateTimeLocalValue(new Date()));
+            setStatusDialogNote("");
+          }}
+          onHistoryAction={(job) => {
+            router.push(`/jobs/${job.id}#history`);
+          }}
+        />
+      )}
       <StatusUpdateDialog
         open={Boolean(statusDialogJob)}
-        status={statusDialogJob?.status ?? "scheduled"}
+        status={statusDialogPreset ?? statusDialogJob?.status ?? "scheduled"}
         changedAt={statusDialogChangedAt}
         note={statusDialogNote}
-        onCancel={() => setStatusDialogJob(null)}
+        onCancel={() => {
+          setStatusDialogJob(null);
+          setStatusDialogPreset(null);
+        }}
         onSave={async (nextStatus, changedAt, note) => {
           if (!statusDialogJob || !changedAt || isSavingStatus) {
             return;

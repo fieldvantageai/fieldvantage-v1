@@ -6,7 +6,9 @@
     "delete": "Excluir ordem",
     "edit": "Editar",
     "changeStatus": "Alterar status",
-    "viewHistory": "Detalhes"
+    "viewHistory": "Detalhes",
+    "openMap": "Abrir no mapa",
+    "cancel": "Cancelar ordem"
   },
   "new": {
     "title": "Nova ordem",
@@ -20,13 +22,18 @@
     "title": "Ordens em andamento",
     "description": "Acompanhe as ordens ativas.",
     "allTitle": "Todas as ordens",
-    "allDescription": "Visualize todas as ordens da sua operacao."
+    "allDescription": "Visualize todas as ordens da sua operacao.",
+    "viewLabel": "Visualizacao",
+    "viewTable": "Lista",
+    "viewKanban": "Kanban"
   },
   "filters": {
     "searchLabel": "Busca",
-    "searchPlaceholder": "Buscar por titulo, cliente ou colaborador...",
+    "searchPlaceholder": "Buscar por ordem, cliente ou equipe...",
     "fromLabel": "De",
-    "toLabel": "Ate",
+    "fromPlaceholder": "Data inicial",
+    "toLabel": "Até",
+    "toPlaceholder": "Data final",
     "statusLabel": "Status",
     "statusAll": "Todas",
     "clear": "Limpar filtros",
@@ -36,6 +43,8 @@
   },
   "pagination": {
     "showing": "Mostrando {from}–{to} de {total}",
+    "resultsSingle": "1 ordem encontrada",
+    "resultsPlural": "{total} ordens encontradas",
     "previous": "Anterior",
     "next": "Proxima",
     "page": "Pagina {page} de {totalPages}"

@@ -24,13 +24,15 @@ export default function OrdersPagination({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
+  const resultsLabel =
+    total === 1
+      ? t("pagination.resultsSingle")
+      : format(t("pagination.resultsPlural"), { total });
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
-      <span>
-        {format(t("pagination.showing"), { from, to, total })}
-      </span>
-      <div className="flex items-center gap-2">
+      <span>{resultsLabel}</span>
+      <div className="flex items-center gap-3">
         <Button
           type="button"
           variant="ghost"

@@ -19,6 +19,12 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
         : status === "canceled"
           ? "danger"
           : "default";
+  const scheduledClass =
+    status === "scheduled" ? "bg-blue-50 text-blue-700" : "";
 
-  return <Badge variant={variant}>{label}</Badge>;
+  return (
+    <Badge variant={variant} className={scheduledClass}>
+      {label}
+    </Badge>
+  );
 }

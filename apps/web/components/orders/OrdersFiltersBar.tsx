@@ -1,9 +1,10 @@
 "use client";
 
+import { Calendar, Search, X } from "lucide-react";
+
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { Calendar } from "@/components/ui/Calendar";
+import { Calendar as CalendarPicker } from "@/components/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import { useClientT } from "@/lib/i18n/useClientT";
 import type { JobStatus } from "@fieldvantage/shared";
@@ -33,84 +34,115 @@ export default function OrdersFiltersBar({
     date ? new Intl.DateTimeFormat(locale).format(date) : "";
 
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-4 shadow-sm">
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.6fr)]">
-        <Input
-          label={t("filters.searchLabel")}
-          placeholder={t("filters.searchPlaceholder")}
-          value={filters.query}
-          onChange={(event) =>
-            onChange({ ...filters, query: event.target.value })
-          }
-        />
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className="flex h-full w-full flex-col items-start justify-center rounded-xl border border-slate-200/70 bg-white/90 px-3 py-2.5 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-200"
-            >
-              <span className="text-xs font-medium text-slate-500">
-                {t("filters.fromLabel")}
-              </span>
-              <span className="text-sm text-slate-700">
-                {filters.fromDate ? formatDate(filters.fromDate) : t("filters.any")}
-              </span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="p-2">
-            <Calendar
-              mode="single"
-              selected={filters.fromDate ?? undefined}
-              onSelect={(date) => onChange({ ...filters, fromDate: date })}
+    <div>
+      <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-6 lg:grid-cols-12">
+        <div className="sm:col-span-6 lg:col-span-4">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
+            {t("filters.searchLabel")}
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Search className="h-4 w-4" />
+            </span>
+            <input
+              value={filters.query}
+              onChange={(event) =>
+                onChange({ ...filters, query: event.target.value })
+              }
+              placeholder={t("filters.searchPlaceholder")}
+              className="h-11 w-full rounded-xl border border-slate-200/70 bg-white/90 px-9 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
             />
-          </PopoverContent>
-        </Popover>
+          </div>
+        </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className="flex h-full w-full flex-col items-start justify-center rounded-xl border border-slate-200/70 bg-white/90 px-3 py-2.5 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-200"
-            >
-              <span className="text-xs font-medium text-slate-500">
-                {t("filters.toLabel")}
-              </span>
-              <span className="text-sm text-slate-700">
-                {filters.toDate ? formatDate(filters.toDate) : t("filters.any")}
-              </span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="p-2">
-            <Calendar
-              mode="single"
-              selected={filters.toDate ?? undefined}
-              onSelect={(date) => onChange({ ...filters, toDate: date })}
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="sm:col-span-3 lg:col-span-2">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
+            {t("filters.fromLabel")}
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex h-11 w-full items-center gap-2 rounded-xl border border-slate-200/70 bg-white/90 px-3 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-200"
+              >
+                <Calendar className="h-4 w-4 text-blue-500" />
+                <span className="text-sm text-slate-700">
+                  {filters.fromDate
+                    ? formatDate(filters.fromDate)
+                    : t("filters.fromPlaceholder")}
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="p-2">
+              <CalendarPicker
+                mode="single"
+                selected={filters.fromDate ?? undefined}
+                onSelect={(date) => onChange({ ...filters, fromDate: date })}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
 
-        <Select
-          label={t("filters.statusLabel")}
-          value={filters.status}
-          options={[
-            { value: "all", label: t("filters.statusAll") },
-            { value: "scheduled", label: t("status.scheduled") },
-            { value: "in_progress", label: t("status.in_progress") },
-            { value: "done", label: t("status.done") },
-            { value: "canceled", label: t("status.canceled") }
-          ]}
-          onChange={(event) =>
-            onChange({ ...filters, status: event.target.value as OrdersFilters["status"] })
-          }
-        />
+        <div className="sm:col-span-3 lg:col-span-2">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
+            {t("filters.toLabel")}
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex h-11 w-full items-center gap-2 rounded-xl border border-slate-200/70 bg-white/90 px-3 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-200"
+              >
+                <Calendar className="h-4 w-4 text-blue-500" />
+                <span className="text-sm text-slate-700">
+                  {filters.toDate
+                    ? formatDate(filters.toDate)
+                    : t("filters.toPlaceholder")}
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="p-2">
+              <CalendarPicker
+                mode="single"
+                selected={filters.toDate ?? undefined}
+                onSelect={(date) => onChange({ ...filters, toDate: date })}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="sm:col-span-3 lg:col-span-2">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
+            {t("filters.statusLabel")}
+          </label>
+          <select
+            value={filters.status}
+            onChange={(event) =>
+              onChange({ ...filters, status: event.target.value as OrdersFilters["status"] })
+            }
+            className="h-11 w-full rounded-xl border border-slate-200/70 bg-white/90 px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+          >
+            <option value="all">{t("filters.statusAll")}</option>
+            <option value="scheduled">{t("status.scheduled")}</option>
+            <option value="in_progress">{t("status.in_progress")}</option>
+            <option value="done">{t("status.done")}</option>
+            <option value="canceled">{t("status.canceled")}</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end sm:col-span-3 lg:col-span-2">
+          <Button
+            type="button"
+            variant="ghost"
+            className="flex h-11 items-center px-3"
+            onClick={onClear}
+          >
+            <X className="mr-2 h-4 w-4 text-slate-400" />
+            {t("filters.clear")}
+          </Button>
+        </div>
       </div>
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-slate-500">{t("filters.helper")}</span>
-        <Button type="button" variant="ghost" onClick={onClear}>
-          {t("filters.clear")}
-        </Button>
-      </div>
+      <p className="mt-3 text-xs text-slate-500">{t("filters.helper")}</p>
     </div>
   );
 }

@@ -6,7 +6,9 @@
     "delete": "Delete job",
     "edit": "Edit",
     "changeStatus": "Change status",
-    "viewHistory": "Details"
+    "viewHistory": "Details",
+    "openMap": "Open in map",
+    "cancel": "Cancel job"
   },
   "new": {
     "title": "New job",
@@ -20,13 +22,18 @@
     "title": "Active jobs",
     "description": "Track active jobs.",
     "allTitle": "All jobs",
-    "allDescription": "View every job in your operation."
+    "allDescription": "View every job in your operation.",
+    "viewLabel": "View",
+    "viewTable": "List",
+    "viewKanban": "Kanban"
   },
   "filters": {
     "searchLabel": "Search",
-    "searchPlaceholder": "Search by title, customer, or employee...",
+    "searchPlaceholder": "Search by job, customer, or team...",
     "fromLabel": "From",
+    "fromPlaceholder": "Start date",
     "toLabel": "To",
+    "toPlaceholder": "End date",
     "statusLabel": "Status",
     "statusAll": "All",
     "clear": "Clear filters",
@@ -36,6 +43,8 @@
   },
   "pagination": {
     "showing": "Showing {from}–{to} of {total}",
+    "resultsSingle": "1 job found",
+    "resultsPlural": "{total} jobs found",
     "previous": "Previous",
     "next": "Next",
     "page": "Page {page} of {totalPages}"
