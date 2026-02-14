@@ -158,18 +158,40 @@
     "estimatedEndAt": "Fin estimado",
     "status": "Estado"
   },
+  "form": {
+    "status": {
+      "changeLabel": "Cambiar estado"
+    },
+    "sections": {
+      "main": {
+        "title": "Informacion principal",
+        "subtitle": "Detalles esenciales de la orden."
+      },
+      "planning": {
+        "title": "Planificacion",
+        "subtitle": "Estado y fechas de ejecucion."
+      },
+      "notes": {
+        "title": "Notas",
+        "subtitle": "Notas internas de la orden."
+      }
+    }
+  },
   "assignment": {
     "title": "Colaboradores asignados",
     "subtitle": "Define quien esta asignado a este trabajo.",
+    "helper": "Gestiona quien ejecutara esta orden.",
     "add": "Agregar empleado",
     "hideSelector": "Ocultar seleccion",
     "empty": "No hay empleados asignados.",
+    "emptyHelper": "Agrega colaboradores para mantener esta orden en marcha.",
     "filterLabel": "Filtrar por nombre",
     "filterPlaceholder": "Escribe para buscar",
     "filterEmpty": "No se encontraron empleados.",
     "selected": "Seleccionado",
     "showInactive": "Mostrar inactivos",
     "allowInactive": "Permitir inactivos (backdated)",
+    "assignedBadge": "Asignado",
     "inactiveBadge": "Inactivo",
     "inactiveError": "Este empleado esta inactivo y no se puede asignar."
   },
@@ -214,7 +236,8 @@
   "notes": {
     "row": "Notas",
     "title": "Notas",
-    "label": "Notas"
+    "label": "Notas",
+    "placeholder": "Agrega notas internas para el equipo responsable de esta orden..."
   },
   "messages": {
     "created": "Trabajo creado.",

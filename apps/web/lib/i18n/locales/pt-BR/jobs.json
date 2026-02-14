@@ -158,18 +158,40 @@
     "estimatedEndAt": "Previsao de termino",
     "status": "Status"
   },
+  "form": {
+    "status": {
+      "changeLabel": "Alterar status"
+    },
+    "sections": {
+      "main": {
+        "title": "Informacoes principais",
+        "subtitle": "Dados essenciais da ordem."
+      },
+      "planning": {
+        "title": "Planejamento",
+        "subtitle": "Status e datas da execucao."
+      },
+      "notes": {
+        "title": "Notas",
+        "subtitle": "Observacoes internas da ordem."
+      }
+    }
+  },
   "assignment": {
     "title": "Colaboradores alocados",
     "subtitle": "Defina quem esta alocado nesta ordem.",
+    "helper": "Gerencie quem vai executar esta ordem.",
     "add": "Adicionar colaborador",
     "hideSelector": "Fechar selecao",
     "empty": "Nenhum colaborador atribuido.",
+    "emptyHelper": "Adicione colaboradores para manter esta ordem em andamento.",
     "filterLabel": "Filtrar por nome",
     "filterPlaceholder": "Digite para buscar",
     "filterEmpty": "Nenhum colaborador encontrado.",
     "selected": "Selecionado",
     "showInactive": "Mostrar inativos",
     "allowInactive": "Permitir inativos (backdated)",
+    "assignedBadge": "Alocado",
     "inactiveBadge": "Inativo",
     "inactiveError": "Este colaborador esta inativo e nao pode ser atribuido."
   },
@@ -214,7 +236,8 @@
   "notes": {
     "row": "Notas",
     "title": "Notas",
-    "label": "Notas"
+    "label": "Notas",
+    "placeholder": "Adicione observacoes internas para a equipe responsavel por esta ordem..."
   },
   "messages": {
     "created": "Ordem criada.",

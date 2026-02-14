@@ -2,8 +2,8 @@ import * as React from "react";
 
 type SaveAnimatedButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isLoading?: boolean;
-  label?: string;
-  loadingLabel?: string;
+  label?: React.ReactNode;
+  loadingLabel?: React.ReactNode;
 };
 
 export function SaveAnimatedButton({

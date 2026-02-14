@@ -14,12 +14,28 @@ import { Textarea } from "@/components/ui/Textarea";
 import RecurrenceModal from "@/components/orders/RecurrenceModal";
 import { formatRecurrenceSummary } from "@/components/orders/recurrenceSummary";
 import {
+  DateField,
+  FormSection,
+  StatusCardField
+} from "@/components/orders/OrderFormSection";
+import {
   newJobSchema,
   type NewJobFormValues
 } from "@/features/jobs/forms/newJob/formSchema";
 import type { Customer, Employee, Job } from "@/features/_shared/types";
 import type { CustomerAddress, JobRecurrence } from "@fieldvantage/shared";
 import { useClientT } from "@/lib/i18n/useClientT";
+import {
+  Calendar,
+  CalendarClock,
+  ClipboardList,
+  Clock,
+  Plus,
+  Save,
+  StickyNote,
+  Trash2,
+  Users
+} from "lucide-react";
 
 type EditJobFormProps = {
   job: Job;
@@ -125,15 +141,6 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   const selectedStatus = watch("status");
   const isRecurring = watch("isRecurring");
 
-  const statusClass =
-    selectedStatus === "done"
-      ? "text-emerald-700"
-      : selectedStatus === "in_progress"
-        ? "text-amber-700"
-        : selectedStatus === "canceled"
-          ? "text-rose-700"
-          : "text-slate-700";
-
   const recurrenceSummary = (recurrence?: unknown) =>
     formatRecurrenceSummary(
       (recurrence ?? null) as JobRecurrence | null,
@@ -156,6 +163,18 @@ export default function EditJobForm({ job }: EditJobFormProps) {
       address.country
     ].filter(Boolean);
     return parts.join(" · ");
+  };
+
+  const getInitials = (name?: string | null) => {
+    if (!name) {
+      return "--";
+    }
+    return name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("");
   };
 
   useEffect(() => {
@@ -287,7 +306,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-8">
       {toast ? (
         <ToastBanner
           message={toast.message}
@@ -296,145 +315,171 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           closeLabel={tCommon("actions.close")}
         />
       ) : null}
-      <Input
-        label={t("fields.title")}
-        error={errors.title?.message}
-        {...register("title")}
-      />
-      <Select
-        label={t("fields.customer")}
-        error={errors.customerName?.message}
-        value={selectedCustomerId}
-        options={[
-          { value: "", label: t("fields.customerPlaceholder") },
-          ...customers.map((customer) => ({
-            value: customer.id,
-            label: customer.name
-          }))
-        ]}
-        onChange={(event) => {
-          const id = event.target.value;
-          const selected = customers.find((customer) => customer.id === id);
-          setValue("customerId", id, { shouldDirty: true });
-          setValue("customerName", selected?.name ?? "", { shouldDirty: true });
-          setValue("customerAddressId", "", { shouldDirty: true });
-        }}
-      />
-      <input type="hidden" {...register("customerId")} />
-      <input type="hidden" {...register("customerName")} />
-      <Select
-        label={t("fields.customerAddress")}
-        value={selectedCustomerAddressId ?? ""}
-        error={errors.customerAddressId?.message}
-        options={[
-          {
-            value: "",
-            label: isLoadingAddresses
-              ? tCommon("status.loading")
-              : t("fields.customerAddressPlaceholder")
-          },
-          ...customerAddresses.map((address) => ({
-            value: address.id,
-            label: buildAddressLabel(address)
-          }))
-        ]}
-        onChange={(event) => {
-          setValue("customerAddressId", event.target.value, {
-            shouldDirty: true
-          });
-        }}
-        disabled={!selectedCustomerId || isLoadingAddresses || customerAddresses.length === 0}
-      />
-      <Select
-        label={t("fields.status")}
-        error={errors.status?.message}
-        options={[
-          { value: "scheduled", label: t("status.scheduled") },
-          { value: "in_progress", label: t("status.in_progress") },
-          { value: "done", label: t("status.done") },
-          { value: "canceled", label: t("status.canceled") }
-        ]}
-        className={statusClass}
-        {...register("status")}
-      />
-      <Input
-        label={t("fields.scheduledFor")}
-        type="datetime-local"
-        error={errors.scheduledFor?.message}
-        {...register("scheduledFor")}
-      />
-      <Input
-        label={t("fields.estimatedEndAt")}
-        type="datetime-local"
-        error={errors.estimatedEndAt?.message}
-        {...register("estimatedEndAt")}
-      />
 
-      <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
-        <input
-          type="checkbox"
-          className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
-          checked={Boolean(isRecurring)}
+      <FormSection
+        icon={<ClipboardList className="h-5 w-5" />}
+        title={t("form.sections.main.title")}
+        subtitle={t("form.sections.main.subtitle")}
+      >
+        <Input
+          label={t("fields.title")}
+          error={errors.title?.message}
+          {...register("title")}
+        />
+        <Select
+          label={t("fields.customer")}
+          error={errors.customerName?.message}
+          value={selectedCustomerId}
+          options={[
+            { value: "", label: t("fields.customerPlaceholder") },
+            ...customers.map((customer) => ({
+              value: customer.id,
+              label: customer.name
+            }))
+          ]}
           onChange={(event) => {
-            setValue("isRecurring", event.target.checked, { shouldDirty: true });
-            if (!event.target.checked) {
-              setValue("recurrence", null, { shouldDirty: true });
-            } else if (!watch("recurrence")) {
-              setValue(
-                "recurrence",
-                { repeat: "daily", every: 1 },
-                { shouldDirty: true }
-              );
-            }
+            const id = event.target.value;
+            const selected = customers.find((customer) => customer.id === id);
+            setValue("customerId", id, { shouldDirty: true });
+            setValue("customerName", selected?.name ?? "", { shouldDirty: true });
+            setValue("customerAddressId", "", { shouldDirty: true });
           }}
         />
-        <span>{t("recurrence.toggle")}</span>
-      </label>
+        <input type="hidden" {...register("customerId")} />
+        <input type="hidden" {...register("customerName")} />
+        <Select
+          label={t("fields.customerAddress")}
+          value={selectedCustomerAddressId ?? ""}
+          error={errors.customerAddressId?.message}
+          options={[
+            {
+              value: "",
+              label: isLoadingAddresses
+                ? tCommon("status.loading")
+                : t("fields.customerAddressPlaceholder")
+            },
+            ...customerAddresses.map((address) => ({
+              value: address.id,
+              label: buildAddressLabel(address)
+            }))
+          ]}
+          onChange={(event) => {
+            setValue("customerAddressId", event.target.value, {
+              shouldDirty: true
+            });
+          }}
+          disabled={
+            !selectedCustomerId || isLoadingAddresses || customerAddresses.length === 0
+          }
+        />
+      </FormSection>
 
-      {isRecurring ? (
-        <button
-          type="button"
-          onClick={() => setShowRecurrence(true)}
-          className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50/70"
-        >
-          <span className="font-semibold">{t("recurrence.custom")}</span>
-          <span className="flex min-w-0 items-center gap-2">
-            <span className="max-w-[220px] truncate text-xs text-slate-500">
-              {recurrenceSummary(watch("recurrence") ?? null)}
+      <FormSection
+        icon={<CalendarClock className="h-5 w-5" />}
+        title={t("form.sections.planning.title")}
+        subtitle={t("form.sections.planning.subtitle")}
+        className="bg-muted/30"
+      >
+        <StatusCardField
+          label={t("fields.status")}
+          status={selectedStatus}
+          error={errors.status?.message}
+          actionLabel={t("form.status.changeLabel")}
+          select={
+            <select
+              className="h-11 w-full rounded-xl border border-slate-300 bg-white/90 px-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+              {...register("status")}
+            >
+              <option value="scheduled">{t("status.scheduled")}</option>
+              <option value="in_progress">{t("status.in_progress")}</option>
+              <option value="done">{t("status.done")}</option>
+              <option value="canceled">{t("status.canceled")}</option>
+            </select>
+          }
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <DateField
+            label={t("fields.scheduledFor")}
+            type="datetime-local"
+            icon={<Calendar className="h-4 w-4 text-blue-500" />}
+            error={errors.scheduledFor?.message}
+            {...register("scheduledFor")}
+          />
+          <DateField
+            label={t("fields.estimatedEndAt")}
+            type="datetime-local"
+            icon={<Clock className="h-4 w-4 text-amber-500" />}
+            error={errors.estimatedEndAt?.message}
+            {...register("estimatedEndAt")}
+          />
+        </div>
+
+        <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+            checked={Boolean(isRecurring)}
+            onChange={(event) => {
+              setValue("isRecurring", event.target.checked, { shouldDirty: true });
+              if (!event.target.checked) {
+                setValue("recurrence", null, { shouldDirty: true });
+              } else if (!watch("recurrence")) {
+                setValue(
+                  "recurrence",
+                  { repeat: "daily", every: 1 },
+                  { shouldDirty: true }
+                );
+              }
+            }}
+          />
+          <span>{t("recurrence.toggle")}</span>
+        </label>
+
+        {isRecurring ? (
+          <button
+            type="button"
+            onClick={() => setShowRecurrence(true)}
+            className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50/70"
+          >
+            <span className="font-semibold">{t("recurrence.custom")}</span>
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="max-w-[220px] truncate text-xs text-slate-500">
+                {recurrenceSummary(watch("recurrence") ?? null)}
+              </span>
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
             </span>
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-              <path
-                d="M9 6l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </svg>
-          </span>
-        </button>
-      ) : null}
+          </button>
+        ) : null}
+      </FormSection>
 
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">
-              {t("assignment.title")}
-            </p>
-            <p className="text-xs text-slate-500">{t("assignment.subtitle")}</p>
-          </div>
+      <FormSection
+        icon={<Users className="h-5 w-5" />}
+        title={t("assignment.title")}
+        subtitle={t("assignment.subtitle")}
+        action={
           <Button
             type="button"
             variant="secondary"
             onClick={() => setShowSelector((value) => !value)}
+            className="inline-flex items-center gap-2"
+            disabled={isSubmitting}
           >
-            {showSelector
-              ? t("assignment.hideSelector")
-              : t("assignment.add")}
+            <Plus className="h-4 w-4" />
+            {showSelector ? t("assignment.hideSelector") : t("assignment.add")}
           </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+        }
+      >
+        <div className="text-xs text-slate-500">{t("assignment.helper")}</div>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -470,38 +515,54 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         </div>
 
         {assignedEmployees.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
-            {t("assignment.empty")}
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-5 text-sm text-slate-500 transition-all duration-200">
+            <div className="flex items-center gap-3">
+              <Users className="h-6 w-6 text-slate-300" />
+              <div>
+                <p className="font-medium text-slate-600">{t("assignment.empty")}</p>
+                <p className="text-xs text-slate-400">
+                  {t("assignment.emptyHelper")}
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-2">
             {assignedEmployees.map((employee) => (
               <div
                 key={employee.id}
-                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700 transition-all duration-200"
               >
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    {employee.full_name}
-                  </p>
-                  <p className="text-xs text-slate-500">{employee.email}</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-500">
+                    {getInitials(employee.full_name)}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-slate-900">
+                        {employee.full_name}
+                      </p>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-500">
+                        {employee.status === "inactive"
+                          ? t("assignment.inactiveBadge")
+                          : t("assignment.assignedBadge")}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">{employee.email}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {employee.status === "inactive" ? (
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
-                      {t("assignment.inactiveBadge")}
-                    </span>
-                  ) : null}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() =>
-                      handleRemoveEmployee(employee.membership_id ?? "")
-                    }
-                  >
-                    {tCommon("actions.remove")}
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50"
+                  onClick={() =>
+                    handleRemoveEmployee(employee.membership_id ?? "")
+                  }
+                  disabled={isSubmitting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {tCommon("actions.remove")}
+                </Button>
               </div>
             ))}
           </div>
@@ -566,32 +627,56 @@ export default function EditJobForm({ job }: EditJobFormProps) {
             )}
           </div>
         ) : null}
-      </div>
+      </FormSection>
 
-      <Textarea
-        label={t("notes.label")}
-        error={errors.notes?.message}
-        {...register("notes")}
-      />
+      <FormSection
+        icon={<StickyNote className="h-5 w-5" />}
+        title={t("form.sections.notes.title")}
+        subtitle={t("form.sections.notes.subtitle")}
+      >
+        <Textarea
+          label={t("notes.label")}
+          placeholder={t("notes.placeholder")}
+          error={errors.notes?.message}
+          className="min-h-[140px] px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-brand-200/30 focus:shadow-md"
+          {...register("notes")}
+        />
+      </FormSection>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Button type="button" variant="ghost" onClick={() => router.push("/jobs")}>
-          {tCommon("actions.back")}
-        </Button>
-        <div className="flex items-center gap-2 sm:ml-auto">
+      <div className="rounded-2xl border-t border-slate-200/70 bg-background/90 px-4 py-3 backdrop-blur-sm shadow-lg md:sticky md:bottom-0 md:z-20 md:rounded-none">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
-            className="bg-rose-50 text-rose-600 hover:bg-rose-100 focus-visible:ring-rose-200"
-            onClick={() => setShowDeleteConfirm(true)}
+            variant="ghost"
+            onClick={() => router.push("/jobs")}
+            disabled={isSubmitting}
           >
-            {t("actions.delete")}
+            {tCommon("actions.back")}
           </Button>
-          <SaveAnimatedButton
-            type="submit"
-            isLoading={isSubmitting}
-            label={tCommon("actions.save")}
-            loadingLabel={tCommon("actions.saving")}
-          />
+          <div className="flex items-center gap-3 sm:ml-auto">
+            <Button
+              type="button"
+              variant="ghost"
+              className="inline-flex items-center gap-2 text-rose-600 hover:bg-rose-50"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSubmitting}
+            >
+              <Trash2 className="h-4 w-4" />
+              {t("actions.delete")}
+            </Button>
+            <SaveAnimatedButton
+              type="submit"
+              isLoading={isSubmitting}
+              className="transition-all duration-200"
+              label={
+                <span className="inline-flex items-center gap-2">
+                  <Save className="h-4 w-4" />
+                  {tCommon("actions.save")}
+                </span>
+              }
+              loadingLabel={tCommon("actions.saving")}
+            />
+          </div>
         </div>
       </div>
       <RecurrenceModal

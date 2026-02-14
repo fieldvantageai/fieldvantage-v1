@@ -158,18 +158,40 @@
     "estimatedEndAt": "Estimated end",
     "status": "Status"
   },
+  "form": {
+    "status": {
+      "changeLabel": "Change status"
+    },
+    "sections": {
+      "main": {
+        "title": "Main information",
+        "subtitle": "Core details for this order."
+      },
+      "planning": {
+        "title": "Planning",
+        "subtitle": "Status and execution dates."
+      },
+      "notes": {
+        "title": "Notes",
+        "subtitle": "Internal notes for this order."
+      }
+    }
+  },
   "assignment": {
     "title": "Assigned collaborators",
     "subtitle": "Define who is assigned to this job.",
+    "helper": "Manage who will execute this order.",
     "add": "Add employee",
     "hideSelector": "Hide selection",
     "empty": "No employees assigned.",
+    "emptyHelper": "Add collaborators to keep this order moving.",
     "filterLabel": "Filter by name",
     "filterPlaceholder": "Type to search",
     "filterEmpty": "No employees found.",
     "selected": "Selected",
     "showInactive": "Show inactive",
     "allowInactive": "Allow inactive (backdated)",
+    "assignedBadge": "Assigned",
     "inactiveBadge": "Inactive",
     "inactiveError": "This employee is inactive and cannot be assigned."
   },
@@ -214,7 +236,8 @@
   "notes": {
     "row": "Notes",
     "title": "Notes",
-    "label": "Notes"
+    "label": "Notes",
+    "placeholder": "Add internal notes for the team responsible for this order..."
   },
   "messages": {
     "created": "Job created.",
