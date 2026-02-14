@@ -1,9 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  Calendar,
+  Check,
+  Clock,
+  ClipboardList,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  Plus,
+  RefreshCcw,
+  StickyNote,
+  User,
+  Users,
+  X
+} from "lucide-react";
+
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
-import OrderStatusControl from "@/components/orders/OrderStatusControl";
+import OrderHistoryTimeline from "@/components/orders/OrderHistoryTimeline";
+import StatusBadge from "@/components/orders/StatusBadge";
 import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById } from "@/features/customers/service";
 import { getJobById, listOrderStatusEventsWithActors } from "@/features/jobs/service";
@@ -92,6 +110,13 @@ export default async function JobDetailPage({ params }: PageProps) {
   const formatTemplate = (template: string, values: Record<string, string | number>) =>
     template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
   const expectedHasTime = job.estimated_end_at?.includes("T");
+  const statusDotStyles: Record<string, string> = {
+    scheduled: "bg-blue-500",
+    in_progress: "bg-amber-500",
+    done: "bg-emerald-500",
+    canceled: "bg-rose-500"
+  };
+  const statusDot = statusDotStyles[job.status] ?? "bg-slate-400";
   const historyItems = [
     ...statusEvents,
     {
@@ -109,128 +134,88 @@ export default async function JobDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-            {job.title ?? t("table.titleFallback")}
-          </h1>
-          <p className="text-sm text-slate-500">
-            {t("detail.customerLabel")}{" "}
-            {job.customer_id ? (
-              <Link
-                href={`/customers/${job.customer_id}`}
-                className="font-semibold text-brand-600 hover:text-brand-700"
-              >
-                {job.customer_name ?? t("detail.customerFallback")}
-              </Link>
-            ) : (
-              <span className="font-semibold text-slate-700">
-                {job.customer_name ?? t("detail.customerFallback")}
-              </span>
-            )}
-          </p>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+              {job.title ?? t("table.titleFallback")}
+            </h1>
+            <StatusBadge status={job.status} />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <User className="h-4 w-4 text-slate-400" />
+            <span>
+              {job.customer_id ? (
+                <Link
+                  href={`/customers/${job.customer_id}`}
+                  className="font-semibold text-brand-600 hover:text-brand-700"
+                >
+                  {job.customer_name ?? t("detail.customerFallback")}
+                </Link>
+              ) : (
+                <span className="font-semibold text-slate-700">
+                  {job.customer_name ?? t("detail.customerFallback")}
+                </span>
+              )}
+            </span>
+          </div>
         </div>
         {isCollaborator ? null : (
           <Link href={`/jobs/${job.id}/edit`}>
-            <Button>{t("detail.edit")}</Button>
+            <Button className="inline-flex items-center gap-2">
+              <Pencil className="h-4 w-4" />
+              {t("detail.edit")}
+            </Button>
           </Link>
         )}
       </header>
 
-      <Section title={t("detail.summary.title")} description={t("detail.summary.subtitle")}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-400">
+      <Section
+        title={
+          <div className="flex items-center gap-2">
+            <ClipboardList className="h-4 w-4 text-slate-400" />
+            <span>{t("detail.summary.title")}</span>
+          </div>
+        }
+        description={t("detail.summary.subtitle")}
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase text-slate-400">
               {tCommon("labels.status")}
             </p>
-            <div className="mt-2">
-              <OrderStatusControl orderId={job.id} status={job.status} />
+            <div className="mt-3 flex items-center gap-2">
+              <span className={`h-2.5 w-2.5 rounded-full ${statusDot}`} />
+              <StatusBadge status={job.status} />
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-400">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase text-slate-400">
               {t("detail.summary.scheduled")}
             </p>
-            <p className="mt-2 text-sm text-slate-700">
-              {formatDateTime(job.scheduled_for)}
-            </p>
+            <div className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+              <Calendar className="h-4 w-4 text-blue-500" />
+              <span>{formatDateTime(job.scheduled_for)}</span>
+            </div>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-400">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase text-slate-400">
               {expectedHasTime
                 ? t("detail.summary.expectedCompletion")
                 : t("detail.summary.expectedCompletionDateOnly")}
             </p>
-            <p className="mt-2 text-sm text-slate-700">
-              {job.estimated_end_at
-                ? expectedHasTime
-                  ? formatDateTime(job.estimated_end_at)
-                  : formatDateOnly(job.estimated_end_at)
-                : t("detail.summary.notDefined")}
-            </p>
+            <div className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+              <Clock className="h-4 w-4 text-amber-500" />
+              <span>
+                {job.estimated_end_at
+                  ? expectedHasTime
+                    ? formatDateTime(job.estimated_end_at)
+                    : formatDateOnly(job.estimated_end_at)
+                  : t("detail.summary.notDefined")}
+              </span>
+            </div>
           </div>
         </div>
       </Section>
-
-      <div id="history">
-        <Section title={t("detail.history.title")} description={t("detail.history.subtitle")}>
-          <div className="space-y-3">
-            {statusEvents.length === 0 ? (
-              <p className="text-sm text-slate-500">{t("detail.history.emptyStatus")}</p>
-            ) : null}
-            {historyItems.map((event) => {
-              const isCreated = "type" in event && event.type === "created";
-              const newStatusLabel = event.new_status
-                ? t(`status.${event.new_status}`)
-                : t("detail.history.statusFallback");
-              const oldStatusLabel = event.old_status
-                ? t(`status.${event.old_status}`)
-                : null;
-              const actorLabel =
-                event.actor_name || event.actor_email || t("detail.history.userFallback");
-              const note =
-                "note" in event && typeof event.note === "string"
-                  ? event.note.trim()
-                  : null;
-              return (
-                <div
-                  key={event.id}
-                  className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3"
-                >
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-500" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-slate-900">
-                      {isCreated
-                        ? t("detail.history.createdLabel")
-                        : t("detail.history.statusChangedLabel")}
-                    </p>
-                    <p className="text-sm text-slate-600">
-                      {isCreated
-                        ? newStatusLabel
-                        : oldStatusLabel
-                          ? formatTemplate(t("detail.history.fromTo"), {
-                              from: oldStatusLabel,
-                              to: newStatusLabel
-                            })
-                          : newStatusLabel}
-                    </p>
-                    {note ? (
-                      <p className="text-sm text-slate-600">
-                        <span className="font-semibold text-slate-700">
-                          {t("detail.history.noteLabel")}:
-                        </span>{" "}
-                        {note}
-                      </p>
-                    ) : null}
-                    <div className="text-xs text-slate-400">
-                      {actorLabel} · {formatDateTime(event.changed_at)}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Section>
-      </div>
 
       {job.is_recurring ? (
         <div className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-600">
@@ -244,28 +229,46 @@ export default async function JobDetailPage({ params }: PageProps) {
         </div>
       ) : null}
 
-      <Section title={t("detail.customer.title")} description={t("detail.customer.subtitle")}>
+      <Section
+        title={
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-slate-400" />
+            <span>{t("detail.customer.title")}</span>
+          </div>
+        }
+        description={t("detail.customer.subtitle")}
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <p className="text-xs uppercase text-slate-400">
               {t("detail.customer.fields.name")}
             </p>
-            <p className="mt-2 text-sm text-slate-700">
-              {job.customer_name ?? t("detail.customerFallback")}
-            </p>
-            <p className="text-sm text-slate-700">
-              {customer?.email ?? t("detail.customer.fields.emailFallback")}
-            </p>
-            <p className="text-sm text-slate-700">
-              {customer?.phone ?? t("detail.customer.fields.phoneFallback")}
-            </p>
+            <div className="mt-2 space-y-2 text-sm text-slate-700">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-slate-400" />
+                <span>{job.customer_name ?? t("detail.customerFallback")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-slate-400" />
+                <span>{customer?.email ?? t("detail.customer.fields.emailFallback")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-slate-400" />
+                <span>{customer?.phone ?? t("detail.customer.fields.phoneFallback")}</span>
+              </div>
+            </div>
           </div>
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs uppercase text-slate-400">
-                {t("detail.customer.fields.address")}
-              </p>
-              <OpenInMapsButton address={primaryAddress ?? null} label="Direções" />
+              <div className="flex items-center gap-2 text-xs uppercase text-slate-400">
+                <MapPin className="h-4 w-4 text-slate-400" />
+                <span>{t("detail.customer.fields.address")}</span>
+              </div>
+              <OpenInMapsButton
+                address={primaryAddress ?? null}
+                label="Direções"
+                className="rounded-xl"
+              />
             </div>
             {primaryAddress ? (
               <div className="mt-2 text-sm text-slate-700">
@@ -289,34 +292,50 @@ export default async function JobDetailPage({ params }: PageProps) {
       </Section>
 
       <Section
-        title={t("detail.team.title")}
+        title={
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-slate-400" />
+            <span>{t("detail.team.title")}</span>
+          </div>
+        }
         description={t("detail.team.subtitle")}
       >
         <p className="text-xs text-slate-500">{t("detail.team.manageHint")}</p>
         {orderedAssignedEmployees.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-6 text-sm text-slate-500">
-            {t("detail.team.empty")}
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-6 text-center text-sm text-slate-500">
+            <Users className="h-5 w-5 text-slate-300" />
+            <p>{t("detail.team.empty")}</p>
+            <p className="text-xs text-slate-400">{t("detail.team.manageHint")}</p>
           </div>
         ) : (
           <div className="space-y-2">
-            {orderedAssignedEmployees.map((employee, index) => (
-              <div
-                key={employee?.id ?? `missing-${index}`}
-                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
-              >
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    {employee?.full_name ?? t("detail.team.unknown")}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {employee?.email ?? t("detail.team.unknownEmail")}
-                  </p>
+            {orderedAssignedEmployees.map((employee, index) => {
+              const label = employee?.full_name?.trim() || t("detail.team.unknown");
+              const initial = label.charAt(0).toUpperCase();
+              return (
+                <div
+                  key={employee?.id ?? `missing-${index}`}
+                  className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-slate-100 text-sm font-semibold text-slate-600">
+                      {initial}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {employee?.full_name ?? t("detail.team.unknown")}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {employee?.email ?? t("detail.team.unknownEmail")}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    {t("detail.team.assignedLabel")}
+                  </span>
                 </div>
-                <span className="text-xs font-semibold text-slate-500">
-                  {t("detail.team.assignedLabel")}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Section>
@@ -330,28 +349,52 @@ export default async function JobDetailPage({ params }: PageProps) {
           .map((item) => ({ ...item, value: item.value?.trim() ?? "" }))
           .filter((item) => item.value.length > 0);
 
-        if (notes.length === 0) {
-          return null;
-        }
-
         return (
-          <Section title={t("detail.notes.title")} description={t("detail.notes.subtitle")}>
-            <div className="space-y-3">
-              {notes.map((note) => (
-                <div
-                  key={note.label}
-                  className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 text-sm text-slate-700"
-                >
-                  <p className="text-xs font-semibold uppercase text-slate-400">
-                    {note.label}
-                  </p>
-                  <p className="mt-2 whitespace-pre-line">{note.value}</p>
-                </div>
-              ))}
+          <Section title={
+            <div className="flex items-center gap-2">
+              <StickyNote className="h-4 w-4 text-slate-400" />
+              <span>{t("detail.notes.title")}</span>
             </div>
+          } description={t("detail.notes.subtitle")}>
+            {notes.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/90 p-4 text-sm text-slate-500">
+                {t("detail.notes.subtitle")}
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                {notes.map((note) => (
+                  <div
+                    key={note.label}
+                    className="rounded-xl border border-slate-200/70 bg-white/90 p-4 text-sm text-slate-700"
+                  >
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      {note.label}
+                    </p>
+                    <p className="mt-2 whitespace-pre-line">{note.value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </Section>
         );
       })()}
+
+      <div id="history" className="border-t border-slate-200/70 pt-6 mt-6">
+        <Section
+          title={
+            <div className="flex items-center gap-2">
+              <RefreshCcw className="h-4 w-4 text-slate-400" />
+              <span>{t("detail.history.title")}</span>
+            </div>
+          }
+          description={t("detail.history.subtitle")}
+        >
+          <OrderHistoryTimeline
+            events={historyItems}
+            locale={locale}
+          />
+        </Section>
+      </div>
     </div>
   );
 }

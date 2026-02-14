@@ -41,6 +41,14 @@
     "helper": "Refine a lista usando filtros.",
     "empty": "Nenhuma ordem encontrada. Ajuste os filtros."
   },
+  "kanban": {
+    "updateError": "Nao foi possivel atualizar o status da ordem.",
+    "permissionError": "Voce nao tem permissao para alterar este status.",
+    "cancelTitle": "Cancelar ordem?",
+    "cancelMessage": "Esta ordem sera marcada como cancelada. Deseja continuar?",
+    "cancelConfirm": "Cancelar ordem",
+    "cancelDismiss": "Voltar"
+  },
   "pagination": {
     "showing": "Mostrando {from}–{to} de {total}",
     "resultsSingle": "1 ordem encontrada",
@@ -112,6 +120,8 @@
       "statusFallback": "Status nao informado",
       "eventFallback": "Atualizacao registrada",
       "emptyStatus": "Nenhuma alteracao de status registrada.",
+      "showAll": "Ver todos",
+      "showLess": "Mostrar menos",
       "fromTo": "De {from} para {to}",
       "noteLabel": "Nota",
       "userLabel": "Por",

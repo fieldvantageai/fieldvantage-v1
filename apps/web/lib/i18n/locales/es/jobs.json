@@ -41,6 +41,14 @@
     "helper": "Refina la lista usando filtros.",
     "empty": "No se encontraron trabajos. Ajusta los filtros."
   },
+  "kanban": {
+    "updateError": "No se pudo actualizar el estado del trabajo.",
+    "permissionError": "No tienes permiso para cambiar este estado.",
+    "cancelTitle": "Cancelar trabajo?",
+    "cancelMessage": "Este trabajo se marcara como cancelado. Continuar?",
+    "cancelConfirm": "Cancelar trabajo",
+    "cancelDismiss": "Volver"
+  },
   "pagination": {
     "showing": "Mostrando {from}–{to} de {total}",
     "resultsSingle": "1 trabajo encontrado",
@@ -112,6 +120,8 @@
       "statusFallback": "Estado no informado",
       "eventFallback": "Actualizacion registrada",
       "emptyStatus": "No hay cambios de estado registrados.",
+      "showAll": "Ver todos",
+      "showLess": "Mostrar menos",
       "fromTo": "De {from} a {to}",
       "noteLabel": "Nota",
       "userLabel": "Por",

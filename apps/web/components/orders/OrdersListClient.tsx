@@ -99,6 +99,31 @@ export default function OrdersListClient({
   const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
   const [isSavingStatus, setIsSavingStatus] = useState(false);
 
+  const persistStatusChange = async (
+    orderId: string,
+    status: Job["status"],
+    changedAt: string,
+    note?: string | null
+  ) => {
+    const payload = {
+      status,
+      changedAt,
+      note: note?.trim() || null
+    };
+    const response = await fetch(`/api/jobs/${orderId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const data = (await response.json()) as { error?: string };
+      throw new Error(data?.error ?? t("kanban.updateError"));
+    }
+    setJobs((prev) =>
+      prev.map((job) => (job.id === orderId ? { ...job, status } : job))
+    );
+  };
+
   useEffect(() => {
     const parsed = parseState(searchParams);
     setFilters(parsed.filters);
@@ -272,6 +297,7 @@ export default function OrdersListClient({
           locale={locale}
           isLoading={isLoading}
           canEdit={canEditOrders}
+          onPersistStatus={persistStatusChange}
           onView={(job) => router.push(`/jobs/${job.id}`)}
           onEdit={(job) => router.push(`/jobs/${job.id}/edit`)}
           onChangeStatus={(job) => {
@@ -331,28 +357,16 @@ export default function OrdersListClient({
             return;
           }
           setIsSavingStatus(true);
-          const payload = {
-            status: nextStatus,
-            changedAt: new Date(changedAt).toISOString(),
-            note: note?.trim() || null
-          };
-          const response = await fetch(
-            `/api/jobs/${statusDialogJob.id}/status`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            }
-          );
-          if (response.ok) {
-            setJobs((prev) =>
-              prev.map((job) =>
-                job.id === statusDialogJob.id
-                  ? { ...job, status: nextStatus }
-                  : job
-              )
+          try {
+            await persistStatusChange(
+              statusDialogJob.id,
+              nextStatus,
+              new Date(changedAt).toISOString(),
+              note
             );
             setStatusDialogJob(null);
+          } catch {
+            // Mantem comportamento atual (sem toast) para a lista.
           }
           setIsSavingStatus(false);
         }}

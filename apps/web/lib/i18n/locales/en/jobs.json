@@ -41,6 +41,14 @@
     "helper": "Refine the list using filters.",
     "empty": "No jobs found. Try adjusting filters."
   },
+  "kanban": {
+    "updateError": "Unable to update the job status.",
+    "permissionError": "You don't have permission to change this status.",
+    "cancelTitle": "Cancel job?",
+    "cancelMessage": "This job will be marked as canceled. Continue?",
+    "cancelConfirm": "Cancel job",
+    "cancelDismiss": "Go back"
+  },
   "pagination": {
     "showing": "Showing {from}–{to} of {total}",
     "resultsSingle": "1 job found",
@@ -112,6 +120,8 @@
       "statusFallback": "Status not informed",
       "eventFallback": "Update recorded",
       "emptyStatus": "No status changes recorded.",
+      "showAll": "View all",
+      "showLess": "Show less",
       "fromTo": "From {from} to {to}",
       "noteLabel": "Note",
       "userLabel": "By",
