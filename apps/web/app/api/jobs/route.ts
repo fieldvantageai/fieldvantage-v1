@@ -22,6 +22,7 @@ export async function GET(request: Request) {
   const status = searchParams.get("status") ?? "all";
   const from = searchParams.get("from");
   const to = searchParams.get("to");
+  const unassigned = searchParams.get("unassigned") === "1";
   const sort = searchParams.get("sort") ?? "startDate";
   const dir = searchParams.get("dir") ?? "desc";
   const page = Number(searchParams.get("page") ?? "1");
@@ -100,6 +101,9 @@ export async function GET(request: Request) {
   if (isCollaborator && membership?.id) {
     jobsQuery = jobsQuery.eq("job_assignments.membership_id", membership.id);
   }
+  if (isCollaborator && unassigned) {
+    return NextResponse.json({ data: [], total: 0 }, { status: 200 });
+  }
 
   if (status !== "all") {
     jobsQuery = jobsQuery.eq("status", status);
@@ -112,6 +116,18 @@ export async function GET(request: Request) {
   }
   if (orFilters.length > 0) {
     jobsQuery = jobsQuery.or(orFilters.join(","));
+  }
+  if (unassigned) {
+    const { data: assignedRows } = await supabase
+      .from("job_assignments")
+      .select("job_id")
+      .eq("company_id", companyId);
+    const assignedIds = (assignedRows ?? [])
+      .map((row) => row.job_id as string)
+      .filter(Boolean);
+    if (assignedIds.length > 0) {
+      jobsQuery = jobsQuery.not("id", "in", `(${assignedIds.join(",")})`);
+    }
   }
 
   const ascending = dir !== "desc";

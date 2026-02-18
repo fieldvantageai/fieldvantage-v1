@@ -12,6 +12,8 @@
     "back": "Back",
     "close": "Close",
     "openMenu": "Open menu",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
     "apply": "Apply",
     "logout": "Sign out",
     "search": "Search"
@@ -36,7 +38,8 @@
     "customers": "Customers",
     "employees": "Employees",
     "teams": "Teams",
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profile"
   },
   "status": {
     "loading": "Loading...",

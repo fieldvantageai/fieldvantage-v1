@@ -5,7 +5,10 @@
     "jobsToday": "Trabajos de hoy",
     "jobsWeek": "Trabajos de la semana",
     "inProgress": "En progreso",
-    "completedToday": "Completados hoy"
+    "inProgressNow": "En progreso ahora",
+    "completedToday": "Completados hoy",
+    "overdue": "Atrasados",
+    "unassigned": "Sin asignacion"
   },
   "companySetup": {
     "title": "Completa el registro de la empresa",
@@ -22,12 +25,45 @@
     "emptySubtitle": "Crea el primer trabajo del dia para tu equipo.",
     "createJob": "Crear trabajo"
   },
+  "live": {
+    "title": "Ejecuciones en vivo",
+    "subtitle": "Ordenes en progreso ahora.",
+    "emptyTitle": "No hay ejecuciones activas ahora",
+    "emptySubtitle": "Las ejecuciones activas apareceran aqui cuando existan.",
+    "noAssignees": "Sin empleados asignados",
+    "elapsed": "{value} en ejecucion"
+  },
   "attention": {
     "title": "Atencion necesaria",
     "subtitle": "Trabajos que requieren accion.",
     "overdue": "Atrasado",
     "unassigned": "Sin asignacion",
-    "shouldStart": "Deberia haber iniciado"
+    "shouldStart": "Deberia haber iniciado",
+    "viewMore": "Ver mas ({count})",
+    "viewLess": "Ver menos"
+  },
+  "risk": {
+    "title": "Panel de riesgo",
+    "empty": "No hay alertas en este momento.",
+    "viewMoreLabel": "Ver mas",
+    "viewLess": "Ver menos",
+    "emptyGroup": "Sin riesgos en este grupo."
+  },
+  "riskStrip": {
+    "empty": "Todo bajo control por ahora."
+  },
+  "progress": {
+    "plannedLabel": "Planificadas hoy:",
+    "completedLabel": "Completadas hoy:",
+    "inProgressLabel": "En progreso:",
+    "remainingLabel": "Restantes:",
+    "empty": "No hay trabajo programado hoy."
+  },
+  "lastUpdated": {
+    "justNow": "Actualizado ahora",
+    "lessThanMinute": "Actualizado hace menos de 1 min",
+    "minutesPrefix": "Actualizado hace",
+    "minutesSuffix": "min"
   },
   "quick": {
     "title": "Acciones rapidas",
@@ -35,5 +71,9 @@
     "createJob": "Crear trabajo",
     "inviteEmployee": "Invitar empleado",
     "addCustomer": "Agregar cliente"
+  },
+  "upcoming": {
+    "title": "Proximas ejecuciones",
+    "empty": "No hay trabajos programados."
   }
 }

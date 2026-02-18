@@ -5,7 +5,10 @@
     "jobsToday": "Jobs today",
     "jobsWeek": "Jobs this week",
     "inProgress": "In progress",
-    "completedToday": "Completed today"
+    "inProgressNow": "In progress now",
+    "completedToday": "Completed today",
+    "overdue": "Overdue",
+    "unassigned": "Unassigned"
   },
   "companySetup": {
     "title": "Complete company setup",
@@ -22,12 +25,45 @@
     "emptySubtitle": "Create the first job of the day for your team.",
     "createJob": "Create job"
   },
+  "live": {
+    "title": "Live executions",
+    "subtitle": "Orders currently in progress.",
+    "emptyTitle": "No active executions right now",
+    "emptySubtitle": "Active executions will appear here when available.",
+    "noAssignees": "No assigned employees",
+    "elapsed": "{value} running"
+  },
   "attention": {
     "title": "Attention needed",
     "subtitle": "Jobs that require action.",
     "overdue": "Overdue",
     "unassigned": "Unassigned",
-    "shouldStart": "Should have started"
+    "shouldStart": "Should have started",
+    "viewMore": "View more ({count})",
+    "viewLess": "View less"
+  },
+  "risk": {
+    "title": "Risk control panel",
+    "empty": "No alerts right now.",
+    "viewMoreLabel": "View more",
+    "viewLess": "View less",
+    "emptyGroup": "No risks in this group."
+  },
+  "riskStrip": {
+    "empty": "All clear for now."
+  },
+  "progress": {
+    "plannedLabel": "Planned today:",
+    "completedLabel": "Completed today:",
+    "inProgressLabel": "In progress:",
+    "remainingLabel": "Remaining:",
+    "empty": "No scheduled work today."
+  },
+  "lastUpdated": {
+    "justNow": "Updated just now",
+    "lessThanMinute": "Updated less than 1m ago",
+    "minutesPrefix": "Updated",
+    "minutesSuffix": "m ago"
   },
   "quick": {
     "title": "Quick actions",
@@ -35,5 +71,9 @@
     "createJob": "Create job",
     "inviteEmployee": "Invite employee",
     "addCustomer": "Add customer"
+  },
+  "upcoming": {
+    "title": "Upcoming executions",
+    "empty": "No upcoming scheduled jobs."
   }
 }

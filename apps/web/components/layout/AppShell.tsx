@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
 
 import { useClientT } from "@/lib/i18n/useClientT";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -10,6 +11,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import FloatingActionButton from "../ui/FloatingActionButton";
 import Sidebar from "./Sidebar";
 import SidebarUserHeader from "./SidebarUserHeader";
+import { ToastBanner } from "../ui/Toast";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -32,11 +34,20 @@ export default function AppShell({ children }: AppShellProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [switcherLoading, setSwitcherLoading] = useState(false);
+  const [switchingCompanyId, setSwitchingCompanyId] = useState<string | null>(null);
   const [companies, setCompanies] = useState<
     Array<{ company_id: string; company_name: string; role: string }>
   >([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [inviteUnreadCount, setInviteUnreadCount] = useState(0);
+  const [companiesLoaded, setCompaniesLoaded] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    variant: "success" | "error" | "info";
+  } | null>(null);
+  const sidebarStorageKey = "fv_sidebar_collapsed";
 
   useEffect(() => {
     let isMounted = true;
@@ -169,11 +180,49 @@ export default function AppShell({ children }: AppShellProps) {
     };
   }, []);
 
+  useEffect(() => {
+    setUserMenuOpen(false);
+    setSwitcherOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const stored = window.localStorage.getItem(sidebarStorageKey);
+    if (stored === "1" || stored === "0") {
+      setSidebarCollapsed(stored === "1");
+      return;
+    }
+    setSidebarCollapsed(window.innerWidth < 1024);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.localStorage.setItem(sidebarStorageKey, sidebarCollapsed ? "1" : "0");
+  }, [sidebarCollapsed]);
+
   const companyLabel =
     companyName?.trim() || tCompanies("fallbackName");
   const companyInitial = companyLabel.charAt(0).toUpperCase();
   const showFab =
     pathname === "/dashboard" || pathname === "/jobs" || pathname === "/customers";
+  const canSwitchCompany = companiesLoaded && companies.length > 1;
+
+  const getInitials = (name?: string | null) => {
+    if (!name) {
+      return "--";
+    }
+    return name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("");
+  };
+  const userInitials = getInitials(userName);
 
   const activeThreadUserId =
     pathname && pathname.startsWith("/messages/")
@@ -302,22 +351,61 @@ export default function AppShell({ children }: AppShellProps) {
         data?: Array<{ company_id: string; company_name: string; role: string }>;
       };
       setCompanies(payload.data ?? []);
+      console.log("User companies:", payload.data ?? []);
+      console.log("Company count:", (payload.data ?? []).length);
     } finally {
+      setCompaniesLoaded(true);
       setSwitcherLoading(false);
     }
   };
 
   const handleSwitchCompany = async (companyId: string) => {
-    const response = await fetch("/api/me/active-company", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company_id: companyId })
-    });
-    if (response.ok) {
+    if (switchingCompanyId) {
+      return;
+    }
+    if (companyId === userCompanyId) {
+      setSwitcherOpen(false);
+      return;
+    }
+    setSwitchingCompanyId(companyId);
+    setToast(null);
+    try {
+      const response = await fetch("/api/me/active-company", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company_id: companyId })
+      });
+      if (!response.ok) {
+        setToast({
+          message: tCompanies("selectCompany.selectError"),
+          variant: "error"
+        });
+        return;
+      }
+      const nextCompany = companies.find((company) => company.company_id === companyId);
+      if (nextCompany) {
+        setCompanyName(nextCompany.company_name);
+      }
+      setUserCompanyId(companyId);
       setSwitcherOpen(false);
       router.refresh();
+    } catch {
+      setToast({
+        message: tCompanies("selectCompany.selectError"),
+        variant: "error"
+      });
+    } finally {
+      setSwitchingCompanyId(null);
     }
   };
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    loadCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
   return (
     <div className="min-h-screen bg-[#f5f6fb]">
       {isOpen ? (
@@ -364,11 +452,15 @@ export default function AppShell({ children }: AppShellProps) {
 
       <div className="flex min-h-screen">
         <Sidebar
-          className="hidden lg:flex lg:h-screen lg:w-60 lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:rounded-none lg:border-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 lg:shadow-none"
+          className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:rounded-none lg:border-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 lg:shadow-none ${
+            sidebarCollapsed ? "lg:w-20" : "lg:w-60"
+          }`}
           userName={userName}
           userRole={userRole}
           userAvatarUrl={userAvatarUrl}
           userEmployeeId={userEmployeeId}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
         />
         <div className="flex min-h-screen flex-1 flex-col">
           <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur">
@@ -454,40 +546,49 @@ export default function AppShell({ children }: AppShellProps) {
                     </span>
                   ) : null}
                 </Link>
-                <Link
-                  href="/settings/company"
-                  className="flex items-center gap-3 transition hover:opacity-90"
+                <div className="flex items-center gap-3">
+                  <div className="hidden min-w-0 sm:block">
+                    {!companiesLoaded ? (
+                      <div className="h-4 w-28 animate-pulse rounded bg-slate-100" />
+                    ) : canSwitchCompany ? (
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition hover:bg-slate-50/70"
+                        onClick={() => setSwitcherOpen((value) => !value)}
+                      >
+                        <span className="truncate">
+                          {isLoadingCompany ? t("status.loading") : companyLabel}
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 text-slate-400 transition ${
+                            switcherOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                    ) : (
+                      <p className="truncate text-sm font-semibold text-slate-900">
+                        {isLoadingCompany ? t("status.loading") : companyLabel}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen((value) => !value)}
+                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
+                  aria-label={t("nav.profile")}
                 >
-                  {companyLogoUrl ? (
+                  {userAvatarUrl ? (
                     <img
-                      src={companyLogoUrl}
-                      alt={companyLabel}
-                      className="h-10 w-10 rounded-full border border-slate-200/70 object-cover shadow-sm"
+                      src={userAvatarUrl}
+                      alt={userName ?? t("status.loading")}
+                      className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-sm font-semibold text-slate-700 shadow-sm">
-                      {companyInitial}
-                    </span>
+                    userInitials
                   )}
-                  <div className="hidden min-w-0 sm:block">
-                    <p className="truncate text-sm font-semibold text-slate-900">
-                      {isLoadingCompany ? t("status.loading") : companyLabel}
-                    </p>
-                    <button
-                      type="button"
-                      className="mt-1 text-xs font-semibold text-slate-500 hover:text-brand-600"
-                      onClick={async () => {
-                        if (!switcherOpen) {
-                          await loadCompanies();
-                        }
-                        setSwitcherOpen((value) => !value);
-                      }}
-                    >
-                      {tCompanies("switcher.label")}
-                    </button>
-                  </div>
-                </Link>
-                {switcherOpen ? (
+                </button>
+                {switcherOpen && canSwitchCompany ? (
                   <div className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-3 shadow-lg">
                     {switcherLoading ? (
                       <p className="text-xs text-slate-500">
@@ -499,25 +600,75 @@ export default function AppShell({ children }: AppShellProps) {
                       </p>
                     ) : (
                       <div className="space-y-2">
-                        {companies.map((company) => (
-                          <button
-                            key={company.company_id}
-                            type="button"
-                            onClick={() => handleSwitchCompany(company.company_id)}
-                            className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs font-semibold transition ${
-                              company.company_id === userCompanyId
-                                ? "border-brand-200 bg-brand-50 text-brand-700"
-                                : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
-                            }`}
-                          >
-                            <span className="truncate">{company.company_name}</span>
-                            <span className="text-[10px] uppercase text-slate-400">
-                              {company.role}
-                            </span>
-                          </button>
-                        ))}
+                        {companies.map((company) => {
+                          const isActive = company.company_id === userCompanyId;
+                          const isSwitching = switchingCompanyId === company.company_id;
+                          return (
+                            <button
+                              key={company.company_id}
+                              type="button"
+                              onClick={() => handleSwitchCompany(company.company_id)}
+                              disabled={switchingCompanyId !== null}
+                              className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs transition duration-150 ${
+                                isActive
+                                  ? "border-brand-200 bg-brand-50 text-brand-700"
+                                  : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                              } ${switchingCompanyId !== null ? "cursor-not-allowed opacity-70" : ""}`}
+                            >
+                              <div className="min-w-0">
+                                <span
+                                  className={`block truncate text-sm ${
+                                    isActive ? "font-semibold" : "font-medium"
+                                  }`}
+                                >
+                                  {company.company_name}
+                                </span>
+                                <span className="text-[10px] uppercase text-slate-400">
+                                  {company.role}
+                                </span>
+                              </div>
+                              <div className="ml-3 flex h-5 w-5 items-center justify-center text-brand-600">
+                                {isSwitching ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : isActive ? (
+                                  <Check className="h-4 w-4" />
+                                ) : null}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
+                  </div>
+                ) : null}
+                {userMenuOpen ? (
+                  <div className="absolute right-0 top-12 z-40 w-56 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg">
+                    <Link
+                      href={userEmployeeId ? `/employees/${userEmployeeId}/edit` : "/employees"}
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      {t("nav.profile")}
+                    </Link>
+                    <Link
+                      href="/settings"
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      {t("nav.settings")}
+                    </Link>
+                    <button
+                      type="button"
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-rose-600 transition hover:bg-rose-50"
+                      onClick={async () => {
+                        setUserMenuOpen(false);
+                        await fetch("/api/auth/logout", { method: "POST" });
+                        router.push("/entrar");
+                        router.refresh();
+                      }}
+                    >
+                      {t("actions.logout")}
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -525,7 +676,16 @@ export default function AppShell({ children }: AppShellProps) {
           </header>
 
           <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-            <main className="space-y-6">{children}</main>
+            <main className="space-y-6">
+              {toast ? (
+                <ToastBanner
+                  message={toast.message}
+                  variant={toast.variant}
+                  onClose={() => setToast(null)}
+                />
+              ) : null}
+              {children}
+            </main>
           </div>
         </div>
       </div>

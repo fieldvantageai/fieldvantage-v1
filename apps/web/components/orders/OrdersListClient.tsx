@@ -20,6 +20,7 @@ type FiltersState = {
   status: "all" | Job["status"];
   fromDate?: Date | null;
   toDate?: Date | null;
+  unassigned?: boolean;
 };
 
 type SortKey = "title" | "status" | "startDate";
@@ -58,7 +59,8 @@ const parseState = (params: URLSearchParams) => {
       query: getParam(params, "q"),
       status: (getParam(params, "status") as FiltersState["status"]) || "all",
       fromDate: parseDate(params.get("from")),
-      toDate: parseDate(params.get("to"))
+      toDate: parseDate(params.get("to")),
+      unassigned: getParam(params, "unassigned") === "1"
     },
     sortKey,
     sortDir: (getParam(params, "dir") as SortDir) || "desc",
@@ -77,7 +79,8 @@ export default function OrdersListClient({
     query: "",
     status: "all",
     fromDate: null,
-    toDate: null
+    toDate: null,
+    unassigned: false
   });
   const [sortKey, setSortKey] = useState<SortKey>("startDate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -146,6 +149,9 @@ export default function OrdersListClient({
     if (filters.toDate) {
       params.set("to", filters.toDate.toISOString().split("T")[0]);
     }
+    if (filters.unassigned) {
+      params.set("unassigned", "1");
+    }
     params.set("sort", sortKey);
     params.set("dir", sortDir);
     params.set("page", String(page));
@@ -174,6 +180,9 @@ export default function OrdersListClient({
       if (filters.toDate) {
         params.set("to", filters.toDate.toISOString().split("T")[0]);
       }
+    if (filters.unassigned) {
+      params.set("unassigned", "1");
+    }
       params.set("sort", sortKey);
       params.set("dir", sortDir);
       params.set("page", String(page));
@@ -246,7 +255,13 @@ export default function OrdersListClient({
             setPage(1);
           }}
           onClear={() => {
-            setFilters({ query: "", status: "all", fromDate: null, toDate: null });
+            setFilters({
+              query: "",
+              status: "all",
+              fromDate: null,
+              toDate: null,
+              unassigned: false
+            });
             setPage(1);
           }}
         />

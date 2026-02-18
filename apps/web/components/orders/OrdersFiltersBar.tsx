@@ -14,6 +14,7 @@ export type OrdersFilters = {
   status: "all" | JobStatus;
   fromDate?: Date | null;
   toDate?: Date | null;
+  unassigned?: boolean;
 };
 
 type OrdersFiltersBarProps = {

@@ -12,6 +12,8 @@
     "back": "Volver",
     "close": "Cerrar",
     "openMenu": "Abrir menu",
+    "collapse": "Contraer menu",
+    "expand": "Expandir menu",
     "apply": "Aplicar",
     "logout": "Cerrar sesión",
     "search": "Buscar"
@@ -36,7 +38,8 @@
     "customers": "Clientes",
     "employees": "Empleados",
     "teams": "Equipos",
-    "settings": "Configuracion"
+    "settings": "Configuracion",
+    "profile": "Perfil"
   },
   "status": {
     "loading": "Cargando...",

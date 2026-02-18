@@ -5,7 +5,10 @@
     "jobsToday": "Ordens de hoje",
     "jobsWeek": "Ordens na semana",
     "inProgress": "Em andamento",
-    "completedToday": "Concluidas hoje"
+    "inProgressNow": "Em execucao agora",
+    "completedToday": "Concluidas hoje",
+    "overdue": "Atrasadas",
+    "unassigned": "Sem colaborador"
   },
   "companySetup": {
     "title": "Finalize o cadastro da empresa",
@@ -22,12 +25,45 @@
     "emptySubtitle": "Crie a primeira ordem do dia para sua equipe.",
     "createJob": "Criar ordem"
   },
+  "live": {
+    "title": "Execucoes ao vivo",
+    "subtitle": "Ordens em andamento agora.",
+    "emptyTitle": "Nenhuma execucao ativa agora",
+    "emptySubtitle": "Assim que houver ordens em andamento, elas aparecerao aqui.",
+    "noAssignees": "Sem colaboradores atribuidos",
+    "elapsed": "{value} em execucao"
+  },
   "attention": {
     "title": "Atencao necessaria",
     "subtitle": "Ordens que precisam de acao.",
     "overdue": "Atrasada",
     "unassigned": "Sem colaborador",
-    "shouldStart": "Deveria ter iniciado"
+    "shouldStart": "Deveria ter iniciado",
+    "viewMore": "Ver mais ({count})",
+    "viewLess": "Ver menos"
+  },
+  "risk": {
+    "title": "Painel de risco",
+    "empty": "Nenhum alerta no momento.",
+    "viewMoreLabel": "Ver mais",
+    "viewLess": "Ver menos",
+    "emptyGroup": "Sem riscos neste grupo."
+  },
+  "riskStrip": {
+    "empty": "Tudo sob controle por enquanto."
+  },
+  "progress": {
+    "plannedLabel": "Planejadas hoje:",
+    "completedLabel": "Concluidas hoje:",
+    "inProgressLabel": "Em andamento:",
+    "remainingLabel": "Restantes:",
+    "empty": "Nenhuma ordem agendada para hoje."
+  },
+  "lastUpdated": {
+    "justNow": "Atualizado agora",
+    "lessThanMinute": "Atualizado ha menos de 1 min",
+    "minutesPrefix": "Atualizado ha",
+    "minutesSuffix": "min"
   },
   "quick": {
     "title": "Acoes rapidas",
@@ -35,5 +71,9 @@
     "createJob": "Criar ordem",
     "inviteEmployee": "Convidar colaborador",
     "addCustomer": "Adicionar cliente"
+  },
+  "upcoming": {
+    "title": "Proximas execucoes",
+    "empty": "Nenhuma ordem futura agendada."
   }
 }
