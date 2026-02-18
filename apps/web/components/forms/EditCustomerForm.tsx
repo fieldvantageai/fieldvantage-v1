@@ -215,7 +215,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         }
         onAdd={() =>
           append({
-            type: "",
+            type: "residential",
             label: "",
             note: "",
             address_line1: "",

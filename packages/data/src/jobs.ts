@@ -21,7 +21,7 @@ type JobRow = {
 };
 
 type JobAssignmentRow = {
-  employee_id: string;
+  membership_id: string;
 };
 
 export type CreateJobInput = {
@@ -33,7 +33,7 @@ export type CreateJobInput = {
   estimated_end_at?: string | null;
   status: JobStatus;
   notes?: string | null;
-  assigned_employee_ids?: string[];
+  assigned_membership_ids?: string[];
   allow_inactive_assignments?: boolean;
   is_recurring?: boolean;
   recurrence?: JobRecurrence | null;
@@ -52,7 +52,7 @@ const toJob = (row: JobRow, assignments: JobAssignmentRow[] = []): Job => ({
   scheduled_for: `${row.scheduled_date}T${row.scheduled_time?.slice(0, 5) ?? "00:00"}`,
   estimated_end_at: row.estimated_end_at,
   notes: row.notes,
-  assigned_employee_ids: assignments.map((assignment) => assignment.employee_id),
+  assigned_membership_ids: assignments.map((assignment) => assignment.membership_id),
   is_recurring: row.is_recurring,
   recurrence: row.recurrence ?? null,
   created_at: row.created_at,
@@ -90,7 +90,7 @@ export async function listJobs(supabase: SupabaseClient, companyId: string) {
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id)"
+      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id)"
     )
     .eq("company_id", companyId)
     .order("scheduled_date", { ascending: true })
@@ -117,7 +117,7 @@ export async function getJobById(
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(employee_id)"
+      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id)"
     )
     .eq("company_id", companyId)
     .eq("id", id)
@@ -176,18 +176,18 @@ export async function createJob(
     throw error;
   }
 
-  if (input.assigned_employee_ids?.length) {
+  if (input.assigned_membership_ids?.length) {
     await setJobAssignments(
       supabase,
       data.id,
-      input.assigned_employee_ids,
+      input.assigned_membership_ids,
       input.allow_inactive_assignments ?? false
     );
   }
 
   return toJob(
     data as JobRow,
-    input.assigned_employee_ids?.map((id) => ({ employee_id: id })) ?? []
+    input.assigned_membership_ids?.map((id) => ({ membership_id: id })) ?? []
   );
 }
 
@@ -239,17 +239,18 @@ export async function updateJob(
     return null;
   }
 
-  if (input.assigned_employee_ids) {
+  if (input.assigned_membership_ids) {
     await setJobAssignments(
       supabase,
       id,
-      input.assigned_employee_ids,
+      input.assigned_membership_ids,
       input.allow_inactive_assignments ?? false
     );
   }
 
   const assignments =
-    input.assigned_employee_ids?.map((employee_id) => ({ employee_id })) ?? [];
+    input.assigned_membership_ids?.map((membership_id) => ({ membership_id })) ??
+    [];
 
   return toJob(data as JobRow, assignments);
 }
@@ -284,18 +285,18 @@ export async function deleteJob(
 export async function setJobAssignments(
   supabase: SupabaseClient,
   jobId: string,
-  employeeIds: string[],
+  membershipIds: string[],
   allowInactive = false
 ) {
   await supabase.from("job_assignments").delete().eq("job_id", jobId);
 
-  if (employeeIds.length === 0) {
+  if (membershipIds.length === 0) {
     return;
   }
 
-  const payload = employeeIds.map((employeeId) => ({
+  const payload = membershipIds.map((membershipId) => ({
     job_id: jobId,
-    employee_id: employeeId,
+    membership_id: membershipId,
     allow_inactive: allowInactive
   }));
 

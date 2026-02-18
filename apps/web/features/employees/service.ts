@@ -10,7 +10,20 @@ type MembershipRow = {
   created_at: string;
 };
 
-type EmployeeRow = Employee & { user_id?: string | null };
+type EmployeeRow = {
+  id: string;
+  user_id?: string | null;
+  full_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  role?: string | null;
+  is_active?: boolean | null;
+  avatar_url?: string | null;
+  created_at: string;
+  updated_at?: string | null;
+};
 
 const pickNewestEmployee = (rows: EmployeeRow[]) =>
   rows.sort((a, b) => {
@@ -119,7 +132,7 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
   const { data, error } = await supabase
     .from("employees")
     .select(
-      "id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
+      "id, company_id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
     )
     .eq("id", id)
     .maybeSingle();
@@ -130,7 +143,23 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
 
   const context = await getActiveCompanyContext();
   if (!context || !data.user_id) {
-    return data as EmployeeWithJobs;
+    const fallbackStatus = data.is_active === false ? "inactive" : "active";
+    return {
+      id: data.id,
+      company_id: data.company_id ?? "",
+      user_id: data.user_id,
+      full_name: data.full_name ?? "",
+      first_name: data.first_name ?? "",
+      last_name: data.last_name ?? "",
+      email: data.email ?? null,
+      phone: data.phone ?? null,
+      role: (data.role ?? "employee") as Employee["role"],
+      avatar_url: data.avatar_url ?? null,
+      created_at: data.created_at,
+      updated_at: data.updated_at ?? data.created_at,
+      status: fallbackStatus,
+      membership_id: null
+    };
   }
 
   const { data: membership } = await supabase
@@ -163,11 +192,20 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
   }
 
   return {
-    ...(data as EmployeeWithJobs),
-    role: membership?.role ?? data.role,
+    id: data.id,
+    company_id: data.company_id ?? "",
+    user_id: data.user_id,
+    full_name: data.full_name ?? "",
+    first_name: data.first_name ?? "",
+    last_name: data.last_name ?? "",
+    email: data.email ?? null,
+    phone: data.phone ?? null,
+    role: (membership?.role ?? data.role ?? "employee") as Employee["role"],
+    avatar_url: data.avatar_url ?? null,
+    created_at: membership?.created_at ?? data.created_at,
+    updated_at: data.updated_at ?? data.created_at,
     status: membership?.status === "active" ? "active" : "inactive",
     membership_id: membership?.id ?? null,
-    created_at: membership?.created_at ?? data.created_at,
     avatar_signed_url: avatarSignedUrl,
     jobs: (jobRows ?? []).map((row) => ({
       id: row.id as string,
@@ -277,7 +315,7 @@ export async function updateEmployee(
     })
     .eq("id", id)
     .select(
-      "id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
+      "id, company_id, user_id, full_name, first_name, last_name, email, phone, role, is_active, avatar_url, created_at, updated_at"
     )
     .maybeSingle();
 
@@ -296,7 +334,24 @@ export async function updateEmployee(
       .eq("user_id", current.user_id);
   }
 
-  return updated as Employee;
+  const resolvedStatus =
+    input.membership_status ?? (updated.is_active === false ? "inactive" : "active");
+  return {
+    id: updated.id,
+    company_id: companyId,
+    user_id: updated.user_id,
+    full_name: updated.full_name ?? "",
+    first_name: updated.first_name ?? "",
+    last_name: updated.last_name ?? "",
+    email: updated.email ?? null,
+    phone: updated.phone ?? null,
+    role: updated.role as Employee["role"],
+    avatar_url: updated.avatar_url ?? null,
+    created_at: updated.created_at,
+    updated_at: updated.updated_at ?? updated.created_at,
+    status: resolvedStatus,
+    membership_id: null
+  };
 }
 
 export async function deactivateEmployeeMembership(userId: string, companyId: string) {

@@ -96,7 +96,7 @@ export default function NeedsAttentionSection({
                 >
                   {isExpanded
                     ? t("attention.viewLess")
-                    : t("attention.viewMore", { count: remaining })}
+                    : t("attention.viewMore").replace("{count}", String(remaining))}
                 </button>
               ) : null}
             </div>

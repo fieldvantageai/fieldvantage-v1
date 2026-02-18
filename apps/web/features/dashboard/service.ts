@@ -86,7 +86,7 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     const assignedNames =
       job.assigned_membership_ids
         ?.map((id) => employeesByMembershipId.get(id)?.full_name)
-        .filter(Boolean) ?? [];
+        .filter((name): name is string => Boolean(name)) ?? [];
     return {
       id: job.id,
       title: job.title ?? null,

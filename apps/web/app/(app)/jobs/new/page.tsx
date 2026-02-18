@@ -3,20 +3,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Section } from "@/components/ui/Section";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
+import type { JobStatus } from "@fieldvantage/shared";
 
 export default async function NewJobPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "jobs");
-  const status = "scheduled";
-  const variant =
-    status === "done"
-      ? "success"
-      : status === "in_progress"
-        ? "warning"
-        : status === "canceled"
-          ? "danger"
-          : "default";
-  const scheduledClass = status === "scheduled" ? "bg-blue-50 text-blue-700" : "";
+  const status: JobStatus = "scheduled";
+  const variant = "default";
+  const scheduledClass = "bg-blue-50 text-blue-700";
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Section

@@ -118,7 +118,11 @@ export default async function JobDetailPage({ params }: PageProps) {
   };
   const statusDot = statusDotStyles[job.status] ?? "bg-slate-400";
   const historyItems = [
-    ...statusEvents,
+    ...statusEvents.map((event) => ({
+      ...event,
+      actor_name: event.actor_name ?? null,
+      actor_email: event.actor_email ?? null
+    })),
     {
       id: `created-${job.id}`,
       changed_at: job.created_at,

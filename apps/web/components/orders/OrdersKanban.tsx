@@ -39,11 +39,11 @@ type OrdersKanbanProps = {
     changedAt: string,
     note?: string | null
   ) => Promise<void>;
-  onView: (job: Job) => void;
-  onEdit: (job: Job) => void;
-  onChangeStatus: (job: Job) => void;
-  onOpenMap: (job: Job) => void;
-  onCancel: (job: Job) => void;
+  onView: (job: Job & { assigned_label: string }) => void;
+  onEdit: (job: Job & { assigned_label: string }) => void;
+  onChangeStatus: (job: Job & { assigned_label: string }) => void;
+  onOpenMap: (job: Job & { assigned_label: string }) => void;
+  onCancel: (job: Job & { assigned_label: string }) => void;
 };
 
 type StatusColumn = {
