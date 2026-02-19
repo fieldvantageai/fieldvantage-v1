@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ClipboardList, Users, UserRound, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Users,
+  UserRound,
+  PanelLeftClose,
+  PanelLeftOpen
+} from "lucide-react";
 
 import { useClientT } from "@/lib/i18n/useClientT";
 import { getNavItems, normalizeUserRole } from "@/lib/navigation/getNavItems";
-import SidebarUserHeader from "@/components/layout/SidebarUserHeader";
 
 type SidebarProps = {
   className?: string;
   onNavigate?: () => void;
-  showHeader?: boolean;
-  userName?: string | null;
   userRole?: string | null;
-  userAvatarUrl?: string | null;
-  userEmployeeId?: string | null;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 };
@@ -23,11 +25,7 @@ type SidebarProps = {
 export default function Sidebar({
   className,
   onNavigate,
-  showHeader = true,
-  userName,
   userRole,
-  userAvatarUrl,
-  userEmployeeId,
   collapsed = false,
   onToggleCollapse
 }: SidebarProps) {
@@ -44,42 +42,45 @@ export default function Sidebar({
     "/employees": <UserRound className="h-4 w-4" />
   };
 
-  const profileHref = userEmployeeId
-    ? `/employees/${userEmployeeId}/edit`
-    : "/employees";
-
   return (
     <aside
       className={`shrink-0 rounded-3xl border border-slate-200/70 bg-white/95 p-4 shadow-sm transition-all duration-200 ${
         collapsed ? "w-20" : "w-72"
       } ${className ?? ""}`}
     >
-      <div className={`flex items-center ${collapsed ? "justify-center" : "justify-between"} mb-4`}>
+      <div
+        className={`mb-4 flex items-center gap-3 ${
+          collapsed ? "justify-center" : "justify-between"
+        }`}
+      >
+        <Link
+          href="/dashboard"
+          onClick={onNavigate}
+          className="flex items-center gap-2"
+          aria-label={t("nav.dashboard")}
+        >
+          <img
+            src="/brand/logo.png"
+            alt={t("appName")}
+            className="h-8 w-8 rounded-lg object-contain"
+          />
+          {!collapsed ? (
+            <span className="text-sm font-semibold text-slate-900">{t("appName")}</span>
+          ) : null}
+        </Link>
         <button
           type="button"
           onClick={onToggleCollapse}
           className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/70 bg-white text-slate-600 transition hover:bg-slate-50"
           aria-label={collapsed ? t("actions.expand") : t("actions.collapse")}
         >
-          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          {collapsed ? (
+            <PanelLeftOpen className="h-4 w-4" />
+          ) : (
+            <PanelLeftClose className="h-4 w-4" />
+          )}
         </button>
       </div>
-
-      {showHeader && !collapsed ? (
-        <Link
-          href={profileHref}
-          onClick={onNavigate}
-          className="mb-6 block"
-          aria-label={t("nav.employees")}
-        >
-          <SidebarUserHeader
-            userName={userName}
-            userRole={userRole}
-            userAvatarUrl={userAvatarUrl}
-            variant="desktop"
-          />
-        </Link>
-      ) : null}
       <nav className="space-y-2">
         {!navItems ? (
           <div className="space-y-2 animate-pulse">

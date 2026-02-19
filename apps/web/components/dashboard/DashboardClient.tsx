@@ -36,11 +36,36 @@ export default function DashboardClient({
 }: DashboardClientProps) {
   const { t } = useClientT("dashboard");
   const { t: tJobs } = useClientT("jobs");
+  const { t: tCommon } = useClientT("common");
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(() => Date.now());
   const [secondsSinceUpdate, setSecondsSinceUpdate] = useState(0);
   const pollRef = useRef<number | null>(null);
   const [riskPanelOpen, setRiskPanelOpen] = useState(false);
+  const [isSwitchingCompany, setIsSwitchingCompany] = useState(false);
+  useEffect(() => {
+    setSnapshot(initialSnapshot);
+    if (isSwitchingCompany) {
+      setIsSwitchingCompany(false);
+      window.dispatchEvent(new CustomEvent("fv-company-switching-complete"));
+    }
+  }, [initialSnapshot]);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ isSwitching: boolean }>).detail;
+      if (typeof detail?.isSwitching === "boolean") {
+        setIsSwitchingCompany(detail.isSwitching);
+        if (detail.isSwitching) {
+          setRiskPanelOpen(false);
+        }
+      }
+    };
+    window.addEventListener("fv-company-switching", handler);
+    return () => {
+      window.removeEventListener("fv-company-switching", handler);
+    };
+  }, []);
 
   useEffect(() => {
     setLastUpdatedAt(Date.now());
@@ -226,84 +251,112 @@ export default function DashboardClient({
         </div>
       </header>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
-                  {item.label}
-                </p>
-                <span className="rounded-full bg-slate-100 p-2 text-slate-500">
-                  <Icon className="h-4 w-4" />
-                </span>
+      <div className={`relative space-y-8 ${isSwitchingCompany ? "pointer-events-none" : ""}`}>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {isSwitchingCompany
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={`card-skeleton-${index}`}
+                className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+                  <div className="h-8 w-8 animate-pulse rounded-full bg-slate-100" />
+                </div>
+                <div className="mt-3 h-7 w-16 animate-pulse rounded bg-slate-100" />
               </div>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">
-                {item.value}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 text-sm text-slate-600">
-        <div className="flex flex-wrap items-center gap-4">
-          {snapshot.metrics.planned_today > 0 ? (
-            <>
-              <span>
-                {t("progress.plannedLabel")} {snapshot.metrics.planned_today}
-              </span>
-              <span>
-                {t("progress.completedLabel")} {snapshot.metrics.completed_today}
-              </span>
-              <span>
-                {t("progress.inProgressLabel")} {snapshot.metrics.in_progress_today}
-              </span>
-              <span>
-                {t("progress.remainingLabel")} {snapshot.metrics.remaining_today}
-              </span>
-            </>
-          ) : (
-            <span>{t("progress.empty")}</span>
-          )}
-          <div className="h-2 w-48 overflow-hidden rounded-full bg-slate-100">
-            <div
-              className="h-full bg-brand-600"
-              style={{
-                width:
-                  snapshot.metrics.planned_today > 0
-                    ? `${Math.min(
-                        100,
-                        (snapshot.metrics.completed_today /
-                          snapshot.metrics.planned_today) *
-                          100
-                      )}%`
-                    : "0%"
-              }}
-            />
-          </div>
+            ))
+          : cards.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      {item.label}
+                    </p>
+                    <span className="rounded-full bg-slate-100 p-2 text-slate-500">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <p className="mt-2 text-2xl font-semibold text-slate-900">
+                    {item.value}
+                  </p>
+                </Link>
+              );
+            })}
         </div>
-      </div>
 
-      <div
+        <div className="rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 text-sm text-slate-600">
+        {isSwitchingCompany ? (
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
+            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+            <div className="h-2 w-48 animate-pulse rounded-full bg-slate-100" />
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-4">
+            {snapshot.metrics.planned_today > 0 ? (
+              <>
+                <span>
+                  {t("progress.plannedLabel")} {snapshot.metrics.planned_today}
+                </span>
+                <span>
+                  {t("progress.completedLabel")} {snapshot.metrics.completed_today}
+                </span>
+                <span>
+                  {t("progress.inProgressLabel")} {snapshot.metrics.in_progress_today}
+                </span>
+                <span>
+                  {t("progress.remainingLabel")} {snapshot.metrics.remaining_today}
+                </span>
+              </>
+            ) : (
+              <span>{t("progress.empty")}</span>
+            )}
+            <div className="h-2 w-48 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full bg-brand-600"
+                style={{
+                  width:
+                    snapshot.metrics.planned_today > 0
+                      ? `${Math.min(
+                          100,
+                          (snapshot.metrics.completed_today /
+                            snapshot.metrics.planned_today) *
+                            100
+                        )}%`
+                      : "0%"
+                }}
+              />
+            </div>
+          </div>
+        )}
+        </div>
+
+        <div
         className={`rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 transition ${
-          canExpandRiskPanel ? "cursor-pointer hover:bg-slate-50/70" : ""
+          canExpandRiskPanel && !isSwitchingCompany
+            ? "cursor-pointer hover:bg-slate-50/70"
+            : ""
         }`}
-        role={canExpandRiskPanel ? "button" : undefined}
-        tabIndex={canExpandRiskPanel ? 0 : -1}
-        aria-expanded={canExpandRiskPanel ? riskPanelOpen : undefined}
+        role={canExpandRiskPanel && !isSwitchingCompany ? "button" : undefined}
+        tabIndex={canExpandRiskPanel && !isSwitchingCompany ? 0 : -1}
+        aria-expanded={
+          canExpandRiskPanel && !isSwitchingCompany ? riskPanelOpen : undefined
+        }
         onClick={() => {
-          if (canExpandRiskPanel) {
+          if (canExpandRiskPanel && !isSwitchingCompany) {
             setRiskPanelOpen((prev) => !prev);
           }
         }}
         onKeyDown={(event) => {
-          if (!canExpandRiskPanel) {
+          if (!canExpandRiskPanel || isSwitchingCompany) {
             return;
           }
           if (event.key === "Enter" || event.key === " ") {
@@ -313,7 +366,13 @@ export default function DashboardClient({
         }}
       >
         <div className="flex items-center justify-between gap-3">
-          {canExpandRiskPanel ? (
+          {isSwitchingCompany ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
+              <div className="h-6 w-32 animate-pulse rounded-full bg-slate-100" />
+              <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
+            </div>
+          ) : canExpandRiskPanel ? (
             <div className="flex flex-wrap items-center gap-2">
               {visibleRiskChips.map((chip) => {
                 const Icon = chip.icon;
@@ -336,7 +395,7 @@ export default function DashboardClient({
           ) : (
             <p className="text-sm text-slate-500">{t("riskStrip.empty")}</p>
           )}
-          {canExpandRiskPanel ? (
+          {canExpandRiskPanel && !isSwitchingCompany ? (
             <ChevronDown
               className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
                 riskPanelOpen ? "rotate-180" : ""
@@ -344,9 +403,9 @@ export default function DashboardClient({
             />
           ) : null}
         </div>
-      </div>
+        </div>
 
-      {canExpandRiskPanel ? (
+        {canExpandRiskPanel ? (
         <div
           className={`overflow-hidden transition-all duration-200 ${
             riskPanelOpen
@@ -399,10 +458,22 @@ export default function DashboardClient({
         </div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
         <div className="space-y-6">
           <Section title={t("live.title")} description={t("live.subtitle")}>
-            {snapshot.lists.live_executions.length === 0 ? (
+            {isSwitchingCompany ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`live-skeleton-${index}`}
+                    className="rounded-3xl border border-slate-200/70 bg-white/95 px-4 py-3"
+                  >
+                    <div className="h-3 w-32 animate-pulse rounded bg-slate-100" />
+                    <div className="mt-2 h-3 w-24 animate-pulse rounded bg-slate-100" />
+                  </div>
+                ))}
+              </div>
+            ) : snapshot.lists.live_executions.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-200/70 bg-white/95 p-6 text-center">
                 <p className="text-base font-semibold text-slate-900">
                   {t("live.emptyTitle")}
@@ -450,7 +521,19 @@ export default function DashboardClient({
           </Section>
 
           <Section title={t("today.title")} description={t("today.subtitle")}>
-            {snapshot.lists.todays_orders.length === 0 ? (
+            {isSwitchingCompany ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`today-skeleton-${index}`}
+                    className="rounded-3xl border border-slate-200/70 bg-white/95 px-4 py-3"
+                  >
+                    <div className="h-3 w-36 animate-pulse rounded bg-slate-100" />
+                    <div className="mt-2 h-3 w-24 animate-pulse rounded bg-slate-100" />
+                  </div>
+                ))}
+              </div>
+            ) : snapshot.lists.todays_orders.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-200/70 bg-white/95 p-6 text-center">
                 <p className="text-base font-semibold text-slate-900">
                   {t("today.emptyTitle")}
@@ -514,66 +597,95 @@ export default function DashboardClient({
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-900">{monthLabel}</p>
-              <CalendarIcon className="h-4 w-4 text-slate-400" />
+          {isSwitchingCompany ? (
+            <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
+                <div className="h-4 w-4 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div className="mt-4 grid grid-cols-7 gap-1">
+                {Array.from({ length: 21 }).map((_, index) => (
+                  <div
+                    key={`calendar-skeleton-${index}`}
+                    className="h-8 animate-pulse rounded bg-slate-100"
+                  />
+                ))}
+              </div>
             </div>
-            <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs text-slate-400">
-              {["S", "T", "Q", "Q", "S", "S", "D"].map((label, index) => (
-                <span key={`${label}-${index}`}>{label}</span>
-              ))}
-            </div>
-            <div className="mt-2 grid grid-cols-7 gap-1 text-xs text-slate-600">
-              {calendarCells.map((day, index) => {
-                const isToday = day === new Date().getDate();
-                const dateKey = day
-                  ? toDateParam(
-                      new Date(
-                        calendarDate.getFullYear(),
-                        calendarDate.getMonth(),
-                        day
+          ) : (
+            <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-900">{monthLabel}</p>
+                <CalendarIcon className="h-4 w-4 text-slate-400" />
+              </div>
+              <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs text-slate-400">
+                {["S", "T", "Q", "Q", "S", "S", "D"].map((label, index) => (
+                  <span key={`${label}-${index}`}>{label}</span>
+                ))}
+              </div>
+              <div className="mt-2 grid grid-cols-7 gap-1 text-xs text-slate-600">
+                {calendarCells.map((day, index) => {
+                  const isToday = day === new Date().getDate();
+                  const dateKey = day
+                    ? toDateParam(
+                        new Date(
+                          calendarDate.getFullYear(),
+                          calendarDate.getMonth(),
+                          day
+                        )
                       )
-                    )
-                  : "";
-                const count = day ? jobsByDate.get(dateKey) ?? 0 : 0;
-                return (
-                  <div key={`${day ?? "empty"}-${index}`} className="h-10">
-                    {day ? (
-                      <Link
-                        href={`/jobs?from=${dateKey}&to=${dateKey}`}
-                        className={`flex h-8 items-center justify-center rounded-lg transition ${
-                          isToday
-                            ? "bg-brand-600 text-white"
-                            : "text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        {day}
-                      </Link>
-                    ) : (
-                      <span className="flex h-8 items-center justify-center text-transparent">
-                        0
-                      </span>
-                    )}
-                    {count > 0 ? (
-                      <div className="mt-0.5 flex justify-center">
-                        <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-                      </div>
-                    ) : (
-                      <div className="mt-0.5 h-1.5" />
-                    )}
-                  </div>
-                );
-              })}
+                    : "";
+                  const count = day ? jobsByDate.get(dateKey) ?? 0 : 0;
+                  return (
+                    <div key={`${day ?? "empty"}-${index}`} className="h-10">
+                      {day ? (
+                        <Link
+                          href={`/jobs?from=${dateKey}&to=${dateKey}`}
+                          className={`flex h-8 items-center justify-center rounded-lg transition ${
+                            isToday
+                              ? "bg-brand-600 text-white"
+                              : "text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          {day}
+                        </Link>
+                      ) : (
+                        <span className="flex h-8 items-center justify-center text-transparent">
+                          0
+                        </span>
+                      )}
+                      {count > 0 ? (
+                        <div className="mt-0.5 flex justify-center">
+                          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+                        </div>
+                      ) : (
+                        <div className="mt-0.5 h-1.5" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
             <p className="text-sm font-semibold text-slate-900">
               {t("upcoming.title")}
             </p>
             <div className="mt-3 space-y-3 text-sm text-slate-600">
-              {snapshot.lists.upcoming_executions.length === 0 ? (
+              {isSwitchingCompany ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 2 }).map((_, index) => (
+                    <div
+                      key={`upcoming-skeleton-${index}`}
+                      className="rounded-2xl border border-slate-200/70 bg-white/90 px-3 py-2"
+                    >
+                      <div className="h-3 w-20 animate-pulse rounded bg-slate-100" />
+                      <div className="mt-2 h-3 w-28 animate-pulse rounded bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : snapshot.lists.upcoming_executions.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("upcoming.empty")}</p>
               ) : (
                 snapshot.lists.upcoming_executions.map((job) => {
@@ -607,16 +719,35 @@ export default function DashboardClient({
           {isMember ? null : (
             <Section title={t("quick.title")} description={t("quick.subtitle")}>
               <div className="flex flex-col gap-3">
-                <Link href="/jobs/new" className="w-full">
-                  <Button className="w-full">{t("quick.createJob")}</Button>
+                <Link
+                  href="/jobs/new"
+                  className={`w-full ${isSwitchingCompany ? "pointer-events-none" : ""}`}
+                >
+                  <Button className="w-full" disabled={isSwitchingCompany}>
+                    {t("quick.createJob")}
+                  </Button>
                 </Link>
-                <Link href="/customers/new" className="w-full">
-                  <Button variant="secondary" className="w-full">
+                <Link
+                  href="/customers/new"
+                  className={`w-full ${isSwitchingCompany ? "pointer-events-none" : ""}`}
+                >
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    disabled={isSwitchingCompany}
+                  >
                     {t("quick.addCustomer")}
                   </Button>
                 </Link>
-                <Link href="/employees/new" className="w-full">
-                  <Button variant="ghost" className="w-full gap-2">
+                <Link
+                  href="/employees/new"
+                  className={`w-full ${isSwitchingCompany ? "pointer-events-none" : ""}`}
+                >
+                  <Button
+                    variant="ghost"
+                    className="w-full gap-2"
+                    disabled={isSwitchingCompany}
+                  >
                     <UserPlus className="h-4 w-4" />
                     {t("quick.inviteEmployee")}
                   </Button>
@@ -625,6 +756,14 @@ export default function DashboardClient({
             </Section>
           )}
         </div>
+        </div>
+        {isSwitchingCompany ? (
+          <div className="pointer-events-auto absolute inset-0 z-10 flex items-start justify-center">
+            <div className="mt-6 rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 text-sm text-slate-600 shadow-sm">
+              {tCommon("status.loading")}
+            </div>
+          </div>
+        ) : null}
       </div>
 
     </div>

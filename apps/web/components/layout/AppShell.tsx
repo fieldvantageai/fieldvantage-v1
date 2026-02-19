@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Check, ChevronDown, Loader2 } from "lucide-react";
@@ -10,7 +10,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 import FloatingActionButton from "../ui/FloatingActionButton";
 import Sidebar from "./Sidebar";
-import SidebarUserHeader from "./SidebarUserHeader";
 import { ToastBanner } from "../ui/Toast";
 
 type AppShellProps = {
@@ -32,9 +31,13 @@ export default function AppShell({ children }: AppShellProps) {
   const [userEmployeeId, setUserEmployeeId] = useState<string | null>(null);
   const [userCompanyId, setUserCompanyId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<"workspace" | "account" | null>(null);
   const [switcherLoading, setSwitcherLoading] = useState(false);
   const [switchingCompanyId, setSwitchingCompanyId] = useState<string | null>(null);
+  const [isSwitchingCompany, setIsSwitchingCompany] = useState(false);
+  const switchTimeoutRef = useRef<number | null>(null);
+  const workspaceMenuRef = useRef<HTMLDivElement | null>(null);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const [companies, setCompanies] = useState<
     Array<{ company_id: string; company_name: string; role: string }>
   >([]);
@@ -42,7 +45,6 @@ export default function AppShell({ children }: AppShellProps) {
   const [inviteUnreadCount, setInviteUnreadCount] = useState(0);
   const [companiesLoaded, setCompaniesLoaded] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     variant: "success" | "error" | "info";
@@ -181,9 +183,31 @@ export default function AppShell({ children }: AppShellProps) {
   }, []);
 
   useEffect(() => {
-    setUserMenuOpen(false);
-    setSwitcherOpen(false);
+    setOpenMenu(null);
   }, [pathname]);
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenMenu(null);
+      }
+    };
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node | null;
+      if (
+        workspaceMenuRef.current?.contains(target as Node) ||
+        accountMenuRef.current?.contains(target as Node)
+      ) {
+        return;
+      }
+      setOpenMenu(null);
+    };
+    document.addEventListener("keydown", handleKey);
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -222,6 +246,7 @@ export default function AppShell({ children }: AppShellProps) {
       .map((part) => part[0]?.toUpperCase())
       .join("");
   };
+  const companyInitials = getInitials(companyLabel);
   const userInitials = getInitials(userName);
 
   const activeThreadUserId =
@@ -359,16 +384,35 @@ export default function AppShell({ children }: AppShellProps) {
     }
   };
 
+  const stopCompanySwitching = () => {
+    setIsSwitchingCompany(false);
+    if (switchTimeoutRef.current) {
+      window.clearTimeout(switchTimeoutRef.current);
+      switchTimeoutRef.current = null;
+    }
+    window.dispatchEvent(
+      new CustomEvent("fv-company-switching", {
+        detail: { isSwitching: false }
+      })
+    );
+  };
+
   const handleSwitchCompany = async (companyId: string) => {
     if (switchingCompanyId) {
       return;
     }
     if (companyId === userCompanyId) {
-      setSwitcherOpen(false);
+      setOpenMenu(null);
       return;
     }
     setSwitchingCompanyId(companyId);
     setToast(null);
+    setIsSwitchingCompany(true);
+    window.dispatchEvent(
+      new CustomEvent("fv-company-switching", {
+        detail: { isSwitching: true }
+      })
+    );
     try {
       const response = await fetch("/api/me/active-company", {
         method: "POST",
@@ -380,6 +424,7 @@ export default function AppShell({ children }: AppShellProps) {
           message: tCompanies("selectCompany.selectError"),
           variant: "error"
         });
+        stopCompanySwitching();
         return;
       }
       const nextCompany = companies.find((company) => company.company_id === companyId);
@@ -387,17 +432,34 @@ export default function AppShell({ children }: AppShellProps) {
         setCompanyName(nextCompany.company_name);
       }
       setUserCompanyId(companyId);
-      setSwitcherOpen(false);
+      setOpenMenu(null);
       router.refresh();
+      if (switchTimeoutRef.current) {
+        window.clearTimeout(switchTimeoutRef.current);
+      }
+      switchTimeoutRef.current = window.setTimeout(() => {
+        stopCompanySwitching();
+      }, 8000);
     } catch {
       setToast({
         message: tCompanies("selectCompany.selectError"),
         variant: "error"
       });
+      stopCompanySwitching();
     } finally {
       setSwitchingCompanyId(null);
     }
   };
+
+  useEffect(() => {
+    const handler = () => {
+      stopCompanySwitching();
+    };
+    window.addEventListener("fv-company-switching-complete", handler);
+    return () => {
+      window.removeEventListener("fv-company-switching-complete", handler);
+    };
+  }, []);
 
   useEffect(() => {
     if (!userId) {
@@ -416,14 +478,19 @@ export default function AppShell({ children }: AppShellProps) {
           />
           <div className="absolute inset-y-3 left-3 w-[85vw] max-w-sm rounded-r-3xl bg-white/95 px-4 pb-3 pt-4 shadow-2xl ring-1 ring-slate-200/70 motion-safe:animate-[drawer-in_220ms_ease-out]">
             <div className="mb-5 flex items-center justify-between">
-              <SidebarUserHeader
-                userName={userName}
-                userRole={userRole}
-                userAvatarUrl={userAvatarUrl}
-                companyName={isLoadingCompany ? null : companyLabel}
-                companyLogoUrl={companyLogoUrl ?? null}
-                variant="mobile"
-              />
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2"
+                aria-label={t("nav.dashboard")}
+                onClick={() => setIsOpen(false)}
+              >
+                <img
+                  src="/brand/logo.png"
+                  alt={t("appName")}
+                  className="h-8 w-8 rounded-lg object-contain"
+                />
+                <span className="text-sm font-semibold text-slate-900">{t("appName")}</span>
+              </Link>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -443,7 +510,6 @@ export default function AppShell({ children }: AppShellProps) {
             <Sidebar
               className="w-full border-none p-0 shadow-none"
               onNavigate={() => setIsOpen(false)}
-              showHeader={false}
               userRole={userRole}
             />
           </div>
@@ -455,10 +521,7 @@ export default function AppShell({ children }: AppShellProps) {
           className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:rounded-none lg:border-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 lg:shadow-none ${
             sidebarCollapsed ? "lg:w-20" : "lg:w-60"
           }`}
-          userName={userName}
           userRole={userRole}
-          userAvatarUrl={userAvatarUrl}
-          userEmployeeId={userEmployeeId}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
         />
@@ -547,121 +610,165 @@ export default function AppShell({ children }: AppShellProps) {
                   ) : null}
                 </Link>
                 <div className="flex items-center gap-3">
-                  <div className="hidden min-w-0 sm:block">
-                    {!companiesLoaded ? (
-                      <div className="h-4 w-28 animate-pulse rounded bg-slate-100" />
-                    ) : canSwitchCompany ? (
-                      <button
-                        type="button"
-                        className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition hover:bg-slate-50/70"
-                        onClick={() => setSwitcherOpen((value) => !value)}
-                      >
-                        <span className="truncate">
-                          {isLoadingCompany ? t("status.loading") : companyLabel}
-                        </span>
-                        <ChevronDown
-                          className={`h-4 w-4 text-slate-400 transition ${
-                            switcherOpen ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-                    ) : (
-                      <p className="truncate text-sm font-semibold text-slate-900">
+                  <button
+                    type="button"
+                    disabled={isSwitchingCompany}
+                    className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition hover:bg-slate-50/70 ${
+                      isSwitchingCompany ? "cursor-not-allowed opacity-70" : ""
+                    }`}
+                    onClick={() =>
+                      setOpenMenu((prev) => (prev === "workspace" ? null : "workspace"))
+                    }
+                    aria-label={tCompanies("switcher.label")}
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="truncate">
                         {isLoadingCompany ? t("status.loading") : companyLabel}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setUserMenuOpen((value) => !value)}
-                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
-                  aria-label={t("nav.profile")}
-                >
-                  {userAvatarUrl ? (
-                    <img
-                      src={userAvatarUrl}
-                      alt={userName ?? t("status.loading")}
-                      className="h-full w-full rounded-full object-cover"
+                      </span>
+                      {isSwitchingCompany ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      ) : null}
+                      {isLoadingCompany ? (
+                        <span className="h-7 w-7 animate-pulse rounded-full bg-slate-100" />
+                      ) : companyLogoUrl ? (
+                        <img
+                          src={companyLogoUrl}
+                          alt={companyLabel}
+                          className="h-7 w-7 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                          {companyInitials || companyInitial}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-400 transition ${
+                        openMenu === "workspace" ? "rotate-180" : ""
+                      }`}
                     />
-                  ) : (
-                    userInitials
-                  )}
-                </button>
-                {switcherOpen && canSwitchCompany ? (
-                  <div className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-3 shadow-lg">
-                    {switcherLoading ? (
-                      <p className="text-xs text-slate-500">
-                        {tCompanies("switcher.loading")}
-                      </p>
-                    ) : companies.length === 0 ? (
-                      <p className="text-xs text-slate-500">
-                        {tCompanies("switcher.empty")}
-                      </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenMenu((prev) => (prev === "account" ? null : "account"))
+                    }
+                    className="flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-2 py-1 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
+                    aria-label={t("nav.profile")}
+                  >
+                    {userAvatarUrl ? (
+                      <img
+                        src={userAvatarUrl}
+                        alt={userName ?? t("status.loading")}
+                        className="h-7 w-7 rounded-full object-cover"
+                      />
                     ) : (
-                      <div className="space-y-2">
-                        {companies.map((company) => {
-                          const isActive = company.company_id === userCompanyId;
-                          const isSwitching = switchingCompanyId === company.company_id;
-                          return (
-                            <button
-                              key={company.company_id}
-                              type="button"
-                              onClick={() => handleSwitchCompany(company.company_id)}
-                              disabled={switchingCompanyId !== null}
-                              className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs transition duration-150 ${
-                                isActive
-                                  ? "border-brand-200 bg-brand-50 text-brand-700"
-                                  : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
-                              } ${switchingCompanyId !== null ? "cursor-not-allowed opacity-70" : ""}`}
-                            >
-                              <div className="min-w-0">
-                                <span
-                                  className={`block truncate text-sm ${
-                                    isActive ? "font-semibold" : "font-medium"
-                                  }`}
-                                >
-                                  {company.company_name}
-                                </span>
-                                <span className="text-[10px] uppercase text-slate-400">
-                                  {company.role}
-                                </span>
-                              </div>
-                              <div className="ml-3 flex h-5 w-5 items-center justify-center text-brand-600">
-                                {isSwitching ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : isActive ? (
-                                  <Check className="h-4 w-4" />
-                                ) : null}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                        {userInitials}
+                      </span>
                     )}
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-400 transition ${
+                        openMenu === "account" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                </div>
+                {openMenu === "workspace" ? (
+                  <div
+                    ref={workspaceMenuRef}
+                    className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg"
+                  >
+                    {canSwitchCompany ? (
+                      <div className="space-y-2">
+                        {switcherLoading ? (
+                          <p className="px-2 text-xs text-slate-500">
+                            {tCompanies("switcher.loading")}
+                          </p>
+                        ) : companies.length === 0 ? (
+                          <p className="px-2 text-xs text-slate-500">
+                            {tCompanies("switcher.empty")}
+                          </p>
+                        ) : (
+                          <div className="space-y-2">
+                            {companies.map((company) => {
+                              const isActive = company.company_id === userCompanyId;
+                              const isSwitching = switchingCompanyId === company.company_id;
+                              return (
+                                <button
+                                  key={company.company_id}
+                                  type="button"
+                                  onClick={() => handleSwitchCompany(company.company_id)}
+                                  disabled={switchingCompanyId !== null}
+                                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs transition duration-150 ${
+                                    isActive
+                                      ? "border-brand-200 bg-brand-50 text-brand-700"
+                                      : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                                  } ${switchingCompanyId !== null ? "cursor-not-allowed opacity-70" : ""}`}
+                                >
+                                  <div className="min-w-0">
+                                    <span
+                                      className={`block truncate text-sm ${
+                                        isActive ? "font-semibold" : "font-medium"
+                                      }`}
+                                    >
+                                      {company.company_name}
+                                    </span>
+                                    <span className="text-[10px] uppercase text-slate-400">
+                                      {company.role}
+                                    </span>
+                                  </div>
+                                  <div className="ml-3 flex h-5 w-5 items-center justify-center text-brand-600">
+                                    {isSwitching ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : isActive ? (
+                                      <Check className="h-4 w-4" />
+                                    ) : null}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="my-1 h-px bg-slate-200/70" />
+                      </div>
+                    ) : null}
+                    {userRole === "owner" ? (
+                      <Link
+                        href="/settings/company"
+                        className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                        onClick={() => setOpenMenu(null)}
+                      >
+                        {tCompanies("title")}
+                      </Link>
+                    ) : null}
                   </div>
                 ) : null}
-                {userMenuOpen ? (
-                  <div className="absolute right-0 top-12 z-40 w-56 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg">
+                {openMenu === "account" ? (
+                  <div
+                    ref={accountMenuRef}
+                    className="absolute right-0 top-12 z-40 w-56 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg"
+                  >
                     <Link
                       href={userEmployeeId ? `/employees/${userEmployeeId}/edit` : "/employees"}
                       className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
-                      onClick={() => setUserMenuOpen(false)}
+                      onClick={() => setOpenMenu(null)}
                     >
                       {t("nav.profile")}
                     </Link>
                     <Link
                       href="/settings"
                       className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
-                      onClick={() => setUserMenuOpen(false)}
+                      onClick={() => setOpenMenu(null)}
                     >
                       {t("nav.settings")}
                     </Link>
+                    <div className="my-1 h-px bg-slate-200/70" />
                     <button
                       type="button"
                       className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-rose-600 transition hover:bg-rose-50"
                       onClick={async () => {
-                        setUserMenuOpen(false);
+                        setOpenMenu(null);
                         await fetch("/api/auth/logout", { method: "POST" });
                         router.push("/entrar");
                         router.refresh();
