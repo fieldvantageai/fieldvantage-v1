@@ -43,7 +43,7 @@ export default function CustomerAvatarUpload({
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
+    <div>
       <div className="flex flex-wrap items-center gap-5">
         <div className="relative">
           <div className="h-20 w-20 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100">

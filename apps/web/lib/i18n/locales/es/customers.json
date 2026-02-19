@@ -2,7 +2,14 @@
   "title": "Clientes",
   "subtitle": "Gestiona clientes, sigue servicios y mantén todo organizado.",
   "actions": {
-    "newJob": "Crear trabajo"
+    "newJob": "Crear trabajo",
+    "view": "Ver detalles",
+    "edit": "Editar cliente",
+    "delete": "Eliminar cliente",
+    "cancel": "Cancelar",
+    "confirmDelete": "Eliminar",
+    "deleting": "Eliminando...",
+    "menu": "Acciones del cliente"
   },
   "new": {
     "title": "Nuevo cliente",
@@ -16,11 +23,16 @@
     "title": "Detalles del cliente",
     "subtitle": "Detalles del cliente",
     "edit": "Editar cliente",
+    "stats": {
+      "total": "Total de ordenes",
+      "inProgress": "En progreso",
+      "completed": "Completados"
+    },
     "summary": {
-      "title": "Resumen",
-      "subtitle": "Detalles del cliente.",
+      "title": "Informacion del cliente",
+      "subtitle": "Detalles de contacto y direcciones registradas.",
       "contact": "Contacto",
-      "address": "Direccion"
+      "address": "Direcciones"
     },
     "address": {
       "primary": "Principal",
@@ -28,10 +40,13 @@
       "fallbackLabel": "Direccion"
     },
     "jobs": {
-      "title": "Trabajos de este cliente",
-      "subtitle": "Trabajos vinculados a este cliente.",
-      "empty": "No hay trabajos vinculados a este cliente.",
-      "titleFallback": "Trabajo sin titulo"
+      "title": "Ordenes del cliente",
+      "subtitle": "Ordenes vinculadas a este cliente.",
+      "empty": "No hay ordenes vinculadas a este cliente.",
+      "titleFallback": "Orden sin titulo",
+      "colTitle": "Titulo",
+      "colStatus": "Estado",
+      "colDate": "Fecha programada"
     },
     "history": {
       "title": "Historial reciente",
@@ -43,18 +58,31 @@
     "title": "Busqueda rapida",
     "description": "Encuentra clientes por nombre.",
     "label": "Buscar",
-    "placeholder": "Buscar clientes",
-    "minChars": "Escribe al menos 3 caracteres para buscar.",
+    "placeholder": "Buscar por nombre, email o telefono...",
+    "clear": "Limpiar busqueda",
+    "minChars": "Escribe al menos 2 caracteres para buscar.",
     "noResults": "No se encontraron clientes."
   },
   "list": {
     "title": "Clientes",
-    "description": "Lista actualizada de clientes."
+    "description": "Lista actualizada de clientes.",
+    "found": "clientes encontrados",
+    "colName": "Nombre",
+    "colContact": "Telefono",
+    "colCompany": "Empresa"
   },
   "empty": {
     "title": "Aun no hay clientes",
     "subtitle": "Los clientes permiten crear trabajos, programar servicios y mantener historial.",
     "cta": "Agregar primer cliente"
+  },
+  "sections": {
+    "identity": "Datos del cliente",
+    "identitySubtitle": "Nombre completo y empresa vinculada.",
+    "contact": "Contacto",
+    "contactSubtitle": "Email y telefono para comunicacion.",
+    "notes": "Notas",
+    "notesSubtitle": "Informacion extra y preferencias del cliente."
   },
   "fields": {
     "name": "Nombre del cliente",
@@ -63,6 +91,7 @@
     "avatar": "Foto del cliente",
     "email": "Email",
     "phone": "Telefono",
+    "company": "Empresa",
     "notes": "Notas",
     "address": "Direccion"
   },
@@ -75,6 +104,7 @@
     "lastName": "Apellido del cliente",
     "email": "cliente@email.com",
     "phone": "Ej: (555) 123-4567",
+    "company": "Nombre de la empresa (opcional)",
     "notes": "Ej: prefiere contacto por la tarde, perro en el patio, porton azul",
     "address": "Calle, numero, ciudad"
   },
@@ -125,7 +155,8 @@
     "updated": "Cliente actualizado.",
     "updateError": "No se pudo actualizar el cliente.",
     "updateFallback": "Error inesperado al actualizar.",
-    "deleteConfirm": "Desea eliminar este cliente?",
+    "deleteConfirm": "Eliminar este cliente?",
+    "deleteWarning": "Esta accion no se puede deshacer. Los pedidos vinculados se mantendran.",
     "deleteError": "No se pudo eliminar el cliente.",
     "deleteFallback": "Error inesperado al eliminar.",
     "cancelConfirm": "Hay datos ingresados. Desea cancelar?"

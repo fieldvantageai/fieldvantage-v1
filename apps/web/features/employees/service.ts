@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Employee, JobStatus } from "@fieldvantage/shared";
 
 type MembershipRow = {
@@ -185,7 +186,7 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
 
   let avatarSignedUrl: string | null = null;
   if (data.avatar_url) {
-    const { data: signed } = await supabase.storage
+    const { data: signed } = await supabaseAdmin.storage
       .from("customer-avatars")
       .createSignedUrl(data.avatar_url, 60 * 60);
     avatarSignedUrl = signed?.signedUrl ?? null;

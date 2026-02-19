@@ -11,7 +11,8 @@ import {
   TrendingUp,
   UserMinus,
   UserPlus,
-  Users
+  Users,
+  UserX
 } from "lucide-react";
 
 import type { DashboardSnapshot } from "@/features/dashboard/service";
@@ -131,13 +132,21 @@ export default function DashboardClient({
       label: t("cards.jobsToday"),
       value: snapshot.metrics.jobs_today,
       icon: ClipboardList,
-      href: `/jobs?from=${toDateParam(new Date())}&to=${toDateParam(new Date())}`
+      href: `/jobs?from=${toDateParam(new Date())}&to=${toDateParam(new Date())}`,
+      card: "bg-white/95 border-slate-200/70",
+      iconBg: "bg-slate-100",
+      iconColor: "text-slate-500",
+      valueColor: "text-slate-900"
     },
     {
       label: t("cards.inProgressNow"),
       value: snapshot.metrics.in_progress_now,
       icon: TrendingUp,
-      href: "/jobs?status=in_progress"
+      href: "/jobs?status=in_progress",
+      card: "bg-blue-50/60 border-blue-200/70",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+      valueColor: "text-blue-800"
     },
     {
       label: t("cards.overdue"),
@@ -145,13 +154,21 @@ export default function DashboardClient({
       icon: AlertTriangle,
       href: `/jobs?to=${toDateParam(
         new Date(new Date().setDate(new Date().getDate() - 1))
-      )}&status=in_progress`
+      )}&status=in_progress`,
+      card: "bg-amber-50/60 border-amber-200/70",
+      iconBg: "bg-amber-100",
+      iconColor: "text-amber-600",
+      valueColor: "text-amber-900"
     },
     {
       label: t("cards.unassigned"),
       value: snapshot.metrics.unassigned,
-      icon: Users,
-      href: "/jobs?unassigned=1"
+      icon: UserX,
+      href: "/jobs?unassigned=1",
+      card: "bg-red-50/60 border-red-200/70",
+      iconBg: "bg-red-100",
+      iconColor: "text-red-500",
+      valueColor: "text-red-900"
     }
   ];
 
@@ -211,21 +228,30 @@ export default function DashboardClient({
       href: `/jobs?to=${toDateParam(
         new Date(new Date().setDate(new Date().getDate() - 1))
       )}&status=in_progress`,
-      icon: AlertTriangle
+      icon: AlertTriangle,
+      chipCls: "border-amber-200/80 bg-amber-50 hover:bg-amber-100",
+      iconCls: "text-amber-500",
+      countCls: "bg-amber-100 text-amber-700"
     },
     {
       key: "shouldStart",
       label: t("attention.shouldStart"),
       count: snapshot.attention.should_start.length,
       href: "/jobs?status=scheduled",
-      icon: Clock
+      icon: Clock,
+      chipCls: "border-orange-200/80 bg-orange-50 hover:bg-orange-100",
+      iconCls: "text-orange-500",
+      countCls: "bg-orange-100 text-orange-700"
     },
     {
       key: "unassigned",
       label: t("attention.unassigned"),
       count: snapshot.attention.unassigned.length,
       href: "/jobs?unassigned=1",
-      icon: UserMinus
+      icon: UserMinus,
+      chipCls: "border-red-200/80 bg-red-50 hover:bg-red-100",
+      iconCls: "text-red-500",
+      countCls: "bg-red-100 text-red-700"
     }
   ];
   const visibleRiskChips = riskChips.filter((chip) => chip.count > 0);
@@ -272,17 +298,17 @@ export default function DashboardClient({
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md"
+                  className={`rounded-3xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.card}`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       {item.label}
                     </p>
-                    <span className="rounded-full bg-slate-100 p-2 text-slate-500">
-                      <Icon className="h-4 w-4" />
+                    <span className={`rounded-full p-2 ${item.iconBg}`}>
+                      <Icon className={`h-4 w-4 ${item.iconColor}`} />
                     </span>
                   </div>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  <p className={`mt-3 text-3xl font-bold ${item.valueColor}`}>
                     {item.value}
                   </p>
                 </Link>
@@ -290,53 +316,75 @@ export default function DashboardClient({
             })}
         </div>
 
-        <div className="rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 text-sm text-slate-600">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/95 px-5 py-3">
         {isSwitchingCompany ? (
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
-            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
-            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
-            <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
-            <div className="h-2 w-48 animate-pulse rounded-full bg-slate-100" />
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-center gap-4">
-            {snapshot.metrics.planned_today > 0 ? (
-              <>
-                <span>
-                  {t("progress.plannedLabel")} {snapshot.metrics.planned_today}
-                </span>
-                <span>
-                  {t("progress.completedLabel")} {snapshot.metrics.completed_today}
-                </span>
-                <span>
-                  {t("progress.inProgressLabel")} {snapshot.metrics.in_progress_today}
-                </span>
-                <span>
-                  {t("progress.remainingLabel")} {snapshot.metrics.remaining_today}
-                </span>
-              </>
-            ) : (
-              <span>{t("progress.empty")}</span>
-            )}
-            <div className="h-2 w-48 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full bg-brand-600"
-                style={{
-                  width:
-                    snapshot.metrics.planned_today > 0
-                      ? `${Math.min(
-                          100,
-                          (snapshot.metrics.completed_today /
-                            snapshot.metrics.planned_today) *
-                            100
-                        )}%`
-                      : "0%"
-                }}
-              />
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
+              <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+              <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+              <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
             </div>
+            <div className="h-2.5 w-full animate-pulse rounded-full bg-slate-100" />
           </div>
-        )}
+        ) : (() => {
+          const planned = snapshot.metrics.planned_today;
+          const completed = snapshot.metrics.completed_today;
+          const inProgress = snapshot.metrics.in_progress_today;
+          const remaining = snapshot.metrics.remaining_today;
+          const pct = planned > 0 ? Math.min(100, Math.round((completed / planned) * 100)) : 0;
+          return (
+            <div className="space-y-2.5">
+              {planned > 0 ? (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <span className="text-slate-500">
+                    {t("progress.plannedLabel")}{" "}
+                    <span className="font-semibold text-slate-700">{planned}</span>
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <span className="text-slate-500">
+                    {t("progress.completedLabel")}{" "}
+                    <span className="font-semibold text-emerald-600">{completed}</span>
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <span className="text-slate-500">
+                    {t("progress.inProgressLabel")}{" "}
+                    <span className="font-semibold text-blue-600">{inProgress}</span>
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <span className="text-slate-500">
+                    {t("progress.remainingLabel")}{" "}
+                    <span className="font-semibold text-slate-700">{remaining}</span>
+                  </span>
+                  {pct > 0 ? (
+                    <span
+                      className={`ml-auto text-xs font-bold ${
+                        pct === 100 ? "text-emerald-600" : "text-brand-600"
+                      }`}
+                    >
+                      {pct}%
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <span className="text-sm text-slate-500">{t("progress.empty")}</span>
+              )}
+              <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    pct === 100 ? "bg-emerald-500" : pct > 0 ? "bg-brand-500" : ""
+                  }`}
+                  style={{ width: `${pct}%` }}
+                />
+                {pct === 0 && planned > 0 ? (
+                  <div className="absolute inset-0 flex items-center justify-end pr-2">
+                    <span className="text-[10px] font-semibold text-slate-400">0%</span>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          );
+        })()}
         </div>
 
         <div
@@ -381,11 +429,11 @@ export default function DashboardClient({
                     key={chip.key}
                     href={chip.href}
                     onClick={(event) => event.stopPropagation()}
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-200 hover:bg-slate-50"
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold text-slate-700 transition ${chip.chipCls}`}
                   >
-                    <Icon className="h-3.5 w-3.5 text-amber-500" />
+                    <Icon className={`h-3.5 w-3.5 ${chip.iconCls}`} />
                     <span>{chip.label}</span>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${chip.countCls}`}>
                       {chip.count}
                     </span>
                   </Link>
@@ -460,7 +508,19 @@ export default function DashboardClient({
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
         <div className="space-y-6">
-          <Section title={t("live.title")} description={t("live.subtitle")}>
+          <Section
+            title={
+              <span className="flex items-center gap-2">
+                {t("live.title")}
+                {snapshot.lists.live_executions.length > 0 ? (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-600">
+                    {snapshot.lists.live_executions.length}
+                  </span>
+                ) : null}
+              </span>
+            }
+            description={t("live.subtitle")}
+          >
             {isSwitchingCompany ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, index) => (
@@ -483,32 +543,38 @@ export default function DashboardClient({
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {snapshot.lists.live_executions.map((job) => {
                   const startTime = formatTime(job.scheduled_for);
-                  const assignees =
-                    job.assigned_names.length > 0
-                      ? job.assigned_names.join(", ")
-                      : t("live.noAssignees");
+                  const hasAssignees = job.assigned_names.length > 0;
                   return (
                     <Link
                       key={job.id}
                       href={`/jobs/${job.id}`}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-slate-200/70 bg-white/95 px-4 py-3 text-sm text-slate-700 transition hover:border-slate-200 hover:shadow-sm"
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-3 transition hover:border-slate-300 hover:shadow-sm"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900 truncate">
                           {job.title ?? tJobs("table.titleFallback")}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="mt-0.5 text-xs text-slate-500 truncate">
                           {job.customer_name ?? tJobs("detail.customerFallback")}
                         </p>
-                        <p className="text-xs text-slate-500">
-                          {assignees}
-                        </p>
+                        {hasAssignees ? (
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                            <Users className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{job.assigned_names.join(", ")}</span>
+                          </p>
+                        ) : (
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-amber-500">
+                            <UserX className="h-3 w-3 shrink-0" />
+                            <span>{t("live.noAssignees")}</span>
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                          <Clock className="h-3 w-3" />
                           {startTime}
                         </span>
                         <StatusBadge status="in_progress" />
@@ -520,7 +586,19 @@ export default function DashboardClient({
             )}
           </Section>
 
-          <Section title={t("today.title")} description={t("today.subtitle")}>
+          <Section
+            title={
+              <span className="flex items-center gap-2">
+                {t("today.title")}
+                {snapshot.lists.todays_orders.length > 0 ? (
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">
+                    {snapshot.metrics.jobs_today}
+                  </span>
+                ) : null}
+              </span>
+            }
+            description={t("today.subtitle")}
+          >
             {isSwitchingCompany ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, index) => (

@@ -1,8 +1,8 @@
 "use client";
 
+import { MapPin, Star, Trash2 } from "lucide-react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
@@ -31,27 +31,43 @@ export default function AddressCard({
   const addressErrors = errors.addresses?.[index];
 
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-slate-900">
-            {t("addresses.card.title")}
-          </p>
-          <p className="text-xs text-slate-500">
-            {isPrimary ? t("addresses.card.primary") : t("addresses.card.optional")}
-          </p>
-        </div>
+    <div className="rounded-xl border border-slate-200/70 bg-slate-50/50">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
         <div className="flex items-center gap-2">
-          <Button type="button" variant="ghost" onClick={onSetPrimary}>
-            {isPrimary ? t("addresses.card.primaryLabel") : t("addresses.card.setPrimary")}
-          </Button>
-          <Button type="button" variant="secondary" onClick={onRemove}>
+          <MapPin className="h-4 w-4 text-slate-400" />
+          <span className="text-sm font-semibold text-slate-700">
+            {t("addresses.card.title")} {index + 1}
+          </span>
+          {isPrimary ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+              <Star className="h-2.5 w-2.5 fill-brand-600" />
+              {t("addresses.card.primary")}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-1">
+          {!isPrimary ? (
+            <button
+              type="button"
+              onClick={onSetPrimary}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-white hover:text-brand-600 hover:shadow-sm"
+            >
+              <Star className="h-3 w-3" />
+              {t("addresses.card.setPrimary")}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={onRemove}
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 className="h-3 w-3" />
             {t("addresses.card.remove")}
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 p-4 sm:grid-cols-2">
         <Select
           label={t("addresses.fields.type")}
           options={[
@@ -108,7 +124,7 @@ export default function AddressCard({
           label={t("addresses.fields.notes")}
           placeholder={t("addresses.placeholders.notes")}
           className="sm:col-span-2"
-          rows={3}
+          rows={2}
           error={addressErrors?.note?.message as string | undefined}
           {...register(`${base}.note`)}
         />

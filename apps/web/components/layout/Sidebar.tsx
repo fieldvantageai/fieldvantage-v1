@@ -118,29 +118,48 @@ export default function Sidebar({
 
               return (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={onNavigate}
-                    title={collapsed ? item.label : undefined}
-                    className={`group relative flex h-11 items-center rounded-xl text-sm font-medium transition-all duration-200 active:scale-[0.97] ${
-                      collapsed ? "justify-center px-0" : "gap-3 px-3"
-                    } ${
-                      isActive
-                        ? "bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-200"
-                        : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                    }`}
-                  >
-                    <span
-                      className={`shrink-0 ${
+                  {collapsed ? (
+                    /* Collapsed: centered pill icon only */
+                    <Link
+                      href={item.href}
+                      onClick={onNavigate}
+                      title={item.label}
+                      className="group relative flex h-11 w-full items-center justify-center"
+                    >
+                      <span
+                        className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${
+                          isActive
+                            ? "bg-brand-600 text-white shadow-md shadow-brand-300/40"
+                            : "text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+                        }`}
+                      >
+                        {icon}
+                      </span>
+                      {/* Tooltip */}
+                      <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                        {item.label}
+                      </span>
+                    </Link>
+                  ) : (
+                    /* Expanded: full row */
+                    <Link
+                      href={item.href}
+                      onClick={onNavigate}
+                      className={`group flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-200 active:scale-[0.97] ${
                         isActive
-                          ? "text-white"
-                          : "text-slate-400 group-hover:text-blue-500 transition-colors duration-200"
+                          ? "bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-200"
+                          : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                       }`}
                     >
-                      {icon}
-                    </span>
-
-                    {!collapsed ? (
+                      <span
+                        className={`shrink-0 ${
+                          isActive
+                            ? "text-white"
+                            : "text-slate-400 group-hover:text-blue-500 transition-colors duration-200"
+                        }`}
+                      >
+                        {icon}
+                      </span>
                       <span
                         className={`truncate font-medium ${
                           isActive ? "text-white" : ""
@@ -148,15 +167,8 @@ export default function Sidebar({
                       >
                         {item.label}
                       </span>
-                    ) : null}
-
-                    {/* Tooltip when collapsed */}
-                    {collapsed ? (
-                      <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                        {item.label}
-                      </span>
-                    ) : null}
-                  </Link>
+                    </Link>
+                  )}
                 </li>
               );
             })}

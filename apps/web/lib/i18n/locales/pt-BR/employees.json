@@ -8,7 +8,8 @@
     "edit": "Editar",
     "toggleStatus": "Alterar status",
     "viewDetails": "Ver detalhes",
-    "delete": "Apagar usuário",
+    "delete": "Apagar colaborador",
+    "deleting": "Removendo...",
     "changeStatusError": "Não foi possível alterar o status."
   },
   "new": {
@@ -21,9 +22,14 @@
   },
   "detail": {
     "edit": "Editar colaborador",
+    "stats": {
+      "total": "Ordens alocadas",
+      "inProgress": "Em andamento",
+      "completed": "Concluídas"
+    },
     "summary": {
-      "title": "Resumo",
-      "subtitle": "Informações do colaborador.",
+      "title": "Informações do colaborador",
+      "subtitle": "Contato e dados cadastrados.",
       "contact": "Contato",
       "phoneFallback": "Telefone não informado"
     },
@@ -31,7 +37,10 @@
       "title": "Ordens alocadas",
       "subtitle": "Ordens em que este colaborador esta alocado.",
       "empty": "Nenhuma ordem alocada para este colaborador.",
-      "titleFallback": "Ordem sem título"
+      "titleFallback": "Ordem sem título",
+      "colTitle": "Título",
+      "colStatus": "Status",
+      "colDate": "Data agendada"
     },
     "invite": {
       "title": "Convite",
@@ -60,7 +69,8 @@
   },
   "list": {
     "title": "Equipe ativa",
-    "description": "Lista atualizada de colaboradores."
+    "description": "Lista atualizada de colaboradores.",
+    "found": "colaboradores"
   },
   "table": {
     "name": "Nome",
@@ -75,7 +85,8 @@
     "title": "Busca rápida",
     "description": "Encontre colaboradores por nome, email ou cargo.",
     "label": "Pesquisar",
-    "placeholder": "Buscar colaboradores",
+    "placeholder": "Buscar por nome, email ou cargo...",
+    "clear": "Limpar busca",
     "minChars": "Digite ao menos 3 caracteres para buscar.",
     "noResults": "Nenhum colaborador encontrado."
   },
@@ -83,13 +94,29 @@
     "title": "Nenhum colaborador ainda",
     "subtitle": "Convide os primeiros membros do time."
   },
+  "sections": {
+    "identity": "Dados do colaborador",
+    "identitySubtitle": "Nome completo e cargo na equipe.",
+    "contact": "Contato",
+    "contactSubtitle": "Email e telefone para comunicacao.",
+    "address": "Endereço",
+    "addressSubtitle": "Endereço residencial ou comercial.",
+    "notes": "Observações",
+    "notesSubtitle": "Informações extras sobre o colaborador.",
+    "access": "Acesso e permissões",
+    "accessSubtitle": "Perfil de acesso e status na plataforma."
+  },
+  "status": {
+    "activeHint": "O colaborador pode acessar o sistema.",
+    "inactiveHint": "O colaborador não tem acesso ao sistema."
+  },
   "fields": {
     "fullName": "Nome completo",
     "firstName": "Nome",
     "lastName": "Sobrenome",
     "avatar": "Foto do colaborador",
     "email": "Email",
-    "emailOptional": "Email (opcional — necessário para enviar convite)",
+    "emailOptional": "Email (opcional — necessário para convite)",
     "phone": "Telefone",
     "jobTitle": "Cargo",
     "addressLine1": "Endereço",
@@ -101,6 +128,20 @@
     "notes": "Observações",
     "role": "Perfil de acesso",
     "activeStatus": "Colaborador ativo"
+  },
+  "placeholders": {
+    "firstName": "Nome do colaborador",
+    "lastName": "Sobrenome do colaborador",
+    "email": "colaborador@empresa.com",
+    "phone": "Ex: (11) 99999-9999",
+    "jobTitle": "Ex: Técnico de campo",
+    "addressLine1": "Rua e número",
+    "addressLine2": "Complemento",
+    "city": "Cidade",
+    "state": "Estado",
+    "zipCode": "CEP",
+    "country": "Brasil",
+    "notes": "Ex: disponivel aos fins de semana, tem moto própria"
   },
   "invite": {
     "createdTitle": "Colaborador criado",
@@ -123,6 +164,7 @@
     "updateError": "Falha ao atualizar colaborador.",
     "updateFallback": "Erro inesperado ao atualizar colaborador.",
     "deleteConfirm": "Deseja remover este colaborador?",
+    "deleteWarning": "Esta ação não pode ser desfeita.",
     "deleteError": "Falha ao remover colaborador.",
     "deleteFallback": "Erro inesperado ao remover colaborador.",
     "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"

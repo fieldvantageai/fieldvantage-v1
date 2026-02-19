@@ -2,7 +2,14 @@
   "title": "Customers",
   "subtitle": "Manage customers, track services, and keep everything organized.",
   "actions": {
-    "newJob": "Create job"
+    "newJob": "Create job",
+    "view": "View details",
+    "edit": "Edit customer",
+    "delete": "Delete customer",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "deleting": "Deleting...",
+    "menu": "Customer actions"
   },
   "new": {
     "title": "New customer",
@@ -16,11 +23,16 @@
     "title": "Customer details",
     "subtitle": "Customer details",
     "edit": "Edit customer",
+    "stats": {
+      "total": "Total orders",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
     "summary": {
-      "title": "Summary",
-      "subtitle": "Customer details.",
+      "title": "Customer information",
+      "subtitle": "Contact details and registered addresses.",
       "contact": "Contact",
-      "address": "Address"
+      "address": "Addresses"
     },
     "address": {
       "primary": "Primary",
@@ -28,10 +40,13 @@
       "fallbackLabel": "Address"
     },
     "jobs": {
-      "title": "Jobs for this customer",
-      "subtitle": "Jobs linked to this customer.",
-      "empty": "No jobs linked to this customer.",
-      "titleFallback": "Untitled job"
+      "title": "Customer orders",
+      "subtitle": "Orders linked to this customer.",
+      "empty": "No orders linked to this customer.",
+      "titleFallback": "Untitled order",
+      "colTitle": "Title",
+      "colStatus": "Status",
+      "colDate": "Scheduled date"
     },
     "history": {
       "title": "Recent history",
@@ -43,18 +58,31 @@
     "title": "Quick search",
     "description": "Find customers by name.",
     "label": "Search",
-    "placeholder": "Search customers",
-    "minChars": "Type at least 3 characters to search.",
+    "placeholder": "Search by name, email or phone...",
+    "clear": "Clear search",
+    "minChars": "Type at least 2 characters to search.",
     "noResults": "No customers found."
   },
   "list": {
     "title": "Customers",
-    "description": "Up-to-date customer list."
+    "description": "Up-to-date customer list.",
+    "found": "customers found",
+    "colName": "Name",
+    "colContact": "Phone",
+    "colCompany": "Company"
   },
   "empty": {
     "title": "No customers yet",
     "subtitle": "Customers help you create orders, schedule services, and keep history.",
     "cta": "Add first customer"
+  },
+  "sections": {
+    "identity": "Customer details",
+    "identitySubtitle": "Full name and associated company.",
+    "contact": "Contact",
+    "contactSubtitle": "Email and phone for communication.",
+    "notes": "Notes",
+    "notesSubtitle": "Extra information and customer preferences."
   },
   "fields": {
     "name": "Customer name",
@@ -63,6 +91,7 @@
     "avatar": "Customer photo",
     "email": "Email",
     "phone": "Phone",
+    "company": "Company",
     "notes": "Notes",
     "address": "Address"
   },
@@ -75,6 +104,7 @@
     "lastName": "Customer last name",
     "email": "customer@email.com",
     "phone": "Ex: (555) 123-4567",
+    "company": "Company name (optional)",
     "notes": "Ex: prefers afternoon contact, dog in yard, blue gate",
     "address": "Street, number, city"
   },
@@ -125,7 +155,8 @@
     "updated": "Customer updated.",
     "updateError": "Failed to update customer.",
     "updateFallback": "Unexpected error while updating.",
-    "deleteConfirm": "Do you want to remove this customer?",
+    "deleteConfirm": "Delete this customer?",
+    "deleteWarning": "This action cannot be undone. Linked orders will be kept.",
     "deleteError": "Failed to remove customer.",
     "deleteFallback": "Unexpected error while removing.",
     "cancelConfirm": "There is filled data. Do you want to cancel?"

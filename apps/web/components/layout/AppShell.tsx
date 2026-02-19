@@ -571,6 +571,7 @@ export default function AppShell({ children }: AppShellProps) {
                     </span>
                   ) : null}
                 </Link>
+                <div className="mx-1 h-6 w-px bg-slate-200/80" aria-hidden="true" />
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
@@ -584,25 +585,26 @@ export default function AppShell({ children }: AppShellProps) {
                     aria-label={tCompanies("switcher.label")}
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <span className="truncate">
-                        {isLoadingCompany ? t("status.loading") : companyLabel}
-                      </span>
-                      {isSwitchingCompany ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                      ) : null}
+                      {/* Company logo/initials — BEFORE the name */}
                       {isLoadingCompany ? (
-                        <span className="h-7 w-7 animate-pulse rounded-full bg-slate-100" />
+                        <span className="h-7 w-7 shrink-0 animate-pulse rounded-lg bg-slate-100" />
                       ) : companyLogoUrl ? (
                         <img
                           src={companyLogoUrl}
                           alt={companyLabel}
-                          className="h-7 w-7 rounded-full object-cover"
+                          className="h-7 w-7 shrink-0 rounded-lg object-cover"
                         />
                       ) : (
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700">
                           {companyInitials || companyInitial}
                         </span>
                       )}
+                      <span className="truncate text-sm font-semibold text-slate-800">
+                        {isLoadingCompany ? t("status.loading") : companyLabel}
+                      </span>
+                      {isSwitchingCompany ? (
+                        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-slate-400" />
+                      ) : null}
                     </span>
                     <ChevronDown
                       className={`h-4 w-4 text-slate-400 transition ${
@@ -615,22 +617,22 @@ export default function AppShell({ children }: AppShellProps) {
                     onClick={() =>
                       setOpenMenu((prev) => (prev === "account" ? null : "account"))
                     }
-                    className="flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-2 py-1 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
+                    className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white p-1 pr-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                     aria-label={t("nav.profile")}
                   >
                     {userAvatarUrl ? (
                       <img
                         src={userAvatarUrl}
                         alt={userName ?? t("status.loading")}
-                        className="h-7 w-7 rounded-full object-cover"
+                        className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200/60"
                       />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
                         {userInitials}
                       </span>
                     )}
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition ${
+                      className={`h-3.5 w-3.5 text-slate-400 transition ${
                         openMenu === "account" ? "rotate-180" : ""
                       }`}
                     />

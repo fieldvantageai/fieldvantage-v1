@@ -8,7 +8,8 @@
     "edit": "Edit",
     "toggleStatus": "Change status",
     "viewDetails": "View details",
-    "delete": "Delete user",
+    "delete": "Delete employee",
+    "deleting": "Deleting...",
     "changeStatusError": "Could not change status."
   },
   "new": {
@@ -21,9 +22,14 @@
   },
   "detail": {
     "edit": "Edit employee",
+    "stats": {
+      "total": "Assigned jobs",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
     "summary": {
-      "title": "Summary",
-      "subtitle": "Employee details.",
+      "title": "Employee details",
+      "subtitle": "Contact and registered information.",
       "contact": "Contact",
       "phoneFallback": "Phone not provided"
     },
@@ -31,7 +37,10 @@
       "title": "Assigned jobs",
       "subtitle": "Jobs this employee is assigned to.",
       "empty": "No jobs assigned to this employee.",
-      "titleFallback": "Untitled job"
+      "titleFallback": "Untitled job",
+      "colTitle": "Title",
+      "colStatus": "Status",
+      "colDate": "Scheduled date"
     },
     "invite": {
       "title": "Invite",
@@ -60,7 +69,8 @@
   },
   "list": {
     "title": "Active team",
-    "description": "Up-to-date team list."
+    "description": "Up-to-date team list.",
+    "found": "employees"
   },
   "table": {
     "name": "Name",
@@ -75,13 +85,30 @@
     "title": "Quick search",
     "description": "Find employees by name, email, or role.",
     "label": "Search",
-    "placeholder": "Search employees",
+    "placeholder": "Search by name, email or role...",
+    "clear": "Clear search",
     "minChars": "Type at least 3 characters to search.",
     "noResults": "No employees found."
   },
   "empty": {
     "title": "No employees yet",
     "subtitle": "Invite the first team members."
+  },
+  "sections": {
+    "identity": "Employee details",
+    "identitySubtitle": "Full name and job title.",
+    "contact": "Contact",
+    "contactSubtitle": "Email and phone for communication.",
+    "address": "Address",
+    "addressSubtitle": "Residential or business address.",
+    "notes": "Notes",
+    "notesSubtitle": "Extra information about the employee.",
+    "access": "Access & permissions",
+    "accessSubtitle": "Access profile and platform status."
+  },
+  "status": {
+    "activeHint": "Employee can access the system.",
+    "inactiveHint": "Employee has no access to the system."
   },
   "fields": {
     "fullName": "Full name",
@@ -101,6 +128,20 @@
     "notes": "Notes",
     "role": "Access role",
     "activeStatus": "Employee active"
+  },
+  "placeholders": {
+    "firstName": "Employee first name",
+    "lastName": "Employee last name",
+    "email": "employee@company.com",
+    "phone": "Ex: (555) 123-4567",
+    "jobTitle": "Ex: Field technician",
+    "addressLine1": "Street and number",
+    "addressLine2": "Apt, Suite, etc.",
+    "city": "City",
+    "state": "State",
+    "zipCode": "Zip code",
+    "country": "USA",
+    "notes": "Ex: available on weekends, has own vehicle"
   },
   "invite": {
     "createdTitle": "Collaborator created",
@@ -123,6 +164,7 @@
     "updateError": "Failed to update employee.",
     "updateFallback": "Unexpected error while updating employee.",
     "deleteConfirm": "Do you want to remove this employee?",
+    "deleteWarning": "This action cannot be undone.",
     "deleteError": "Failed to remove employee.",
     "deleteFallback": "Unexpected error while removing employee.",
     "cancelConfirm": "There is filled data. Do you want to cancel?"

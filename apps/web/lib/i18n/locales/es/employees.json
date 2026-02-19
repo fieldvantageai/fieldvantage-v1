@@ -8,7 +8,8 @@
     "edit": "Editar",
     "toggleStatus": "Cambiar estado",
     "viewDetails": "Ver detalles",
-    "delete": "Eliminar usuario",
+    "delete": "Eliminar empleado",
+    "deleting": "Eliminando...",
     "changeStatusError": "No se pudo cambiar el estado."
   },
   "new": {
@@ -21,9 +22,14 @@
   },
   "detail": {
     "edit": "Editar empleado",
+    "stats": {
+      "total": "Trabajos asignados",
+      "inProgress": "En progreso",
+      "completed": "Completados"
+    },
     "summary": {
-      "title": "Resumen",
-      "subtitle": "Detalles del colaborador.",
+      "title": "Datos del colaborador",
+      "subtitle": "Contacto e informacion registrada.",
       "contact": "Contacto",
       "phoneFallback": "Telefono no informado"
     },
@@ -31,7 +37,10 @@
       "title": "Trabajos asignados",
       "subtitle": "Trabajos en los que este empleado esta asignado.",
       "empty": "No hay trabajos asignados a este empleado.",
-      "titleFallback": "Trabajo sin titulo"
+      "titleFallback": "Trabajo sin titulo",
+      "colTitle": "Titulo",
+      "colStatus": "Estado",
+      "colDate": "Fecha agendada"
     },
     "invite": {
       "title": "Invitacion",
@@ -60,7 +69,8 @@
   },
   "list": {
     "title": "Equipo activo",
-    "description": "Lista actualizada del equipo."
+    "description": "Lista actualizada del equipo.",
+    "found": "empleados"
   },
   "table": {
     "name": "Nombre",
@@ -75,13 +85,30 @@
     "title": "Busqueda rapida",
     "description": "Encuentra colaboradores por nombre, email o cargo.",
     "label": "Buscar",
-    "placeholder": "Buscar colaboradores",
+    "placeholder": "Buscar por nombre, email o cargo...",
+    "clear": "Limpiar busqueda",
     "minChars": "Escribe al menos 3 caracteres para buscar.",
     "noResults": "No se encontraron colaboradores."
   },
   "empty": {
     "title": "Aun no hay empleados",
     "subtitle": "Invita a los primeros miembros del equipo."
+  },
+  "sections": {
+    "identity": "Datos del empleado",
+    "identitySubtitle": "Nombre completo y cargo en el equipo.",
+    "contact": "Contacto",
+    "contactSubtitle": "Email y telefono para comunicacion.",
+    "address": "Direccion",
+    "addressSubtitle": "Direccion residencial o comercial.",
+    "notes": "Notas",
+    "notesSubtitle": "Informacion extra sobre el empleado.",
+    "access": "Acceso y permisos",
+    "accessSubtitle": "Perfil de acceso y estado en la plataforma."
+  },
+  "status": {
+    "activeHint": "El empleado puede acceder al sistema.",
+    "inactiveHint": "El empleado no tiene acceso al sistema."
   },
   "fields": {
     "fullName": "Nombre completo",
@@ -101,6 +128,20 @@
     "notes": "Notas",
     "role": "Rol de acceso",
     "activeStatus": "Empleado activo"
+  },
+  "placeholders": {
+    "firstName": "Nombre del empleado",
+    "lastName": "Apellido del empleado",
+    "email": "empleado@empresa.com",
+    "phone": "Ej: (555) 123-4567",
+    "jobTitle": "Ej: Tecnico de campo",
+    "addressLine1": "Calle y numero",
+    "addressLine2": "Complemento",
+    "city": "Ciudad",
+    "state": "Estado",
+    "zipCode": "Codigo postal",
+    "country": "USA",
+    "notes": "Ej: disponible los fines de semana, tiene moto propia"
   },
   "invite": {
     "createdTitle": "Colaborador creado",
@@ -123,6 +164,7 @@
     "updateError": "No se pudo actualizar el empleado.",
     "updateFallback": "Error inesperado al actualizar el empleado.",
     "deleteConfirm": "Desea eliminar este empleado?",
+    "deleteWarning": "Esta accion no se puede deshacer.",
     "deleteError": "No se pudo eliminar el empleado.",
     "deleteFallback": "Error inesperado al eliminar el empleado.",
     "cancelConfirm": "Hay datos ingresados. Desea cancelar?"

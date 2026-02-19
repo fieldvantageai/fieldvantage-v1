@@ -2,7 +2,14 @@
   "title": "Clientes",
   "subtitle": "Gerencie seus clientes, acompanhe servicos e mantenha tudo organizado.",
   "actions": {
-    "newJob": "Criar ordem"
+    "newJob": "Criar ordem",
+    "view": "Ver detalhes",
+    "edit": "Editar cliente",
+    "delete": "Excluir cliente",
+    "cancel": "Cancelar",
+    "confirmDelete": "Excluir",
+    "deleting": "Excluindo...",
+    "menu": "Ações do cliente"
   },
   "new": {
     "title": "Novo cliente",
@@ -16,11 +23,16 @@
     "title": "Detalhes do cliente",
     "subtitle": "Detalhes do cliente",
     "edit": "Editar cliente",
+    "stats": {
+      "total": "Total de ordens",
+      "inProgress": "Em andamento",
+      "completed": "Concluidas"
+    },
     "summary": {
-      "title": "Resumo",
-      "subtitle": "Informacoes do cliente.",
+      "title": "Informacoes do cliente",
+      "subtitle": "Contato e enderecos cadastrados.",
       "contact": "Contato",
-      "address": "Endereco"
+      "address": "Enderecos"
     },
     "address": {
       "primary": "Principal",
@@ -31,7 +43,10 @@
       "title": "Ordens do cliente",
       "subtitle": "Ordens vinculadas a este cliente.",
       "empty": "Nenhuma ordem vinculada a este cliente.",
-      "titleFallback": "Ordem sem titulo"
+      "titleFallback": "Ordem sem titulo",
+      "colTitle": "Titulo",
+      "colStatus": "Status",
+      "colDate": "Data agendada"
     },
     "history": {
       "title": "Historico recente",
@@ -43,18 +58,31 @@
     "title": "Busca rapida",
     "description": "Encontre clientes por nome.",
     "label": "Pesquisar",
-    "placeholder": "Buscar clientes",
-    "minChars": "Digite ao menos 3 caracteres para buscar.",
+    "placeholder": "Buscar por nome, email ou telefone...",
+    "clear": "Limpar busca",
+    "minChars": "Digite ao menos 2 caracteres para buscar.",
     "noResults": "Nenhum cliente encontrado."
   },
   "list": {
     "title": "Clientes",
-    "description": "Lista atualizada de clientes."
+    "description": "Lista atualizada de clientes.",
+    "found": "clientes encontrados",
+    "colName": "Nome",
+    "colContact": "Telefone",
+    "colCompany": "Empresa"
   },
   "empty": {
     "title": "Nenhum cliente ainda",
     "subtitle": "Clientes permitem criar ordens, agendar servicos e acompanhar o historico.",
     "cta": "Adicionar primeiro cliente"
+  },
+  "sections": {
+    "identity": "Dados do cliente",
+    "identitySubtitle": "Nome completo e empresa vinculada.",
+    "contact": "Contato",
+    "contactSubtitle": "Email e telefone para comunicacao.",
+    "notes": "Observacoes",
+    "notesSubtitle": "Informacoes extras e preferencias do cliente."
   },
   "fields": {
     "name": "Nome do cliente",
@@ -63,6 +91,7 @@
     "avatar": "Foto do cliente",
     "email": "Email",
     "phone": "Telefone",
+    "company": "Empresa",
     "notes": "Observacoes",
     "address": "Endereco"
   },
@@ -74,7 +103,8 @@
     "firstName": "Nome do cliente",
     "lastName": "Sobrenome do cliente",
     "email": "cliente@email.com",
-    "phone": "Ex: (555) 123-4567",
+    "phone": "Ex: (11) 99999-9999",
+    "company": "Nome da empresa (opcional)",
     "notes": "Ex: prefere contato a tarde, cachorro no quintal, portao azul",
     "address": "Rua, numero, cidade"
   },
@@ -125,7 +155,8 @@
     "updated": "Cliente atualizado.",
     "updateError": "Falha ao atualizar cliente.",
     "updateFallback": "Erro inesperado ao atualizar.",
-    "deleteConfirm": "Deseja remover este cliente?",
+    "deleteConfirm": "Excluir este cliente?",
+    "deleteWarning": "Esta acao nao pode ser desfeita. As ordens vinculadas serao mantidas.",
     "deleteError": "Falha ao remover cliente.",
     "deleteFallback": "Erro inesperado ao remover.",
     "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
