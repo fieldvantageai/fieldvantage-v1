@@ -9,6 +9,7 @@ import { useClientT } from "@/lib/i18n/useClientT";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 import FloatingActionButton from "../ui/FloatingActionButton";
+import MobileBottomBar from "./MobileBottomBar";
 import Sidebar from "./Sidebar";
 import { ToastBanner } from "../ui/Toast";
 
@@ -469,77 +470,38 @@ export default function AppShell({ children }: AppShellProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
   return (
-    <div className="min-h-screen bg-[#f5f6fb]">
-      {isOpen ? (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute inset-y-3 left-3 w-[85vw] max-w-sm rounded-r-3xl bg-white/95 px-4 pb-3 pt-4 shadow-2xl ring-1 ring-slate-200/70 motion-safe:animate-[drawer-in_220ms_ease-out]">
-            <div className="mb-5 flex items-center justify-between">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2"
-                aria-label={t("nav.dashboard")}
-                onClick={() => setIsOpen(false)}
-              >
-                <img
-                  src="/brand/logo.png"
-                  alt={t("appName")}
-                  className="h-8 w-8 rounded-lg object-contain"
-                />
-                <span className="text-sm font-semibold text-slate-900">{t("appName")}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500/80 transition hover:bg-slate-50/70 hover:text-slate-600"
-                aria-label={t("actions.close")}
-              >
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                  <path
-                    d="M6 6l12 12M18 6l-12 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <Sidebar
-              className="w-full border-none p-0 shadow-none"
-              onNavigate={() => setIsOpen(false)}
-              userRole={userRole}
-            />
-          </div>
-        </div>
-      ) : null}
-
+    <div className="min-h-screen bg-slate-50">
       <div className="flex min-h-screen">
+        {/* Desktop Sidebar */}
         <Sidebar
-          className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:rounded-none lg:border-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 lg:shadow-none ${
-            sidebarCollapsed ? "lg:w-20" : "lg:w-60"
+          className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 transition-[width] duration-300 ease-in-out ${
+            sidebarCollapsed ? "lg:w-[72px]" : "lg:w-60"
           }`}
           userRole={userRole}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
         />
+
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur">
-            <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-10">
-              <div className="flex min-w-0 items-center gap-4">
-                <button
-                  type="button"
-                  className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200/70 bg-white text-slate-700 lg:hidden"
-                  onClick={() => setIsOpen(true)}
-                  aria-label={t("actions.openMenu")}
+          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-sm">
+            <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6">
+              {/* Left: Logo on mobile */}
+              <div className="flex min-w-0 items-center gap-3">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 lg:hidden"
+                  aria-label={t("nav.dashboard")}
                 >
-                  <span className="text-xl">☰</span>
-                </button>
+                  <img
+                    src="/brand/logo.png"
+                    alt={t("appName")}
+                    className="h-8 w-8 rounded-xl object-contain"
+                  />
+                  <span className="text-sm font-bold text-slate-900">{t("appName")}</span>
+                </Link>
                 <div className="hidden items-center lg:flex">
-                  <div className="w-full min-w-[240px] max-w-md">
-                    <div className="flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-white px-3 py-2 text-sm text-slate-500 shadow-sm">
+                  <div className="w-full min-w-[200px] max-w-sm">
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200/70 bg-slate-50 px-3 py-2 text-sm text-slate-500 transition focus-within:border-brand-300 focus-within:bg-white focus-within:shadow-sm">
                       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                         <path
                           d="M11 19a8 8 0 1 1 5.657-2.343L21 21"
@@ -782,7 +744,7 @@ export default function AppShell({ children }: AppShellProps) {
             </div>
           </header>
 
-          <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+          <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 sm:px-6 md:pb-8 lg:px-10 lg:py-8">
             <main className="space-y-6">
               {toast ? (
                 <ToastBanner
@@ -796,19 +758,11 @@ export default function AppShell({ children }: AppShellProps) {
           </div>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomBar userRole={userRole} />
+
       <FloatingActionButton isVisible={showFab} />
-      <style jsx global>{`
-        @keyframes drawer-in {
-          from {
-            transform: translateX(-12px);
-            opacity: 0.96;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }

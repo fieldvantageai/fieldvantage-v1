@@ -28,7 +28,7 @@ export default function FloatingActionButton({
   }
 
   return (
-    <div className="md:hidden">
+    <div className="hidden">
       {isOpen ? (
         <div
           className="fixed inset-0 z-40"
