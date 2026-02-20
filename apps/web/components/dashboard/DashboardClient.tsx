@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ClipboardList,
   Clock,
+  Info,
   TrendingUp,
   UserMinus,
   UserPlus,
@@ -172,35 +173,43 @@ export default function DashboardClient({
     }
   ];
 
-  const jobsByDate = useMemo(() => {
-    const map = new Map<string, number>();
-    snapshot.jobs_by_date.forEach((entry) => {
-      map.set(entry.date, entry.count);
-    });
+  const calendarDayMap = useMemo(() => {
+    const map = new Map<string, typeof snapshot.jobs_by_date[0]>();
+    snapshot.jobs_by_date.forEach((entry) => map.set(entry.date, entry));
     return map;
   }, [snapshot.jobs_by_date]);
 
   const calendarDate = useMemo(() => new Date(snapshot.generated_at), [snapshot]);
-  const monthStart = new Date(
-    calendarDate.getFullYear(),
-    calendarDate.getMonth(),
-    1
-  );
-  const monthEnd = new Date(
-    calendarDate.getFullYear(),
-    calendarDate.getMonth() + 1,
-    0
-  );
+  const todayDateKey = toDateParam(new Date());
+  const [selectedDateKey, setSelectedDateKey] = useState<string>(todayDateKey);
+  const [legendOpen, setLegendOpen] = useState(false);
+
+  const monthStart = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+  const monthEnd = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
   const daysInMonth = monthEnd.getDate();
   const startOffset = (monthStart.getDay() + 6) % 7;
   const calendarCells = [
     ...Array.from({ length: startOffset }, () => null),
-    ...Array.from({ length: daysInMonth }, (_, index) => index + 1)
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
   ];
-  const monthLabel = calendarDate.toLocaleDateString(locale, {
-    month: "long",
-    year: "numeric"
-  });
+  const monthLabel = (() => {
+    const raw = calendarDate.toLocaleDateString(locale, {
+      month: "long",
+      year: "numeric",
+    });
+    // Normalize any capitalised connector words (e.g. "Fevereiro De 2026" → "Fevereiro de 2026")
+    return raw.replace(/\b(De|Del|Of)\b/g, (m) => m.toLowerCase());
+  })();
+
+  const selectedDayData = calendarDayMap.get(selectedDateKey);
+  const selectedDayLabel = (() => {
+    const raw = new Date(selectedDateKey + "T12:00:00").toLocaleDateString(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+    return raw.replace(/\b(De|Del|Of)\b/g, (m) => m.toLowerCase());
+  })();
 
   const formatTime = (value: string) =>
     new Date(value).toLocaleTimeString(locale, {
@@ -278,18 +287,18 @@ export default function DashboardClient({
       </header>
 
       <div className={`relative space-y-8 ${isSwitchingCompany ? "pointer-events-none" : ""}`}>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {isSwitchingCompany
           ? Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={`card-skeleton-${index}`}
-                className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm"
+                className="rounded-2xl border border-slate-200/70 bg-white/95 p-4 shadow-sm sm:rounded-3xl sm:p-5"
               >
                 <div className="flex items-center justify-between">
-                  <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
-                  <div className="h-8 w-8 animate-pulse rounded-full bg-slate-100" />
+                  <div className="h-3 w-16 animate-pulse rounded bg-slate-100 sm:w-24" />
+                  <div className="h-7 w-7 animate-pulse rounded-full bg-slate-100 sm:h-8 sm:w-8" />
                 </div>
-                <div className="mt-3 h-7 w-16 animate-pulse rounded bg-slate-100" />
+                <div className="mt-2 h-6 w-12 animate-pulse rounded bg-slate-100 sm:mt-3 sm:h-7 sm:w-16" />
               </div>
             ))
           : cards.map((item) => {
@@ -298,17 +307,17 @@ export default function DashboardClient({
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`rounded-3xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.card}`}
+                  className={`rounded-2xl border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:rounded-3xl sm:p-5 ${item.card}`}
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <div className="flex items-start justify-between gap-1">
+                    <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-500 sm:text-xs">
                       {item.label}
                     </p>
-                    <span className={`rounded-full p-2 ${item.iconBg}`}>
-                      <Icon className={`h-4 w-4 ${item.iconColor}`} />
+                    <span className={`shrink-0 rounded-full p-1.5 sm:p-2 ${item.iconBg}`}>
+                      <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${item.iconColor}`} />
                     </span>
                   </div>
-                  <p className={`mt-3 text-3xl font-bold ${item.valueColor}`}>
+                  <p className={`mt-2 text-2xl font-bold sm:mt-3 sm:text-3xl ${item.valueColor}`}>
                     {item.value}
                   </p>
                 </Link>
@@ -691,108 +700,169 @@ export default function DashboardClient({
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
-              <div className="flex items-center justify-between">
+            <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm">
+              {/* Calendar header */}
+              <div className="flex items-center justify-between px-5 pt-5">
                 <p className="text-sm font-semibold text-slate-900">{monthLabel}</p>
-                <CalendarIcon className="h-4 w-4 text-slate-400" />
+                <div className="flex items-center gap-2">
+                  {/* Legend tooltip — click/tap to toggle (works on mobile) */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      aria-label={t("calendar.legendLabel")}
+                      aria-expanded={legendOpen}
+                      onClick={() => setLegendOpen((prev) => !prev)}
+                      className="flex items-center justify-center rounded-full p-0.5 text-slate-400 transition hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                    {legendOpen ? (
+                      <>
+                        {/* Backdrop to close on outside tap (mobile-friendly) */}
+                        <div
+                          className="fixed inset-0 z-10"
+                          aria-hidden="true"
+                          onClick={() => setLegendOpen(false)}
+                        />
+                        <div className="absolute right-0 top-6 z-20 w-48 rounded-xl border border-slate-200/80 bg-white p-3 shadow-lg">
+                          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                            {t("calendar.legendTitle")}
+                          </p>
+                          <ul className="space-y-1.5">
+                            <li className="flex items-center gap-2 text-xs text-slate-600">
+                              <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                              {t("calendar.legendOverdue")}
+                            </li>
+                            <li className="flex items-center gap-2 text-xs text-slate-600">
+                              <span className="h-2 w-2 shrink-0 rounded-full bg-blue-600" />
+                              {t("calendar.legendActive")}
+                            </li>
+                            <li className="flex items-center gap-2 text-xs text-slate-600">
+                              <span className="h-2 w-2 shrink-0 rounded-full bg-slate-300" />
+                              {t("calendar.legendInactive")}
+                            </li>
+                          </ul>
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+                  <CalendarIcon className="h-4 w-4 text-slate-400" />
+                </div>
               </div>
-              <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs text-slate-400">
+
+              {/* Day-of-week labels */}
+              <div className="mt-4 grid grid-cols-7 gap-1 px-3 text-center text-xs text-slate-400">
                 {["S", "T", "Q", "Q", "S", "S", "D"].map((label, index) => (
                   <span key={`${label}-${index}`}>{label}</span>
                 ))}
               </div>
-              <div className="mt-2 grid grid-cols-7 gap-1 text-xs text-slate-600">
+
+              {/* Days grid */}
+              <div className="mt-2 grid grid-cols-7 gap-1 px-3 pb-4 text-xs text-slate-600">
                 {calendarCells.map((day, index) => {
-                  const isToday = day === new Date().getDate();
+                  const isToday = day !== null &&
+                    toDateParam(new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day)) === todayDateKey;
                   const dateKey = day
-                    ? toDateParam(
-                        new Date(
-                          calendarDate.getFullYear(),
-                          calendarDate.getMonth(),
-                          day
-                        )
-                      )
+                    ? toDateParam(new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day))
                     : "";
-                  const count = day ? jobsByDate.get(dateKey) ?? 0 : 0;
+                  const dayData = day ? calendarDayMap.get(dateKey) : undefined;
+                  const isSelected = dateKey === selectedDateKey;
+
+                  // Dot color priority
+                  let dotColor = "";
+                  if (dayData) {
+                    if (dayData.hasOverdue) dotColor = "bg-red-500";
+                    else if (dayData.hasActive) dotColor = "bg-blue-600";
+                    else dotColor = "bg-slate-300";
+                  }
+
+                  // When today has overdue jobs, show a red ring on the blue circle
+                  const todayRing = isToday && dayData?.hasOverdue ? "ring-2 ring-red-400 ring-offset-1" : "";
+
                   return (
                     <div key={`${day ?? "empty"}-${index}`} className="h-10">
                       {day ? (
-                        <Link
-                          href={`/jobs?from=${dateKey}&to=${dateKey}`}
-                          className={`flex h-8 items-center justify-center rounded-lg transition ${
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDateKey(dateKey)}
+                          className={`flex h-8 w-full items-center justify-center rounded-lg font-medium transition ${
                             isToday
-                              ? "bg-brand-600 text-white"
-                              : "text-slate-700 hover:bg-slate-100"
+                              ? `bg-brand-600 text-white hover:bg-brand-700 ${todayRing}`
+                              : isSelected
+                                ? "bg-slate-200 text-slate-900"
+                                : "text-slate-700 hover:bg-slate-100"
                           }`}
                         >
                           {day}
-                        </Link>
+                        </button>
                       ) : (
-                        <span className="flex h-8 items-center justify-center text-transparent">
-                          0
-                        </span>
+                        <span className="flex h-8 items-center justify-center text-transparent">0</span>
                       )}
-                      {count > 0 ? (
-                        <div className="mt-0.5 flex justify-center">
-                          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-                        </div>
-                      ) : (
-                        <div className="mt-0.5 h-1.5" />
-                      )}
+                      <div className="mt-0.5 flex justify-center">
+                        {dotColor ? (
+                          <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
+                        ) : (
+                          <span className="h-1.5" />
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Agenda View */}
+              <div className="border-t border-slate-100">
+                <div className="flex items-center justify-between px-5 py-3">
+                  <p className="text-xs font-semibold capitalize text-slate-500">
+                    {selectedDateKey === todayDateKey ? t("calendar.today") : selectedDayLabel}
+                  </p>
+                  {selectedDayData && selectedDayData.jobs.length > 0 ? (
+                    <Link
+                      href={`/jobs?from=${selectedDateKey}&to=${selectedDateKey}`}
+                      className="text-xs font-semibold text-brand-600 hover:underline"
+                    >
+                      {t("calendar.viewAll")}
+                    </Link>
+                  ) : null}
+                </div>
+
+                {selectedDayData && selectedDayData.jobs.length > 0 ? (
+                  <ul className="divide-y divide-slate-100">
+                    {selectedDayData.jobs.slice(0, 5).map((job) => {
+                      const timeLabel = new Date(job.scheduled_for).toLocaleTimeString(locale, {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      });
+                      const dotCls =
+                        job.status === "in_progress" && new Date(job.scheduled_for) < new Date()
+                          ? "bg-red-500"
+                          : job.status === "in_progress" || job.status === "scheduled"
+                            ? "bg-blue-600"
+                            : "bg-slate-300";
+                      return (
+                        <li key={job.id}>
+                          <Link
+                            href={`/jobs/${job.id}`}
+                            className="flex items-center gap-3 px-5 py-2.5 transition hover:bg-slate-50"
+                          >
+                            <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dotCls}`} />
+                            <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                              {job.title ?? tJobs("table.titleFallback")}
+                            </span>
+                            <span className="shrink-0 text-xs text-slate-400">{timeLabel}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="px-5 pb-4 text-xs text-slate-400">
+                    {t("calendar.noOrders")}
+                  </p>
+                )}
+              </div>
             </div>
           )}
-
-          <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
-            <p className="text-sm font-semibold text-slate-900">
-              {t("upcoming.title")}
-            </p>
-            <div className="mt-3 space-y-3 text-sm text-slate-600">
-              {isSwitchingCompany ? (
-                <div className="space-y-2">
-                  {Array.from({ length: 2 }).map((_, index) => (
-                    <div
-                      key={`upcoming-skeleton-${index}`}
-                      className="rounded-2xl border border-slate-200/70 bg-white/90 px-3 py-2"
-                    >
-                      <div className="h-3 w-20 animate-pulse rounded bg-slate-100" />
-                      <div className="mt-2 h-3 w-28 animate-pulse rounded bg-slate-100" />
-                    </div>
-                  ))}
-                </div>
-              ) : snapshot.lists.upcoming_executions.length === 0 ? (
-                <p className="text-sm text-slate-500">{t("upcoming.empty")}</p>
-              ) : (
-                snapshot.lists.upcoming_executions.map((job) => {
-                  const scheduled = new Date(job.scheduled_for);
-                  const label = scheduled.toLocaleDateString(locale, {
-                    month: "short",
-                    day: "numeric"
-                  });
-                  return (
-                    <Link
-                      key={job.id}
-                      href={`/jobs/${job.id}`}
-                      className="flex items-start justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-3 py-2 transition hover:border-slate-200 hover:shadow-sm"
-                    >
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-slate-400">
-                          {label}
-                        </p>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {job.customer_name ?? tJobs("detail.customerFallback")}
-                        </p>
-                      </div>
-                      <StatusBadge status={job.status} />
-                    </Link>
-                  );
-                })
-              )}
-            </div>
-          </div>
 
           {isMember ? null : (
             <Section title={t("quick.title")} description={t("quick.subtitle")}>

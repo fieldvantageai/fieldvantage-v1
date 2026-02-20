@@ -72,6 +72,16 @@
     "inviteEmployee": "Invite employee",
     "addCustomer": "Add customer"
   },
+  "calendar": {
+    "noOrders": "No orders on this day.",
+    "viewAll": "View all",
+    "today": "Today",
+    "legendLabel": "Color legend",
+    "legendTitle": "Legend",
+    "legendOverdue": "Overdue",
+    "legendActive": "Scheduled / In progress",
+    "legendInactive": "No active orders"
+  },
   "upcoming": {
     "title": "Upcoming executions",
     "empty": "No upcoming scheduled jobs."

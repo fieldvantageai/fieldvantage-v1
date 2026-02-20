@@ -72,6 +72,16 @@
     "inviteEmployee": "Invitar empleado",
     "addCustomer": "Agregar cliente"
   },
+  "calendar": {
+    "noOrders": "Sin ordenes en este dia.",
+    "viewAll": "Ver todas",
+    "today": "Hoy",
+    "legendLabel": "Leyenda de colores",
+    "legendTitle": "Leyenda",
+    "legendOverdue": "Atrasada",
+    "legendActive": "Programada / En curso",
+    "legendInactive": "Sin ordenes activas"
+  },
   "upcoming": {
     "title": "Proximas ejecuciones",
     "empty": "No hay trabajos programados."

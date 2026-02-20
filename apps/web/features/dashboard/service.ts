@@ -17,6 +17,21 @@ type DashboardAttentionItem = {
   customer_name: string | null;
 };
 
+type CalendarDayJob = {
+  id: string;
+  title: string | null;
+  scheduled_for: string;
+  status: JobStatus;
+};
+
+export type CalendarDay = {
+  date: string;
+  count: number;
+  hasOverdue: boolean;
+  hasActive: boolean;
+  jobs: CalendarDayJob[];
+};
+
 export type DashboardSnapshot = {
   generated_at: string;
   metrics: {
@@ -39,7 +54,7 @@ export type DashboardSnapshot = {
     should_start: DashboardAttentionItem[];
     unassigned: DashboardAttentionItem[];
   };
-  jobs_by_date: Array<{ date: string; count: number }>;
+  jobs_by_date: CalendarDay[];
 };
 
 const toDateKey = (date: Date) => date.toISOString().split("T")[0];
@@ -133,10 +148,30 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     }))
   };
 
-  const jobsByDateMap = new Map<string, number>();
+  type DayAccumulator = {
+    count: number;
+    hasOverdue: boolean;
+    hasActive: boolean;
+    jobs: CalendarDayJob[];
+  };
+  const jobsByDateMap = new Map<string, DayAccumulator>();
   jobs.forEach((job) => {
     const key = toDateKey(new Date(job.scheduled_for));
-    jobsByDateMap.set(key, (jobsByDateMap.get(key) ?? 0) + 1);
+    const existing: DayAccumulator = jobsByDateMap.get(key) ?? {
+      count: 0, hasOverdue: false, hasActive: false, jobs: []
+    };
+    const isOverdue = job.status === "in_progress" && new Date(job.scheduled_for) < now;
+    const isActive = job.status === "in_progress" || job.status === "scheduled";
+    existing.count += 1;
+    if (isOverdue) existing.hasOverdue = true;
+    if (isActive) existing.hasActive = true;
+    existing.jobs.push({
+      id: job.id,
+      title: job.title ?? null,
+      scheduled_for: job.scheduled_for,
+      status: job.status,
+    });
+    jobsByDateMap.set(key, existing);
   });
 
   return {
@@ -157,9 +192,14 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
       upcoming_executions: upcomingExecutions
     },
     attention,
-    jobs_by_date: Array.from(jobsByDateMap.entries()).map(([date, count]) => ({
+    jobs_by_date: Array.from(jobsByDateMap.entries()).map(([date, acc]) => ({
       date,
-      count
+      count: acc.count,
+      hasOverdue: acc.hasOverdue,
+      hasActive: acc.hasActive,
+      jobs: acc.jobs.sort(
+        (a, b) => new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime()
+      ),
     }))
   };
 }

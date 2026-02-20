@@ -1,3 +1,4 @@
+import AppVersionFooter from "@/components/settings/AppVersionFooter";
 import SettingsPanel from "@/components/settings/SettingsPanel";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
@@ -14,6 +15,7 @@ export default async function SettingsPage() {
         <p className="text-sm text-slate-500">{t("subtitle")}</p>
       </header>
       <SettingsPanel />
+      <AppVersionFooter />
     </div>
   );
 }

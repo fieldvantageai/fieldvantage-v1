@@ -75,5 +75,15 @@
   "upcoming": {
     "title": "Proximas execucoes",
     "empty": "Nenhuma ordem futura agendada."
+  },
+  "calendar": {
+    "noOrders": "Nenhuma ordem neste dia.",
+    "viewAll": "Ver todas",
+    "today": "Hoje",
+    "legendLabel": "Legenda das cores",
+    "legendTitle": "Legenda",
+    "legendOverdue": "Atrasada",
+    "legendActive": "Agendada / Em andamento",
+    "legendInactive": "Sem ordens ativas"
   }
 }
