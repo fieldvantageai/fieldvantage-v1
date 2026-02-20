@@ -12,9 +12,6 @@ export default async function LandingPage() {
   return (
     <div className="space-y-10">
       <div className="space-y-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-600">
-          {t("appName")}
-        </p>
         <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
           {t("landing.title")}
         </h1>
