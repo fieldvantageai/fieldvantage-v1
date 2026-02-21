@@ -41,8 +41,35 @@ const isPublicPath = (pathname: string) =>
 const isAuthOnlyPath = (pathname: string) =>
   AUTH_ONLY_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
+const MARKETING_ALLOWED_PATHS = ["/", "/invite/accept"];
+
+const isMarketingAllowed = (p: string) =>
+  MARKETING_ALLOWED_PATHS.some((m) => p === m || p.startsWith(`${m}/`));
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next();
+
+  const pathname = request.nextUrl.pathname;
+
+  // ── Hostname-based domain routing ─────────────────────────────────────────
+  // geklix.com / www.geklix.com → serve only marketing routes
+  // app.geklix.com / localhost  → serve the full SaaS app
+  const hostname = request.headers.get("host") ?? "";
+  const isLocal =
+    hostname.includes("localhost") || hostname.includes("127.0.0.1");
+  const isAppDomain = isLocal || hostname.startsWith("app.");
+
+  if (!isAppDomain) {
+    // Marketing domain: only allow "/" and "/invite/accept/*"
+    if (!isMarketingAllowed(pathname)) {
+      const dest = request.nextUrl.clone();
+      dest.host = "app.geklix.com";
+      return NextResponse.redirect(dest, { status: 301 });
+    }
+    // Skip all auth/tenant logic for marketing visitors
+    return response;
+  }
+  // ── End hostname routing ───────────────────────────────────────────────────
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
@@ -70,7 +97,6 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
   if (!user && !isPublicPath(pathname)) {
     const nextPath = `${pathname}${request.nextUrl.search}`;
     const redirectUrl = request.nextUrl.clone();

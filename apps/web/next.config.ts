@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_DATE: new Date().toISOString(),
     NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV ?? "development",
   },
+  // Allow local subdomain testing: add "127.0.0.1 app.localhost" to your hosts file
+  // and access http://app.localhost:3000 to simulate app.geklix.com locally
+  allowedDevOrigins: ["app.localhost"],
 };
 
 export default nextConfig;
