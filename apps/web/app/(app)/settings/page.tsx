@@ -9,10 +9,10 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-[var(--text)] sm:text-3xl">
           {t("title")}
         </h1>
-        <p className="text-sm text-slate-500">{t("subtitle")}</p>
+        <p className="text-sm text-slate-500 dark:text-[var(--text-muted)]">{t("subtitle")}</p>
       </header>
       <SettingsPanel />
       <AppVersionFooter />

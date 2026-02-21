@@ -25,7 +25,7 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 backdrop-blur-sm md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 backdrop-blur-sm md:hidden dark:border-[var(--border)] dark:bg-[var(--bg2)]/95"
       aria-label="Mobile navigation"
     >
       <ul className="flex items-stretch">
@@ -41,15 +41,17 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
                 href={item.href}
                 className={`flex min-h-[56px] w-full flex-col items-center justify-center gap-0.5 px-0.5 transition-colors duration-200 active:scale-95 ${
                   isActive
-                    ? "text-blue-600"
-                    : "text-slate-400 hover:text-slate-700"
+                    ? "text-brand-600 dark:text-brand-400"
+                    : "text-slate-400 hover:text-slate-700 dark:text-[var(--text-muted)] dark:hover:text-[var(--text)]"
                 }`}
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
               >
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-xl transition-colors duration-200 ${
-                    isActive ? "bg-blue-50" : ""
+                    isActive
+                      ? "bg-brand-50 dark:bg-[var(--primary-subtle)]"
+                      : ""
                   }`}
                 >
                   {icon}
@@ -63,7 +65,7 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
         })}
       </ul>
       {/* iOS safe area */}
-      <div className="h-safe-area-inset-bottom bg-white/95" />
+      <div className="h-safe-area-inset-bottom bg-white/95 dark:bg-[var(--bg2)]/95" />
     </nav>
   );
 }

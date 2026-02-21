@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40" width="140" height="40">
+  <!-- Icon: emerald rounded rect with G -->
+  <rect width="40" height="40" rx="10" fill="#16C784"/>
+  <text x="20" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="white">G</text>
+  <!-- Wordmark: Geklix in white for dark backgrounds -->
+  <text x="52" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="white" letter-spacing="-0.3">Geklix</text>
+</svg>

@@ -11,26 +11,31 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputId = id ?? name ?? label.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-slate-700" htmlFor={inputId}>
+        <label
+          className="text-sm font-medium text-slate-700 dark:text-[var(--text-muted)]"
+          htmlFor={inputId}
+        >
           {label}
         </label>
         <input
           ref={ref}
           id={inputId}
           name={name}
-          className={`w-full rounded-xl border bg-white/90 px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 ${
-            error ? "border-rose-400 focus:border-rose-400" : "border-slate-200/70"
+          className={`w-full rounded-xl border bg-white/90 px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:bg-[var(--surface)] dark:text-[var(--text)] dark:placeholder:text-[var(--text-muted)] dark:focus:border-brand-600/70 dark:focus:ring-brand-600/20 ${
+            error
+              ? "border-rose-400 focus:border-rose-400 dark:border-rose-500/70"
+              : "border-slate-200/70 dark:border-[var(--border)]"
           } ${className ?? ""}`}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${inputId}-error` : undefined}
           {...props}
         />
         {error ? (
-          <p className="text-xs text-rose-600" id={`${inputId}-error`}>
+          <p className="text-xs text-rose-600 dark:text-rose-400" id={`${inputId}-error`}>
             {error}
           </p>
         ) : helperText ? (
-          <p className="text-xs text-slate-500">{helperText}</p>
+          <p className="text-xs text-slate-500 dark:text-[var(--text-muted)]">{helperText}</p>
         ) : null}
       </div>
     );

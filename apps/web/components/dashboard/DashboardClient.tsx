@@ -134,20 +134,20 @@ export default function DashboardClient({
       value: snapshot.metrics.jobs_today,
       icon: ClipboardList,
       href: `/jobs?from=${toDateParam(new Date())}&to=${toDateParam(new Date())}`,
-      card: "bg-white/95 border-slate-200/70",
-      iconBg: "bg-slate-100",
-      iconColor: "text-slate-500",
-      valueColor: "text-slate-900"
+      card: "bg-white/95 border-slate-200/70 dark:bg-[var(--surface)] dark:border-[var(--border)]",
+      iconBg: "bg-slate-100 dark:bg-white/10",
+      iconColor: "text-slate-500 dark:text-slate-400",
+      valueColor: "text-slate-900 dark:text-[var(--text)]"
     },
     {
       label: t("cards.inProgressNow"),
       value: snapshot.metrics.in_progress_now,
       icon: TrendingUp,
       href: "/jobs?status=in_progress",
-      card: "bg-blue-50/60 border-blue-200/70",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
-      valueColor: "text-blue-800"
+      card: "bg-blue-50/60 border-blue-200/70 dark:bg-blue-900/20 dark:border-blue-800/30",
+      iconBg: "bg-blue-100 dark:bg-blue-900/40",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      valueColor: "text-blue-800 dark:text-blue-300"
     },
     {
       label: t("cards.overdue"),
@@ -156,20 +156,20 @@ export default function DashboardClient({
       href: `/jobs?to=${toDateParam(
         new Date(new Date().setDate(new Date().getDate() - 1))
       )}&status=in_progress`,
-      card: "bg-amber-50/60 border-amber-200/70",
-      iconBg: "bg-amber-100",
-      iconColor: "text-amber-600",
-      valueColor: "text-amber-900"
+      card: "bg-amber-50/60 border-amber-200/70 dark:bg-amber-900/20 dark:border-amber-800/30",
+      iconBg: "bg-amber-100 dark:bg-amber-900/40",
+      iconColor: "text-amber-600 dark:text-amber-400",
+      valueColor: "text-amber-900 dark:text-amber-300"
     },
     {
       label: t("cards.unassigned"),
       value: snapshot.metrics.unassigned,
       icon: UserX,
       href: "/jobs?unassigned=1",
-      card: "bg-red-50/60 border-red-200/70",
-      iconBg: "bg-red-100",
-      iconColor: "text-red-500",
-      valueColor: "text-red-900"
+      card: "bg-red-50/60 border-red-200/70 dark:bg-red-900/20 dark:border-red-800/30",
+      iconBg: "bg-red-100 dark:bg-red-900/40",
+      iconColor: "text-red-500 dark:text-red-400",
+      valueColor: "text-red-900 dark:text-red-300"
     }
   ];
 
@@ -310,7 +310,7 @@ export default function DashboardClient({
                   className={`rounded-2xl border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:rounded-3xl sm:p-5 ${item.card}`}
                 >
                   <div className="flex items-start justify-between gap-1">
-                    <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-500 sm:text-xs">
+                    <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-500 dark:text-[var(--text-muted)] sm:text-xs">
                       {item.label}
                     </p>
                     <span className={`shrink-0 rounded-full p-1.5 sm:p-2 ${item.iconBg}`}>

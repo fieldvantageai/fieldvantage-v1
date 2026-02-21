@@ -1,14 +1,113 @@
 @config "../tailwind.config.ts";
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────
+   Dark mode variant: tied to [data-theme="dark"] on <html>
+   Enables dark: prefix in all Tailwind utilities.
+───────────────────────────────────────────────────────────────── */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ─────────────────────────────────────────────────────────────────
+   DESIGN TOKENS — Light Mode (default)
+───────────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light;
+
+  /* Surfaces */
+  --bg:          #F7F9F8;
+  --bg2:         #EEF2F1;
+  --surface:     #FFFFFF;
+  --surface2:    #F3F5F4;
+  --border:      #E5E7EB;
+  --sidebar-bg:  #EAEEEC;
+
+  /* Typography */
+  --text:       #0F172A;
+  --text-muted: #64748B;
+
+  /* Primary — Geklix Emerald */
+  --primary:        #16C784;
+  --primary-hover:  #12B76A;
+  --primary-active: #0E9F6E;
+  --primary-subtle: #ecfdf5;
+  --primary-muted:  #d1fae5;
+
+  /* Semantic (same in both modes — meaning must not change) */
+  --success: #16C784;
+  --warning: #F59E0B;
+  --danger:  #EF4444;
+  --info:    #2D8CFF;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   DESIGN TOKENS — Dark Mode
+───────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces — slightly lighter than original for better depth perception */
+  --bg:          #0E1626;
+  --bg2:         #131F35;
+  --surface:     rgba(255, 255, 255, 0.08);
+  --surface2:    rgba(255, 255, 255, 0.11);
+  --border:      rgba(255, 255, 255, 0.10);
+  --sidebar-bg:  #0B1422;
+
+  /* Typography */
+  --text:       #E5E7EB;
+  --text-muted: #94A3B8;
+
+  /* Primary — same emerald in dark mode */
+  --primary:        #16C784;
+  --primary-hover:  #12B76A;
+  --primary-active: #0E9F6E;
+  --primary-subtle: rgba(22, 199, 132, 0.12);
+  --primary-muted:  rgba(22, 199, 132, 0.20);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   THEME TRANSITION — smooth switch between light and dark
+───────────────────────────────────────────────────────────────── */
+html {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BASE LAYER
+───────────────────────────────────────────────────────────────── */
 body {
-  @apply bg-white text-slate-900 antialiased;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  @apply antialiased;
+  min-height: 100vh;
 }
 
 a {
-  @apply text-brand-600 hover:text-brand-700;
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   SCROLLBAR (dark mode refinement)
+───────────────────────────────────────────────────────────────── */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }

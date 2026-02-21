@@ -7,7 +7,8 @@ import { Check, ChevronDown, Loader2 } from "lucide-react";
 
 import { useClientT } from "@/lib/i18n/useClientT";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-
+import { ThemedLogo } from "@/components/ui/ThemedLogo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import FloatingActionButton from "../ui/FloatingActionButton";
 import MobileBottomBar from "./MobileBottomBar";
 import Sidebar from "./Sidebar";
@@ -186,6 +187,7 @@ export default function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     setOpenMenu(null);
   }, [pathname]);
+
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -229,8 +231,7 @@ export default function AppShell({ children }: AppShellProps) {
     window.localStorage.setItem(sidebarStorageKey, sidebarCollapsed ? "1" : "0");
   }, [sidebarCollapsed]);
 
-  const companyLabel =
-    companyName?.trim() || tCompanies("fallbackName");
+  const companyLabel = companyName?.trim() || tCompanies("fallbackName");
   const companyInitial = companyLabel.charAt(0).toUpperCase();
   const showFab =
     pathname === "/dashboard" || pathname === "/jobs" || pathname === "/customers";
@@ -377,8 +378,6 @@ export default function AppShell({ children }: AppShellProps) {
         data?: Array<{ company_id: string; company_name: string; role: string }>;
       };
       setCompanies(payload.data ?? []);
-      console.log("User companies:", payload.data ?? []);
-      console.log("Company count:", (payload.data ?? []).length);
     } finally {
       setCompaniesLoaded(true);
       setSwitcherLoading(false);
@@ -428,7 +427,9 @@ export default function AppShell({ children }: AppShellProps) {
         stopCompanySwitching();
         return;
       }
-      const nextCompany = companies.find((company) => company.company_id === companyId);
+      const nextCompany = companies.find(
+        (company) => company.company_id === companyId
+      );
       if (nextCompany) {
         setCompanyName(nextCompany.company_name);
       }
@@ -469,12 +470,13 @@ export default function AppShell({ children }: AppShellProps) {
     loadCompanies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="flex min-h-screen">
         {/* Desktop Sidebar */}
         <Sidebar
-          className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:border-r lg:border-slate-200/70 lg:bg-white/95 transition-[width] duration-300 ease-in-out ${
+          className={`hidden lg:flex lg:h-screen lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:border-r transition-[width] duration-300 ease-in-out ${
             sidebarCollapsed ? "lg:w-[72px]" : "lg:w-60"
           }`}
           userRole={userRole}
@@ -483,25 +485,24 @@ export default function AppShell({ children }: AppShellProps) {
         />
 
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-sm">
+          {/* ── Top Bar ─────────────────────────────────────────────── */}
+          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/90">
             <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6">
-              {/* Left: Logo on mobile */}
+              {/* Left: Logo on mobile / Search on desktop */}
               <div className="flex min-w-0 items-center gap-3">
                 <Link
                   href="/dashboard"
                   className="flex items-center gap-2 lg:hidden"
                   aria-label={t("nav.dashboard")}
                 >
-                  <img
-                    src="/brand/logo.png"
-                    alt={t("appName")}
-                    className="h-8 w-8 rounded-xl object-contain"
-                  />
-                  <span className="text-sm font-bold text-slate-900">{t("appName")}</span>
+                  <ThemedLogo iconOnly className="h-8 w-8 rounded-xl object-contain" />
+                  <span className="text-sm font-bold text-slate-900 dark:text-[var(--text)]">
+                    Geklix
+                  </span>
                 </Link>
                 <div className="hidden items-center lg:flex">
                   <div className="w-full min-w-[200px] max-w-sm">
-                    <div className="flex items-center gap-2 rounded-xl border border-slate-200/70 bg-slate-50 px-3 py-2 text-sm text-slate-500 transition focus-within:border-brand-300 focus-within:bg-white focus-within:shadow-sm">
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200/70 bg-slate-50 px-3 py-2 text-sm text-slate-500 transition focus-within:border-brand-300 focus-within:bg-white focus-within:shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:focus-within:border-brand-600/50 dark:focus-within:bg-[var(--surface2)]">
                       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                         <path
                           d="M11 19a8 8 0 1 1 5.657-2.343L21 21"
@@ -514,17 +515,20 @@ export default function AppShell({ children }: AppShellProps) {
                       <input
                         type="text"
                         placeholder={t("actions.search")}
-                        className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 focus:outline-none"
+                        className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 focus:outline-none dark:text-[var(--text)] dark:placeholder:text-[var(--text-muted)]"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="relative flex min-w-0 items-center gap-3 text-left">
+
+              {/* Right: actions + company + avatar */}
+              <div className="relative flex min-w-0 items-center gap-2 text-left">
+                {/* Invite notifications */}
                 {inviteUnreadCount > 0 ? (
                   <Link
                     href="/invites"
-                    className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600"
+                    className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
                     aria-label={t("nav.invites")}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -550,9 +554,11 @@ export default function AppShell({ children }: AppShellProps) {
                     </span>
                   </Link>
                 ) : null}
+
+                {/* Messages */}
                 <Link
                   href="/messages"
-                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600"
+                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
                   aria-label={t("nav.messages")}
                 >
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -571,23 +577,33 @@ export default function AppShell({ children }: AppShellProps) {
                     </span>
                   ) : null}
                 </Link>
-                <div className="mx-1 h-6 w-px bg-slate-200/80" aria-hidden="true" />
-                <div className="flex items-center gap-3">
+
+                {/* Theme toggle */}
+                <ThemeToggle />
+
+                <div
+                  className="mx-1 h-6 w-px bg-slate-200/80 dark:bg-[var(--border)]"
+                  aria-hidden="true"
+                />
+
+                {/* Company switcher + account */}
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     disabled={isSwitchingCompany}
-                    className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition hover:bg-slate-50/70 ${
+                    className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold transition hover:bg-slate-50/70 dark:hover:bg-[var(--surface2)] ${
                       isSwitchingCompany ? "cursor-not-allowed opacity-70" : ""
                     }`}
                     onClick={() =>
-                      setOpenMenu((prev) => (prev === "workspace" ? null : "workspace"))
+                      setOpenMenu((prev) =>
+                        prev === "workspace" ? null : "workspace"
+                      )
                     }
                     aria-label={tCompanies("switcher.label")}
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      {/* Company logo/initials — BEFORE the name */}
                       {isLoadingCompany ? (
-                        <span className="h-7 w-7 shrink-0 animate-pulse rounded-lg bg-slate-100" />
+                        <span className="h-7 w-7 shrink-0 animate-pulse rounded-lg bg-slate-100 dark:bg-[var(--surface2)]" />
                       ) : companyLogoUrl ? (
                         <img
                           src={companyLogoUrl}
@@ -595,11 +611,11 @@ export default function AppShell({ children }: AppShellProps) {
                           className="h-7 w-7 shrink-0 rounded-lg object-cover"
                         />
                       ) : (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/30 dark:text-brand-400">
                           {companyInitials || companyInitial}
                         </span>
                       )}
-                      <span className="truncate text-sm font-semibold text-slate-800">
+                      <span className="truncate text-sm font-semibold text-slate-800 dark:text-[var(--text)]">
                         {isLoadingCompany ? t("status.loading") : companyLabel}
                       </span>
                       {isSwitchingCompany ? (
@@ -607,67 +623,77 @@ export default function AppShell({ children }: AppShellProps) {
                       ) : null}
                     </span>
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition ${
+                      className={`h-4 w-4 text-slate-400 transition dark:text-[var(--text-muted)] ${
                         openMenu === "workspace" ? "rotate-180" : ""
                       }`}
                     />
                   </button>
+
+                  {/* Avatar button */}
                   <button
                     type="button"
                     onClick={() =>
-                      setOpenMenu((prev) => (prev === "account" ? null : "account"))
+                      setOpenMenu((prev) =>
+                        prev === "account" ? null : "account"
+                      )
                     }
-                    className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white p-1 pr-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                    className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white p-1 pr-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:hover:bg-[var(--surface2)]"
                     aria-label={t("nav.profile")}
                   >
                     {userAvatarUrl ? (
                       <img
                         src={userAvatarUrl}
                         alt={userName ?? t("status.loading")}
-                        className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200/60"
+                        className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200/60 dark:ring-[var(--border)]"
                       />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600 dark:bg-[var(--surface2)] dark:text-[var(--text-muted)]">
                         {userInitials}
                       </span>
                     )}
                     <ChevronDown
-                      className={`h-3.5 w-3.5 text-slate-400 transition ${
+                      className={`h-3.5 w-3.5 text-slate-400 transition dark:text-[var(--text-muted)] ${
                         openMenu === "account" ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                 </div>
+
+                {/* Workspace dropdown */}
                 {openMenu === "workspace" ? (
                   <div
                     ref={workspaceMenuRef}
-                    className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg"
+                    className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg dark:border-[var(--border)] dark:bg-[var(--bg2)]"
                   >
                     {canSwitchCompany ? (
                       <div className="space-y-2">
                         {switcherLoading ? (
-                          <p className="px-2 text-xs text-slate-500">
+                          <p className="px-2 text-xs text-slate-500 dark:text-[var(--text-muted)]">
                             {tCompanies("switcher.loading")}
                           </p>
                         ) : companies.length === 0 ? (
-                          <p className="px-2 text-xs text-slate-500">
+                          <p className="px-2 text-xs text-slate-500 dark:text-[var(--text-muted)]">
                             {tCompanies("switcher.empty")}
                           </p>
                         ) : (
                           <div className="space-y-2">
                             {companies.map((company) => {
-                              const isActive = company.company_id === userCompanyId;
-                              const isSwitching = switchingCompanyId === company.company_id;
+                              const isActive =
+                                company.company_id === userCompanyId;
+                              const isSwitching =
+                                switchingCompanyId === company.company_id;
                               return (
                                 <button
                                   key={company.company_id}
                                   type="button"
-                                  onClick={() => handleSwitchCompany(company.company_id)}
+                                  onClick={() =>
+                                    handleSwitchCompany(company.company_id)
+                                  }
                                   disabled={switchingCompanyId !== null}
                                   className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs transition duration-150 ${
                                     isActive
-                                      ? "border-brand-200 bg-brand-50 text-brand-700"
-                                      : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                                      ? "border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-600/30 dark:bg-brand-900/20 dark:text-brand-400"
+                                      : "border-slate-200/70 bg-white text-slate-700 hover:border-brand-200 hover:bg-brand-50 dark:border-[var(--border)] dark:bg-transparent dark:text-[var(--text)] dark:hover:bg-[var(--surface2)]"
                                   } ${switchingCompanyId !== null ? "cursor-not-allowed opacity-70" : ""}`}
                                 >
                                   <div className="min-w-0">
@@ -678,11 +704,11 @@ export default function AppShell({ children }: AppShellProps) {
                                     >
                                       {company.company_name}
                                     </span>
-                                    <span className="text-[10px] uppercase text-slate-400">
+                                    <span className="text-[10px] uppercase text-slate-400 dark:text-[var(--text-muted)]">
                                       {company.role}
                                     </span>
                                   </div>
-                                  <div className="ml-3 flex h-5 w-5 items-center justify-center text-brand-600">
+                                  <div className="ml-3 flex h-5 w-5 items-center justify-center text-brand-600 dark:text-brand-400">
                                     {isSwitching ? (
                                       <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : isActive ? (
@@ -694,13 +720,13 @@ export default function AppShell({ children }: AppShellProps) {
                             })}
                           </div>
                         )}
-                        <div className="my-1 h-px bg-slate-200/70" />
+                        <div className="my-1 h-px bg-slate-200/70 dark:bg-[var(--border)]" />
                       </div>
                     ) : null}
                     {userRole === "owner" ? (
                       <Link
                         href="/settings/company"
-                        className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                        className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-[var(--text)] dark:hover:bg-[var(--surface2)]"
                         onClick={() => setOpenMenu(null)}
                       >
                         {tCompanies("title")}
@@ -708,29 +734,35 @@ export default function AppShell({ children }: AppShellProps) {
                     ) : null}
                   </div>
                 ) : null}
+
+                {/* Account dropdown */}
                 {openMenu === "account" ? (
                   <div
                     ref={accountMenuRef}
-                    className="absolute right-0 top-12 z-40 w-56 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg"
+                    className="absolute right-0 top-12 z-40 w-56 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg dark:border-[var(--border)] dark:bg-[var(--bg2)]"
                   >
                     <Link
-                      href={userEmployeeId ? `/employees/${userEmployeeId}/edit` : "/employees"}
-                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                      href={
+                        userEmployeeId
+                          ? `/employees/${userEmployeeId}/edit`
+                          : "/employees"
+                      }
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-[var(--text)] dark:hover:bg-[var(--surface2)]"
                       onClick={() => setOpenMenu(null)}
                     >
                       {t("nav.profile")}
                     </Link>
                     <Link
                       href="/settings"
-                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-[var(--text)] dark:hover:bg-[var(--surface2)]"
                       onClick={() => setOpenMenu(null)}
                     >
                       {t("nav.settings")}
                     </Link>
-                    <div className="my-1 h-px bg-slate-200/70" />
+                    <div className="my-1 h-px bg-slate-200/70 dark:bg-[var(--border)]" />
                     <button
                       type="button"
-                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-rose-600 transition hover:bg-rose-50"
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-sm text-rose-600 transition hover:bg-rose-50 dark:hover:bg-rose-950/30"
                       onClick={async () => {
                         setOpenMenu(null);
                         await fetch("/api/auth/logout", { method: "POST" });
@@ -746,6 +778,7 @@ export default function AppShell({ children }: AppShellProps) {
             </div>
           </header>
 
+          {/* ── Main Content ─────────────────────────────────────── */}
           <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 sm:px-6 md:pb-8 lg:px-10 lg:py-8">
             <main className="space-y-6">
               {toast ? (

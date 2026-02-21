@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
+import { ThemeSection } from "@/components/settings/ThemeSection";
 import { defaultEmployeeRoles } from "@/features/employees/roles";
 import { locales, type Locale } from "@/lib/i18n/config";
 import { useLocale } from "@/lib/i18n/localeClient";
@@ -208,6 +209,10 @@ export default function SettingsPanel() {
 
       {activeTab === "app" ? (
         <div className="space-y-6">
+          <Section title="Tema" description="Personaliza a aparência visual do app.">
+            <ThemeSection />
+          </Section>
+
           <Section
             title={t("locale.title")}
             description={t("locale.subtitle")}
