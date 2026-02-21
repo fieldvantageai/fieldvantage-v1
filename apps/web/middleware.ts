@@ -71,6 +71,15 @@ export async function middleware(request: NextRequest) {
   }
   // ── End hostname routing ───────────────────────────────────────────────────
 
+  // On the app domain, "/" has no content — redirect to the app entry point.
+  // The auth logic below will then redirect logged-in users to /dashboard.
+  if (pathname === "/") {
+    const dest = request.nextUrl.clone();
+    dest.pathname = "/entrar";
+    dest.search = "";
+    return NextResponse.redirect(dest);
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
