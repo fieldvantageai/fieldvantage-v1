@@ -268,7 +268,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         />
 
         {/* Footer fixo */}
-        <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm">
+        <div className="fixed bottom-16 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm md:bottom-0 dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
           <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3">
             <Button
               type="button"

@@ -29,6 +29,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <head>
+        <meta charSet="utf-8" />
         {/* Must be the first script in <head> to prevent theme flash */}
         <script dangerouslySetInnerHTML={{ __html: FOUC_SCRIPT }} />
         <link rel="icon" href="/brand/icon.svg" type="image/svg+xml" />

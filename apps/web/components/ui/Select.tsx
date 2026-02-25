@@ -17,32 +17,45 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const inputId = id ?? name ?? label.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-slate-700" htmlFor={inputId}>
+        <label
+          className="text-sm font-medium"
+          style={{ color: "var(--text-muted)" }}
+          htmlFor={inputId}
+        >
           {label}
         </label>
         <select
           ref={ref}
           id={inputId}
           name={name}
-          className={`w-full appearance-none rounded-xl border bg-white/90 px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 ${
-            error ? "border-rose-400 focus:border-rose-400" : "border-slate-200/70"
+          style={{
+            background: "var(--surface)",
+            color: "var(--text)",
+            borderColor: error ? undefined : "var(--border)",
+          }}
+          className={`w-full appearance-none rounded-xl border px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:border-brand-600/70 dark:focus:ring-brand-600/20 ${
+            error ? "border-rose-400 focus:border-rose-400 dark:border-rose-500/70" : ""
           } ${className ?? ""}`}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${inputId}-error` : undefined}
           {...props}
         >
           {options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option
+              key={option.value}
+              value={option.value}
+              style={{ background: "var(--bg2)", color: "var(--text)" }}
+            >
               {option.label}
             </option>
           ))}
         </select>
         {error ? (
-          <p className="text-xs text-rose-600" id={`${inputId}-error`}>
+          <p className="text-xs text-rose-600 dark:text-rose-400" id={`${inputId}-error`}>
             {error}
           </p>
         ) : helperText ? (
-          <p className="text-xs text-slate-500">{helperText}</p>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>{helperText}</p>
         ) : null}
       </div>
     );

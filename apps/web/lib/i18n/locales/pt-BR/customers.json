@@ -1,6 +1,6 @@
 {
   "title": "Clientes",
-  "subtitle": "Gerencie seus clientes, acompanhe servicos e mantenha tudo organizado.",
+  "subtitle": "Gerencie seus clientes, acompanhe serviços e mantenha tudo organizado.",
   "actions": {
     "newJob": "Criar ordem",
     "view": "Ver detalhes",
@@ -13,7 +13,7 @@
   },
   "new": {
     "title": "Novo cliente",
-    "subtitle": "Cadastre informacoes basicas do cliente."
+    "subtitle": "Cadastre informações básicas do cliente."
   },
   "edit": {
     "title": "Editar cliente",
@@ -26,36 +26,36 @@
     "stats": {
       "total": "Total de ordens",
       "inProgress": "Em andamento",
-      "completed": "Concluidas"
+      "completed": "Concluídas"
     },
     "summary": {
-      "title": "Informacoes do cliente",
-      "subtitle": "Contato e enderecos cadastrados.",
+      "title": "Informações do cliente",
+      "subtitle": "Contato e endereços cadastrados.",
       "contact": "Contato",
-      "address": "Enderecos"
+      "address": "Endereços"
     },
     "address": {
       "primary": "Principal",
-      "notes": "Notas do endereco",
-      "fallbackLabel": "Endereco"
+      "notes": "Notas do endereço",
+      "fallbackLabel": "Endereço"
     },
     "jobs": {
       "title": "Ordens do cliente",
       "subtitle": "Ordens vinculadas a este cliente.",
       "empty": "Nenhuma ordem vinculada a este cliente.",
-      "titleFallback": "Ordem sem titulo",
-      "colTitle": "Titulo",
+      "titleFallback": "Ordem sem título",
+      "colTitle": "Título",
       "colStatus": "Status",
       "colDate": "Data agendada"
     },
     "history": {
-      "title": "Historico recente",
+      "title": "Histórico recente",
       "subtitle": "Sem registros ainda",
-      "empty": "Nenhuma ordem vinculada ate o momento."
+      "empty": "Nenhuma ordem vinculada até o momento."
     }
   },
   "search": {
-    "title": "Busca rapida",
+    "title": "Busca rápida",
     "description": "Encontre clientes por nome.",
     "label": "Pesquisar",
     "placeholder": "Buscar por nome, email ou telefone...",
@@ -73,16 +73,16 @@
   },
   "empty": {
     "title": "Nenhum cliente ainda",
-    "subtitle": "Clientes permitem criar ordens, agendar servicos e acompanhar o historico.",
+    "subtitle": "Clientes permitem criar ordens, agendar serviços e acompanhar o histórico.",
     "cta": "Adicionar primeiro cliente"
   },
   "sections": {
     "identity": "Dados do cliente",
     "identitySubtitle": "Nome completo e empresa vinculada.",
     "contact": "Contato",
-    "contactSubtitle": "Email e telefone para comunicacao.",
-    "notes": "Observacoes",
-    "notesSubtitle": "Informacoes extras e preferencias do cliente."
+    "contactSubtitle": "Email e telefone para comunicação.",
+    "notes": "Observações",
+    "notesSubtitle": "Informações extras e preferências do cliente."
   },
   "fields": {
     "name": "Nome do cliente",
@@ -92,11 +92,11 @@
     "email": "Email",
     "phone": "Telefone",
     "company": "Empresa",
-    "notes": "Observacoes",
-    "address": "Endereco"
+    "notes": "Observações",
+    "address": "Endereço"
   },
   "helpers": {
-    "phone": "Usado para contato rapido"
+    "phone": "Usado para contato rápido"
   },
   "placeholders": {
     "name": "Cliente Exemplo",
@@ -105,17 +105,17 @@
     "email": "cliente@email.com",
     "phone": "Ex: (11) 99999-9999",
     "company": "Nome da empresa (opcional)",
-    "notes": "Ex: prefere contato a tarde, cachorro no quintal, portao azul",
-    "address": "Rua, numero, cidade"
+    "notes": "Ex: prefere contato à tarde, cachorro no quintal, portão azul",
+    "address": "Rua, número, cidade"
   },
   "addresses": {
-    "title": "Enderecos",
-    "subtitle": "Enderecos definem onde os servicos acontecem.",
-    "add": "Adicionar endereco +",
-    "empty": "Adicione um endereco para criar ordens e agendamentos.",
+    "title": "Endereços",
+    "subtitle": "Endereços definem onde os serviços acontecem.",
+    "add": "Adicionar endereço +",
+    "empty": "Adicione um endereço para criar ordens e agendamentos.",
     "card": {
-      "title": "Endereco",
-      "primary": "Endereco principal",
+      "title": "Endereço",
+      "primary": "Endereço principal",
       "optional": "Opcional",
       "primaryLabel": "Principal",
       "setPrimary": "Definir como principal",
@@ -124,23 +124,23 @@
     "fields": {
       "type": "Tipo",
       "label": "Etiqueta (opcional)",
-      "addressLine1": "Rua e numero",
+      "addressLine1": "Rua e número",
       "addressLine2": "Complemento",
       "city": "Cidade",
       "state": "Estado",
       "zip": "CEP",
-      "country": "Pais",
-      "notes": "Notas do endereco (opcional)"
+      "country": "País",
+      "notes": "Notas do endereço (opcional)"
     },
     "placeholders": {
-      "type": "Selecione o tipo de endereco",
-      "label": "Ex: Casa, Escritorio, Loja",
-      "addressLine1": "Ex: 123 Main St",
+      "type": "Selecione o tipo de endereço",
+      "label": "Ex: Casa, Escritório, Loja",
+      "addressLine1": "Ex: Rua Principal, 123",
       "addressLine2": "Ex: Apartamento 2B, Sala 301",
-      "city": "Ex: Boston",
-      "state": "Ex: MA",
-      "zip": "Ex: 02118",
-      "country": "USA",
+      "city": "Ex: São Paulo",
+      "state": "Ex: SP",
+      "zip": "Ex: 01310-100",
+      "country": "Brasil",
       "notes": "Ex: Entrada pelos fundos, tocar campainha"
     },
     "options": {
@@ -156,9 +156,9 @@
     "updateError": "Falha ao atualizar cliente.",
     "updateFallback": "Erro inesperado ao atualizar.",
     "deleteConfirm": "Excluir este cliente?",
-    "deleteWarning": "Esta acao nao pode ser desfeita. As ordens vinculadas serao mantidas.",
+    "deleteWarning": "Esta ação não pode ser desfeita. As ordens vinculadas serão mantidas.",
     "deleteError": "Falha ao remover cliente.",
     "deleteFallback": "Erro inesperado ao remover.",
-    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusao?"
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"
   }
 }

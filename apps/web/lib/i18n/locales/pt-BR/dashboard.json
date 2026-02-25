@@ -1,12 +1,12 @@
 {
   "title": "Painel",
-  "subtitle": "Visao rapida das operacoes do dia.",
+  "subtitle": "Visão rápida das operações do dia.",
   "cards": {
     "jobsToday": "Ordens de hoje",
     "jobsWeek": "Ordens na semana",
     "inProgress": "Em andamento",
-    "inProgressNow": "Em execucao agora",
-    "completedToday": "Concluidas hoje",
+    "inProgressNow": "Em execução agora",
+    "completedToday": "Concluídas hoje",
     "overdue": "Atrasadas",
     "unassigned": "Sem colaborador"
   },
@@ -17,25 +17,25 @@
   },
   "today": {
     "title": "Ordens de hoje",
-    "subtitle": "O que esta agendado para hoje.",
-    "timeLabel": "Horario",
-    "noAssignees": "Sem colaboradores atribuidos",
+    "subtitle": "O que está agendado para hoje.",
+    "timeLabel": "Horário",
+    "noAssignees": "Sem colaboradores atribuídos",
     "viewAll": "Ver todas as ordens",
     "emptyTitle": "Nenhuma ordem para hoje",
     "emptySubtitle": "Crie a primeira ordem do dia para sua equipe.",
     "createJob": "Criar ordem"
   },
   "live": {
-    "title": "Execucoes ao vivo",
+    "title": "Execuções ao vivo",
     "subtitle": "Ordens em andamento agora.",
-    "emptyTitle": "Nenhuma execucao ativa agora",
-    "emptySubtitle": "Assim que houver ordens em andamento, elas aparecerao aqui.",
-    "noAssignees": "Sem colaboradores atribuidos",
-    "elapsed": "{value} em execucao"
+    "emptyTitle": "Nenhuma execução ativa agora",
+    "emptySubtitle": "Assim que houver ordens em andamento, elas aparecerão aqui.",
+    "noAssignees": "Sem colaboradores atribuídos",
+    "elapsed": "{value} em execução"
   },
   "attention": {
-    "title": "Atencao necessaria",
-    "subtitle": "Ordens que precisam de acao.",
+    "title": "Atenção necessária",
+    "subtitle": "Ordens que precisam de ação.",
     "overdue": "Atrasada",
     "unassigned": "Sem colaborador",
     "shouldStart": "Deveria ter iniciado",
@@ -54,26 +54,26 @@
   },
   "progress": {
     "plannedLabel": "Planejadas hoje:",
-    "completedLabel": "Concluidas hoje:",
+    "completedLabel": "Concluídas hoje:",
     "inProgressLabel": "Em andamento:",
     "remainingLabel": "Restantes:",
     "empty": "Nenhuma ordem agendada para hoje."
   },
   "lastUpdated": {
     "justNow": "Atualizado agora",
-    "lessThanMinute": "Atualizado ha menos de 1 min",
-    "minutesPrefix": "Atualizado ha",
+    "lessThanMinute": "Atualizado há menos de 1 min",
+    "minutesPrefix": "Atualizado há",
     "minutesSuffix": "min"
   },
   "quick": {
-    "title": "Acoes rapidas",
-    "subtitle": "Atalhos para operacoes frequentes.",
+    "title": "Ações rápidas",
+    "subtitle": "Atalhos para operações frequentes.",
     "createJob": "Criar ordem",
     "inviteEmployee": "Convidar colaborador",
     "addCustomer": "Adicionar cliente"
   },
   "upcoming": {
-    "title": "Proximas execucoes",
+    "title": "Próximas execuções",
     "empty": "Nenhuma ordem futura agendada."
   },
   "calendar": {

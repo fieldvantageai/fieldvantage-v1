@@ -35,7 +35,7 @@
     },
     "jobs": {
       "title": "Ordens alocadas",
-      "subtitle": "Ordens em que este colaborador esta alocado.",
+      "subtitle": "Ordens em que este colaborador está alocado.",
       "empty": "Nenhuma ordem alocada para este colaborador.",
       "titleFallback": "Ordem sem título",
       "colTitle": "Título",
@@ -98,7 +98,7 @@
     "identity": "Dados do colaborador",
     "identitySubtitle": "Nome completo e cargo na equipe.",
     "contact": "Contato",
-    "contactSubtitle": "Email e telefone para comunicacao.",
+    "contactSubtitle": "Email e telefone para comunicação.",
     "address": "Endereço",
     "addressSubtitle": "Endereço residencial ou comercial.",
     "notes": "Observações",
@@ -141,7 +141,7 @@
     "state": "Estado",
     "zipCode": "CEP",
     "country": "Brasil",
-    "notes": "Ex: disponivel aos fins de semana, tem moto própria"
+    "notes": "Ex: disponível aos fins de semana, tem moto própria"
   },
   "invite": {
     "createdTitle": "Colaborador criado",

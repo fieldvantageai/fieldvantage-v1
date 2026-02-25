@@ -49,7 +49,7 @@ export default async function EditEmployeePage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
+      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-36 md:pb-24">
         <EditEmployeeForm employee={employee} />
       </div>
     </div>

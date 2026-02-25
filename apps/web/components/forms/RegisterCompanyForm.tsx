@@ -196,14 +196,14 @@ export default function RegisterCompanyForm() {
             onClick={() => onSelect(option.value)}
             className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-4 text-left text-sm transition ${
               isSelected
-                ? "border-brand-300 bg-brand-50 text-brand-700"
-                : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50"
+                ? "border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-600/50 dark:bg-[var(--primary-subtle)] dark:text-brand-300"
+                : "border-slate-200/70 bg-white/90 text-slate-700 hover:border-brand-200 hover:bg-brand-50 dark:border-[var(--border)] dark:bg-[var(--surface2)] dark:text-[var(--text)] dark:hover:border-brand-600/40 dark:hover:bg-[var(--primary-subtle)]"
             }`}
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm dark:bg-[var(--surface)] dark:text-brand-400">
               {option.icon}
             </span>
-            <span className="font-semibold text-slate-900">{option.title}</span>
+            <span className="font-semibold text-slate-900 dark:text-[var(--text)]">{option.title}</span>
           </button>
         );
       })}
@@ -242,12 +242,12 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {showHeader ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="flex items-center justify-between">
             <button
               type="button"
               onClick={handleBack}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 text-brand-600 transition hover:bg-slate-50/70"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 text-brand-600 transition hover:bg-slate-50/70 dark:border-[var(--border)] dark:text-brand-400 dark:hover:bg-[var(--surface2)]"
               aria-label={tCommon("actions.back")}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -261,25 +261,25 @@ export default function RegisterCompanyForm() {
                 />
               </svg>
             </button>
-            <p className="text-sm font-semibold text-slate-900">FieldVantage</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">Geklix</p>
             <div className="h-10 w-10" aria-hidden="true" />
           </div>
         </div>
       ) : null}
 
       {step === "role" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">
               {t("onboarding.role.title")}
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => setStep("ownerAccount")}
-                className="flex w-full items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 text-left text-sm font-semibold text-slate-900 transition hover:border-brand-200 hover:bg-brand-50"
+                className="flex w-full items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 text-left text-sm font-semibold text-slate-900 transition hover:border-brand-200 hover:bg-brand-50 dark:border-[var(--border)] dark:bg-[var(--surface2)] dark:text-[var(--text)] dark:hover:border-brand-600/40 dark:hover:bg-[var(--primary-subtle)]"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm dark:bg-[var(--surface2)] dark:text-brand-400">
                   {renderIcon("M12 6a4 4 0 1 1 0 8 4 4 0 0 1 0-8")}
                 </span>
                 {t("onboarding.role.owner")}
@@ -287,9 +287,9 @@ export default function RegisterCompanyForm() {
               <button
                 type="button"
                 onClick={() => setStep("employeeAccess")}
-                className="flex w-full items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 text-left text-sm font-semibold text-slate-900 transition hover:border-brand-200 hover:bg-brand-50"
+                className="flex w-full items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-4 text-left text-sm font-semibold text-slate-900 transition hover:border-brand-200 hover:bg-brand-50 dark:border-[var(--border)] dark:bg-[var(--surface2)] dark:text-[var(--text)] dark:hover:border-brand-600/40 dark:hover:bg-[var(--primary-subtle)]"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm dark:bg-[var(--surface2)] dark:text-brand-400">
                   {renderIcon("M7 8a3 3 0 1 1 0 6M17 8a3 3 0 1 1 0 6M4 18a4 4 0 0 1 8 0M12 18a4 4 0 0 1 8 0")}
                 </span>
                 {t("onboarding.role.employee")}
@@ -300,16 +300,16 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "employeeAccess" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
             <div className="space-y-2 text-center">
-              <p className="text-base font-semibold text-slate-900">
+              <p className="text-base font-semibold text-slate-900 dark:text-[var(--text)]">
                 {t("onboarding.employeeAccess.title")}
               </p>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-[var(--text-muted)]">
                 {t("onboarding.employeeAccess.message")}
               </p>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-[var(--text-muted)]">
                 {t("onboarding.employeeAccess.followup")}
               </p>
             </div>
@@ -333,13 +333,13 @@ export default function RegisterCompanyForm() {
           </div>
 
           {employeeRequestModalOpen ? (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
-              <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 dark:bg-black/60">
+              <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:border dark:border-[var(--border)] dark:bg-[var(--bg2)]">
                 <div className="mb-4 flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setEmployeeRequestModalOpen(false)}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 text-brand-600 transition hover:bg-slate-50/70"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 text-brand-600 transition hover:bg-slate-50/70 dark:border-[var(--border)] dark:text-brand-400 dark:hover:bg-[var(--surface2)]"
                     aria-label={tCommon("actions.back")}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -353,7 +353,7 @@ export default function RegisterCompanyForm() {
                       />
                     </svg>
                   </button>
-                  <p className="text-sm font-semibold text-slate-900">FieldVantage</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">Geklix</p>
                   <div className="h-10 w-10" aria-hidden="true" />
                 </div>
                 <div className="space-y-4">
@@ -427,13 +427,13 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "employeeAccessSent" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">
               {t("onboarding.employeeAccess.success")}
             </p>
             {lastRequest ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-[var(--text-muted)]">
                 {t("onboarding.employeeAccess.requestLogged")}
               </p>
             ) : null}
@@ -445,7 +445,7 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "ownerAccount" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
             <Input
               label={t("onboarding.owner.fullName")}
@@ -483,9 +483,9 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "businessType" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">
               {t("onboarding.businessType.title")}
             </p>
             {renderOptionGrid(businessOptions, industry, (value) =>
@@ -505,9 +505,9 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "teamSize" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">
               {t("onboarding.teamSize.title")}
             </p>
             {renderOptionGrid(teamOptions, teamSize, (value) =>
@@ -527,7 +527,7 @@ export default function RegisterCompanyForm() {
       ) : null}
 
       {step === "companyName" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-[var(--border)] dark:bg-[var(--surface)]">
           <div className="space-y-4">
             <Input
               label={t("onboarding.companyName.label")}

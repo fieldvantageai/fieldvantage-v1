@@ -1,5 +1,5 @@
 {
-  "appName": "FieldVantage",
+  "appName": "Geklix",
   "workspace": "Ambiente",
   "actions": {
     "save": "Salvar",
@@ -48,15 +48,15 @@
     "inactive": "Inativo"
   },
   "landing": {
-    "title": "Operacoes de campo com visao clara e execucao simples.",
-    "subtitle": "Centralize equipes, clientes e ordens de servico em uma experiencia limpa e rapida para o dia a dia.",
+    "title": "Operações de campo com visão clara e execução simples.",
+    "subtitle": "Centralize equipes, clientes e ordens de serviço em uma experiência limpa e rápida para o dia a dia.",
     "features": {
       "title": "Fluxo enxuto para equipes em campo",
       "subtitle": "Concentre o trabalho do time e acompanhe os resultados.",
       "cards": [
         {
           "title": "Ordens em andamento",
-          "text": "Visualize o que esta em execucao e o que vem a seguir."
+          "text": "Visualize o que está em execução e o que vem a seguir."
         },
         {
           "title": "Clientes centralizados",
@@ -64,7 +64,7 @@
         },
         {
           "title": "Times alinhados",
-          "text": "Distribua tarefas com clareza e responsaveis definidos."
+          "text": "Distribua tarefas com clareza e responsáveis definidos."
         }
       ]
     }
