@@ -4,14 +4,7 @@ import crypto from "crypto";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const buildInviteLink = (request: Request, rawToken: string) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    request.headers.get("origin") ||
-    "http://localhost:3000";
-  return `${baseUrl.replace(/\/$/, "")}/invite/accept?token=${rawToken}`;
-};
+import { buildInviteLink } from "@/lib/url";
 
 export async function POST(request: Request) {
   try {

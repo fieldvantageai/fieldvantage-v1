@@ -53,17 +53,28 @@ export async function middleware(request: NextRequest) {
 
   // ── Hostname-based domain routing ─────────────────────────────────────────
   // geklix.com / www.geklix.com → serve only marketing routes
-  // app.geklix.com / localhost  → serve the full SaaS app
-  const hostname = request.headers.get("host") ?? "";
-  const isLocal =
-    hostname.includes("localhost") || hostname.includes("127.0.0.1");
-  const isAppDomain = isLocal || hostname.startsWith("app.");
+  // localhost / 127.0.0.1      → serve only marketing routes in local env
+  // app.geklix.com / app.localhost / staging.geklix.com → serve the full SaaS app
+  const requestHostHeader = request.headers.get("host") ?? "";
+  const requestHostname = requestHostHeader.split(":")[0]?.toLowerCase() ?? "";
+  const requestPort = request.nextUrl.port;
+
+  const isLocalMarketingHost =
+    requestHostname === "localhost" || requestHostname === "127.0.0.1";
+  const isAppDomain = requestHostname.startsWith("app.") ||
+    (process.env.NEXT_PUBLIC_APP_HOST
+      ? requestHostname === process.env.NEXT_PUBLIC_APP_HOST
+      : false);
 
   if (!isAppDomain) {
     // Marketing domain: only allow "/" and "/invite/accept/*"
     if (!isMarketingAllowed(pathname)) {
       const dest = request.nextUrl.clone();
-      dest.host = "app.geklix.com";
+      const appHost =
+        isLocalMarketingHost
+          ? requestPort ? `app.localhost:${requestPort}` : "app.localhost"
+          : (process.env.NEXT_PUBLIC_APP_HOST ?? `app.${requestHostname}`);
+      dest.host = appHost;
       return NextResponse.redirect(dest, { status: 301 });
     }
     // Skip all auth/tenant logic for marketing visitors

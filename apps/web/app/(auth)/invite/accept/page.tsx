@@ -16,7 +16,7 @@ const getBaseUrl = async () => {
   if (host) {
     return `${proto}://${host}`;
   }
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 };
 
 export default async function InviteAcceptPage({ searchParams }: PageProps) {

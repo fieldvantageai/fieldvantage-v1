@@ -6,6 +6,7 @@ import { listEmployees } from "@/features/employees/service";
 import { getSupabaseAuthUser } from "@/features/_shared/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { buildInviteLink } from "@/lib/url";
 
 export async function GET() {
   const user = await getSupabaseAuthUser();
@@ -15,14 +16,6 @@ export async function GET() {
   const employees = await listEmployees();
   return NextResponse.json({ data: employees });
 }
-
-const buildInviteLink = (request: Request, rawToken: string) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    request.headers.get("origin") ||
-    "http://localhost:3000";
-  return `${baseUrl.replace(/\/$/, "")}/invite/accept?token=${rawToken}`;
-};
 
 export async function POST(request: Request) {
   try {
