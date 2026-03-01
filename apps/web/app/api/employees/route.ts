@@ -32,6 +32,24 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    // Pré-validação do role para guards antes do schema validate
+    const rawRole = (body as { role?: string }).role;
+
+    // Ninguem pode convidar como proprietario via convite
+    if (rawRole === "owner") {
+      return NextResponse.json(
+        { error: "Nao e possivel convidar alguem como proprietario." },
+        { status: 403 }
+      );
+    }
+
+    // Admin de filial nao pode convidar como administrador
+    if (rawRole === "admin" && context.role === "admin" && !context.isHq) {
+      return NextResponse.json(
+        { error: "Administradores de filial nao podem convidar como administrador." },
+        { status: 403 }
+      );
+    }
     const input = await newEmployeeSchema.validate(body, {
       abortEarly: false,
       stripUnknown: true
@@ -92,6 +110,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // Guard multi-filial: admin com filiais só pode convidar para suas filiais
+    const inputBranchIds: string[] = (input as { branchIds?: string[] | null }).branchIds ?? [];
+    if (!context.isHq && context.branchIds.length > 0) {
+      const forbidden = inputBranchIds.filter((bid) => !context.branchIds.includes(bid));
+      if (forbidden.length > 0) {
+        return NextResponse.json(
+          { error: "Voce so pode convidar funcionarios para suas filiais." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Se o admin de filial não especificou branchIds, herda as suas
+    const resolvedBranchIds =
+      inputBranchIds.length > 0
+        ? inputBranchIds
+        : context.isHq
+          ? []
+          : context.branchIds;
+    const resolvedBranchId = resolvedBranchIds[0] ?? null;
+
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -113,7 +152,9 @@ export async function POST(request: Request) {
         created_by: user.id,
         email: employee.email ?? null,
         full_name: employee.full_name ?? null,
-        role: employee.role ?? null
+        role: employee.role ?? null,
+        branch_id: resolvedBranchId,
+        branch_ids: resolvedBranchIds.length > 0 ? resolvedBranchIds : null
       })
       .select("id, status, expires_at")
       .single();

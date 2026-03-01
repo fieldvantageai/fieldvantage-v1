@@ -28,6 +28,10 @@ export type Employee = BaseEntity & {
   user_id?: string | null;
   membership_id?: string | null;
   status: EmployeeStatus;
+  /** Branch primária (legado). Use branch_ids para acesso multi-filial. */
+  branch_id?: string | null;
+  /** Todas as filiais do colaborador (de membership_branches). */
+  branch_ids?: string[];
 };
 
 const optionalText = () =>
@@ -59,6 +63,7 @@ export const newEmployeeSchema = yup.object({
   state: optionalText(),
   zipCode: optionalText(),
   country: optionalText(),
+  branchIds: yup.array(yup.string().required()).nullable().optional(),
   role: yup
     .mixed<EmployeeRole>()
     .oneOf(["owner", "admin", "employee"])

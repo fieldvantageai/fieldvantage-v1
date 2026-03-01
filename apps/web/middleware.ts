@@ -117,6 +117,10 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[middleware] ${pathname} | user=${user?.id ?? "none"}`);
+  }
+
   if (!user && !isPublicPath(pathname)) {
     const nextPath = `${pathname}${request.nextUrl.search}`;
     const redirectUrl = request.nextUrl.clone();
@@ -130,17 +134,21 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user) {
+    // Using SECURITY DEFINER RPC to avoid JWT/RLS issues in Edge middleware
     const { data: memberships } = await supabase
-      .from("company_memberships")
-      .select("company_id, role, status")
-      .eq("user_id", user.id)
-      .eq("status", "active");
+      .rpc("get_my_memberships") as {
+        data: Array<{ company_id: string; role: string; status: string; branch_id: string | null; branch_ids: string[] | null }> | null
+      };
 
     const activeCookie = request.cookies.get(ACTIVE_COMPANY_COOKIE)?.value ?? null;
     const activeMembership = memberships?.find(
       (membership) => membership.company_id === activeCookie
     );
     const membershipCount = memberships?.length ?? 0;
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[middleware] memberships=${membershipCount} cookie=${activeCookie ?? "none"}`);
+    }
     const isSelectCompanyRoute = pathname === "/select-company";
     const resolvedActiveMembership =
       activeMembership ?? (membershipCount === 1 ? memberships?.[0] ?? null : null);
@@ -202,14 +210,28 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isAuthOnlyPath(pathname)) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = resolvedActiveMembership ? "/dashboard" : "/select-company";
-      redirectUrl.search = "";
-      const redirectResponse = NextResponse.redirect(redirectUrl);
-      response.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie);
-      });
-      return redirectResponse;
+      // Determine destination based on membership state
+      let destination: string;
+      if (resolvedActiveMembership) {
+        destination = "/dashboard";
+      } else if (membershipCount === 0) {
+        // No companies yet → stay at /comecar (or go there from other auth paths)
+        destination = "/comecar";
+      } else {
+        // Has companies but no active selection
+        destination = "/select-company";
+      }
+      // Avoid redirect loop: don't redirect if already at destination
+      if (pathname !== destination) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = destination;
+        redirectUrl.search = "";
+        const redirectResponse = NextResponse.redirect(redirectUrl);
+        response.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie);
+        });
+        return redirectResponse;
+      }
     }
 
     if (resolvedActiveMembership?.role === "member" && !isEmployeeAllowedPath(pathname)) {

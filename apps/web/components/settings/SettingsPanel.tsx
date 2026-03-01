@@ -323,6 +323,21 @@ export default function SettingsPanel() {
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Filiais
+              </p>
+              <div className="mt-2 space-y-2">
+                <Link
+                  href="/settings/branches"
+                  className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700 transition hover:border-brand-200 hover:bg-brand-50"
+                >
+                  <span>Gerenciar filiais</span>
+                  <span className="text-xs font-semibold text-slate-400">→</span>
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                 {t("roles.title")}
               </p>
               <div className="mt-2 space-y-2">

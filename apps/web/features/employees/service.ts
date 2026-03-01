@@ -1,13 +1,28 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import type { Employee, JobStatus } from "@fieldvantage/shared";
+import type { Employee, EmployeeRole, JobStatus } from "@fieldvantage/shared";
+
+/**
+ * O banco armazena "member" em company_memberships, mas a UI usa "employee".
+ * Estes helpers mantêm ambas as camadas consistentes.
+ */
+const dbRoleToUiRole = (dbRole: string): EmployeeRole => {
+  if (dbRole === "member") return "employee";
+  return dbRole as EmployeeRole;
+};
+
+const uiRoleToDbRole = (uiRole: string): string => {
+  if (uiRole === "employee") return "member";
+  return uiRole;
+};
 
 type MembershipRow = {
   id: string;
   user_id: string;
   role: string;
   status: string;
+  branch_id: string | null;
   created_at: string;
 };
 
@@ -40,9 +55,11 @@ export async function listEmployees() {
   }
 
   const supabase = await createSupabaseServerClient();
+
+  // Busca todas as memberships da empresa — RLS (viewer_can_see_membership) filtra por filial automaticamente
   const { data: memberships, error } = await supabase
     .from("company_memberships")
-    .select("id, user_id, role, status, created_at")
+    .select("id, user_id, role, status, branch_id, created_at")
     .eq("company_id", context.companyId);
 
   if (error || !memberships?.length) {
@@ -50,6 +67,32 @@ export async function listEmployees() {
   }
 
   const membershipRows = memberships as MembershipRow[];
+  const membershipIds = membershipRows.map((m) => m.id);
+
+  // Busca vínculos de filial e nomes de branches em paralelo
+  const [{ data: mbRows }, { data: companyBranches }] = await Promise.all([
+    supabaseAdmin
+      .from("membership_branches")
+      .select("membership_id, branch_id")
+      .in("membership_id", membershipIds),
+    supabaseAdmin
+      .from("branches")
+      .select("id, name")
+      .eq("company_id", context.companyId)
+  ]);
+
+  const branchIdsMap = new Map<string, string[]>();
+  (mbRows ?? []).forEach((row) => {
+    const list = branchIdsMap.get(row.membership_id as string) ?? [];
+    list.push(row.branch_id as string);
+    branchIdsMap.set(row.membership_id as string, list);
+  });
+
+  const branchNamesById = new Map<string, string>();
+  (companyBranches ?? []).forEach((b) => {
+    branchNamesById.set(b.id as string, b.name as string);
+  });
+
   const userIds = membershipRows.map((item) => item.user_id).filter(Boolean);
 
   const { data: employees } = userIds.length
@@ -64,9 +107,7 @@ export async function listEmployees() {
   const employeesByUser = new Map<string, EmployeeRow>();
   (employees ?? []).forEach((row) => {
     const userId = row.user_id ?? "";
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
     const existing = employeesByUser.get(userId);
     if (!existing) {
       employeesByUser.set(userId, row as EmployeeRow);
@@ -75,7 +116,6 @@ export async function listEmployees() {
     employeesByUser.set(userId, pickNewestEmployee([existing, row as EmployeeRow]));
   });
 
-  const membershipIds = membershipRows.map((item) => item.id);
   const { data: completedAssignments } = await supabase
     .from("job_assignments")
     .select("membership_id, jobs!inner(status)")
@@ -92,6 +132,9 @@ export async function listEmployees() {
   return membershipRows.map((membership) => {
     const profile = employeesByUser.get(membership.user_id);
     const status = membership.status === "active" ? "active" : "inactive";
+    const memberBranchIds = branchIdsMap.get(membership.id) ??
+      (membership.branch_id ? [membership.branch_id] : []);
+
     return {
       id: profile?.id ?? membership.id,
       user_id: membership.user_id,
@@ -101,18 +144,27 @@ export async function listEmployees() {
       email: profile?.email ?? null,
       phone: profile?.phone ?? null,
       avatar_url: profile?.avatar_url ?? null,
-      role: membership.role,
+      role: dbRoleToUiRole(membership.role),
+      membership_raw_role: membership.role,
       status,
       membership_id: membership.id,
+      branch_id: membership.branch_id ?? null,
+      branch_ids: memberBranchIds,
+      branch_names: memberBranchIds.map((bid) => branchNamesById.get(bid) ?? "").filter(Boolean),
       created_at: membership.created_at,
       updated_at: profile?.updated_at ?? membership.created_at,
       completed_jobs_count: completedCounts.get(membership.id) ?? 0
-    } as Employee & { completed_jobs_count?: number };
+    } as Employee & { completed_jobs_count?: number; branch_id?: string | null; branch_ids?: string[]; branch_names?: string[]; membership_raw_role?: string };
   });
 }
 
 export type EmployeeWithAvatar = Employee & {
   avatar_signed_url?: string | null;
+  branch_id?: string | null;
+  branch_ids?: string[];
+  branch_names?: string[];
+  /** Role cru do banco (company_memberships.role). Usado para guards de promocao. */
+  membership_raw_role?: string;
 };
 
 export type EmployeeWithJobs = EmployeeWithAvatar & {
@@ -159,16 +211,40 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
       created_at: data.created_at,
       updated_at: data.updated_at ?? data.created_at,
       status: fallbackStatus,
-      membership_id: null
+      membership_id: null,
+      branch_id: null,
+      branch_ids: []
     };
   }
 
   const { data: membership } = await supabase
     .from("company_memberships")
-    .select("id, role, status, created_at")
+    .select("id, role, status, branch_id, created_at")
     .eq("company_id", context.companyId)
     .eq("user_id", data.user_id)
     .maybeSingle();
+
+  // Busca branch_ids e nomes de branches
+  let branchIds: string[] = [];
+  let branchNames: string[] = [];
+  if (membership?.id) {
+    const { data: mbRows } = await supabaseAdmin
+      .from("membership_branches")
+      .select("branch_id")
+      .eq("membership_id", membership.id);
+    branchIds = mbRows?.map((r) => r.branch_id as string) ?? [];
+    // Fallback legado
+    if (branchIds.length === 0 && membership.branch_id) {
+      branchIds = [membership.branch_id];
+    }
+    if (branchIds.length > 0) {
+      const { data: branchRows } = await supabaseAdmin
+        .from("branches")
+        .select("id, name")
+        .in("id", branchIds);
+      branchNames = (branchRows ?? []).map((b) => b.name as string);
+    }
+  }
 
   const { data: assignmentRows } = await supabase
     .from("job_assignments")
@@ -192,6 +268,7 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
     avatarSignedUrl = signed?.signedUrl ?? null;
   }
 
+  const resolvedDbRole = membership?.role ?? data.role ?? "employee";
   return {
     id: data.id,
     company_id: data.company_id ?? "",
@@ -201,12 +278,16 @@ export async function getEmployeeById(id: string): Promise<EmployeeWithJobs | nu
     last_name: data.last_name ?? "",
     email: data.email ?? null,
     phone: data.phone ?? null,
-    role: (membership?.role ?? data.role ?? "employee") as Employee["role"],
+    role: dbRoleToUiRole(resolvedDbRole) as Employee["role"],
+    membership_raw_role: resolvedDbRole,
     avatar_url: data.avatar_url ?? null,
     created_at: membership?.created_at ?? data.created_at,
     updated_at: data.updated_at ?? data.created_at,
     status: membership?.status === "active" ? "active" : "inactive",
     membership_id: membership?.id ?? null,
+    branch_id: membership?.branch_id ?? null,
+    branch_ids: branchIds,
+    branch_names: branchNames,
     avatar_signed_url: avatarSignedUrl,
     jobs: (jobRows ?? []).map((row) => ({
       id: row.id as string,
@@ -283,9 +364,11 @@ export async function listEmployeeJobs(employeeId: string) {
   }));
 }
 
-type UpdateEmployeeInput = Partial<Employee> & {
+export type UpdateEmployeeInput = Partial<Employee> & {
   membership_role?: string;
   membership_status?: "active" | "inactive";
+  /** Array de branch_ids. Substitui completamente membership_branches. */
+  membership_branch_ids?: string[];
 };
 
 export async function updateEmployee(
@@ -324,19 +407,67 @@ export async function updateEmployee(
     return null;
   }
 
-  if (current.user_id && (input.membership_role || input.membership_status)) {
-    await supabase
+  if (current.user_id) {
+    // Busca membership para obter o id
+    const { data: membership } = await supabaseAdmin
       .from("company_memberships")
-      .update({
-        role: input.membership_role,
-        status: input.membership_status
-      })
+      .select("id, branch_id")
       .eq("company_id", companyId)
-      .eq("user_id", current.user_id);
+      .eq("user_id", current.user_id)
+      .maybeSingle();
+
+    if (membership) {
+      // Determina a branch primária (legado) a partir de membership_branch_ids
+      const newBranchIds = input.membership_branch_ids;
+      const primaryBranchId = newBranchIds !== undefined
+        ? (newBranchIds[0] ?? null)
+        : membership.branch_id;
+
+      // Atualiza campos em company_memberships
+      const membershipUpdates: Record<string, unknown> = {};
+      if (input.membership_role) {
+        membershipUpdates.role = uiRoleToDbRole(input.membership_role);
+      }
+      if (input.membership_status) {
+        membershipUpdates.status = input.membership_status;
+      }
+      if (newBranchIds !== undefined) {
+        membershipUpdates.branch_id = primaryBranchId;
+      }
+      if (Object.keys(membershipUpdates).length > 0) {
+        await supabaseAdmin
+          .from("company_memberships")
+          .update(membershipUpdates)
+          .eq("id", membership.id);
+      }
+
+      // Sincroniza membership_branches (substitui completamente)
+      if (newBranchIds !== undefined) {
+        await supabaseAdmin
+          .from("membership_branches")
+          .delete()
+          .eq("membership_id", membership.id);
+
+        if (newBranchIds.length > 0) {
+          await supabaseAdmin
+            .from("membership_branches")
+            .insert(
+              newBranchIds.map((bid) => ({
+                membership_id: membership.id,
+                branch_id: bid
+              }))
+            );
+        }
+      }
+    }
   }
 
   const resolvedStatus =
     input.membership_status ?? (updated.is_active === false ? "inactive" : "active");
+  const resolvedRole = input.membership_role
+    ? (dbRoleToUiRole(uiRoleToDbRole(input.membership_role)) as Employee["role"])
+    : dbRoleToUiRole(updated.role ?? "employee") as Employee["role"];
+
   return {
     id: updated.id,
     company_id: companyId,
@@ -346,12 +477,13 @@ export async function updateEmployee(
     last_name: updated.last_name ?? "",
     email: updated.email ?? null,
     phone: updated.phone ?? null,
-    role: updated.role as Employee["role"],
+    role: resolvedRole,
     avatar_url: updated.avatar_url ?? null,
     created_at: updated.created_at,
     updated_at: updated.updated_at ?? updated.created_at,
     status: resolvedStatus,
-    membership_id: null
+    membership_id: null,
+    branch_ids: input.membership_branch_ids ?? []
   };
 }
 

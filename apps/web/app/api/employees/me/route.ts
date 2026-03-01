@@ -29,7 +29,8 @@ export async function GET() {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
   }
 
-  const role = employee?.role ?? context.role;
+  // context.role comes from company_memberships (authoritative); employee.role can be stale
+  const role = context.role ?? employee?.role;
   if (!employee) {
     return NextResponse.json({ error: "Colaborador nao encontrado." }, { status: 404 });
   }
@@ -47,6 +48,9 @@ export async function GET() {
       ...employee,
       role,
       company_id: context.companyId,
+      branch_id: context.branchId ?? null,
+      branch_ids: context.branchIds,
+      is_hq: context.isHq,
       avatar_signed_url: avatarSignedUrl
     }
   });

@@ -1,22 +1,11 @@
-import { headers } from "next/headers";
-
 import InviteAcceptForm from "@/components/invites/InviteAcceptForm";
 import { Section } from "@/components/ui/Section";
+import { validateInviteToken } from "@/features/invites/validateInvite";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
-const getBaseUrl = async () => {
-  const headerList = await headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  if (host) {
-    return `${proto}://${host}`;
-  }
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 };
 
 export default async function InviteAcceptPage({ searchParams }: PageProps) {
@@ -37,21 +26,19 @@ export default async function InviteAcceptPage({ searchParams }: PageProps) {
     );
   }
 
-  const baseUrl = await getBaseUrl();
-  const response = await fetch(
-    `${baseUrl}/api/invites/validate?token=${encodeURIComponent(token)}`,
-    { cache: "no-store" }
-  );
+  // Call the shared server function directly — no self-HTTP-fetch needed
+  const result = await validateInviteToken(token);
 
-  if (!response.ok) {
+  if (!result.ok) {
     const message =
-      response.status === 410
+      result.status === 410
         ? t("page.errors.expired")
-        : response.status === 409
+        : result.status === 409
           ? t("page.errors.accepted")
-          : response.status === 404
+          : result.status === 404
             ? t("page.errors.notFound")
             : t("page.errors.invalid");
+
     return (
       <Section title={t("page.errorTitle")} description={message}>
         <p className="text-sm text-slate-600">{t("page.invalidHint")}</p>
@@ -59,32 +46,20 @@ export default async function InviteAcceptPage({ searchParams }: PageProps) {
     );
   }
 
-  const payload = (await response.json()) as {
-    company: {
-      id: string;
-      name: string;
-      logo_url?: string | null;
-      logo_signed_url?: string | null;
-    };
-    employee: { id: string; first_name: string; last_name: string; email: string | null };
-    invite: { id: string; expires_at: string };
-  };
-
   const formatTemplate = (template: string, values: Record<string, string>) =>
     template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
-  const companyName = payload.company?.name ?? t("page.companyFallback");
+
+  const companyName = result.company.name || t("page.companyFallback");
   const logoUrl =
-    payload.company?.logo_signed_url ??
-    (payload.company?.logo_url?.startsWith("http")
-      ? payload.company.logo_url
+    result.company.logo_signed_url ??
+    (result.company.logo_url?.startsWith("http")
+      ? result.company.logo_url
       : null);
 
   return (
     <div className="space-y-6">
       <Section
-        title={formatTemplate(t("page.title"), {
-          company: companyName
-        })}
+        title={formatTemplate(t("page.title"), { company: companyName })}
         description={t("page.subtitle")}
       >
         <div className="flex justify-center">
@@ -102,8 +77,8 @@ export default async function InviteAcceptPage({ searchParams }: PageProps) {
         </div>
         <InviteAcceptForm
           token={token}
-          email={payload.employee?.email ?? null}
-          expiresAt={payload.invite.expires_at}
+          email={result.employee.email ?? null}
+          expiresAt={result.invite.expires_at}
         />
       </Section>
     </div>

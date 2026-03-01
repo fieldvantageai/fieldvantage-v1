@@ -59,6 +59,68 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       stripUnknown: true
     });
 
+    // ── Guards de hierarquia de promoção ─────────────────────────────────────
+    const targetDbRole = (current as { membership_raw_role?: string }).membership_raw_role ?? "member";
+    const targetUiRole = current.role;
+    const newRole = input.role;
+    const roleIsChanging = newRole !== targetUiRole;
+
+    // 1. Ninguem pode alterar o proprio perfil de acesso
+    if (current.user_id === user.id && roleIsChanging) {
+      return NextResponse.json(
+        { error: "Nao e possivel alterar o proprio perfil de acesso." },
+        { status: 403 }
+      );
+    }
+
+    // 2. Apenas o proprietario pode editar outro proprietario
+    if (targetDbRole === "owner" && context.role !== "owner") {
+      return NextResponse.json(
+        { error: "Apenas o proprietario pode editar outro proprietario." },
+        { status: 403 }
+      );
+    }
+
+    if (roleIsChanging) {
+      // 3. Nao pode definir role como proprietario (apenas o proprietario pode)
+      if (newRole === "owner" && context.role !== "owner") {
+        return NextResponse.json(
+          { error: "Apenas o proprietario pode definir outro proprietario." },
+          { status: 403 }
+        );
+      }
+
+      // 4. Promover para Admin da empresa toda (sem filiais) exige proprietario
+      const newBranchIds = (input as { branchIds?: string[] | null }).branchIds ?? [];
+      if (newRole === "admin" && newBranchIds.length === 0 && context.role !== "owner") {
+        return NextResponse.json(
+          { error: "Apenas o proprietario pode criar um administrador geral da empresa." },
+          { status: 403 }
+        );
+      }
+
+      // 5. Admin de filial nao pode promover para administrador
+      if (newRole === "admin" && context.role === "admin" && !context.isHq) {
+        return NextResponse.json(
+          { error: "Administradores de filial nao podem promover colaboradores para administrador." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // 6. Admin de filial so pode editar membros das suas filiais
+    if (context.role === "admin" && !context.isHq) {
+      const targetBranchIds = (current as { branch_ids?: string[] }).branch_ids ?? [];
+      const hasOverlap = targetBranchIds.some((bid: string) => context.branchIds.includes(bid));
+      if (!hasOverlap) {
+        return NextResponse.json(
+          { error: "Sem permissao para editar este colaborador." },
+          { status: 403 }
+        );
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const normalizeOptional = (value?: string | null) =>
       value && value.trim().length > 0 ? value : null;
     const fullName = `${input.firstName} ${input.lastName}`.trim();
@@ -82,7 +144,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       role: input.role,
       status: input.status,
       membership_role: input.role,
-      membership_status: input.status
+      membership_status: input.status,
+      membership_branch_ids: (input as { branchIds?: string[] | null }).branchIds ?? undefined
       },
       context.companyId
     );

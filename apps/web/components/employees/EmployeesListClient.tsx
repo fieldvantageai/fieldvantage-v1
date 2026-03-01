@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ToastBanner } from "@/components/ui/Toast";
-import { getEmployeeRoleLabel } from "@/features/employees/roleLabels";
+import { getEmployeeRoleScopeLabel } from "@/features/employees/roleLabels";
 import type { Employee } from "@/features/_shared/types";
 import { useClientT } from "@/lib/i18n/useClientT";
 
@@ -38,6 +38,8 @@ function getInitials(name: string) {
 type EmployeeWithCounts = Employee & {
   job_assignments_count?: number;
   completed_jobs_count?: number;
+  branch_ids?: string[];
+  branch_names?: string[];
 };
 
 type EmployeesListClientProps = {
@@ -153,7 +155,8 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
     return employees.filter((emp) => {
       const name = emp.full_name?.toLowerCase() ?? "";
       const email = emp.email?.toLowerCase() ?? "";
-      const role = getEmployeeRoleLabel(emp.role).toLowerCase();
+      const isHq = (emp.branch_ids?.length ?? 0) === 0;
+      const role = getEmployeeRoleScopeLabel(emp.role, emp.branch_names ?? [], isHq).toLowerCase();
       return name.includes(normalized) || email.includes(normalized) || role.includes(normalized);
     });
   }, [employees, normalized]);
@@ -287,7 +290,11 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-slate-900">{name}</p>
                       <p className="truncate text-xs text-slate-500">
-                        {getEmployeeRoleLabel(employee.role)}
+                        {getEmployeeRoleScopeLabel(
+                          employee.role,
+                          employee.branch_names ?? [],
+                          (employee.branch_ids?.length ?? 0) === 0
+                        )}
                       </p>
                     </div>
                   </div>

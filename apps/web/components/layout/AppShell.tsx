@@ -9,6 +9,7 @@ import { useClientT } from "@/lib/i18n/useClientT";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ThemedLogo } from "@/components/ui/ThemedLogo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import BranchIndicator from "@/components/branches/BranchIndicator";
 import FloatingActionButton from "../ui/FloatingActionButton";
 import MobileBottomBar from "./MobileBottomBar";
 import Sidebar from "./Sidebar";
@@ -236,6 +237,7 @@ export default function AppShell({ children }: AppShellProps) {
   const showFab =
     pathname === "/dashboard" || pathname === "/jobs" || pathname === "/customers";
   const canSwitchCompany = companiesLoaded && companies.length > 1;
+  const canOpenWorkspaceMenu = canSwitchCompany || userRole === "owner";
 
   const getInitials = (name?: string | null) => {
     if (!name) {
@@ -524,6 +526,7 @@ export default function AppShell({ children }: AppShellProps) {
 
               {/* Right: actions + company + avatar */}
               <div className="relative flex min-w-0 items-center gap-2 text-left">
+                <BranchIndicator />
                 {/* Invite notifications */}
                 {inviteUnreadCount > 0 ? (
                   <Link
@@ -590,14 +593,18 @@ export default function AppShell({ children }: AppShellProps) {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    disabled={isSwitchingCompany}
-                    className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold transition hover:bg-slate-50/70 dark:hover:bg-[var(--surface2)] ${
-                      isSwitchingCompany ? "cursor-not-allowed opacity-70" : ""
+                    disabled={isSwitchingCompany || !canOpenWorkspaceMenu}
+                    className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold transition dark:hover:bg-[var(--surface2)] ${
+                      isSwitchingCompany || !canOpenWorkspaceMenu
+                        ? "cursor-not-allowed opacity-70"
+                        : "hover:bg-slate-50/70"
                     }`}
                     onClick={() =>
-                      setOpenMenu((prev) =>
-                        prev === "workspace" ? null : "workspace"
-                      )
+                      canOpenWorkspaceMenu
+                        ? setOpenMenu((prev) =>
+                            prev === "workspace" ? null : "workspace"
+                          )
+                        : null
                     }
                     aria-label={tCompanies("switcher.label")}
                   >
@@ -622,11 +629,13 @@ export default function AppShell({ children }: AppShellProps) {
                         <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-slate-400" />
                       ) : null}
                     </span>
-                    <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition dark:text-[var(--text-muted)] ${
-                        openMenu === "workspace" ? "rotate-180" : ""
-                      }`}
-                    />
+                    {canOpenWorkspaceMenu ? (
+                      <ChevronDown
+                        className={`h-4 w-4 text-slate-400 transition dark:text-[var(--text-muted)] ${
+                          openMenu === "workspace" ? "rotate-180" : ""
+                        }`}
+                      />
+                    ) : null}
                   </button>
 
                   {/* Avatar button */}
@@ -660,7 +669,7 @@ export default function AppShell({ children }: AppShellProps) {
                 </div>
 
                 {/* Workspace dropdown */}
-                {openMenu === "workspace" ? (
+                {openMenu === "workspace" && canOpenWorkspaceMenu ? (
                   <div
                     ref={workspaceMenuRef}
                     className="absolute right-0 top-12 z-40 w-64 rounded-2xl border border-slate-200/70 bg-white/95 p-2 shadow-lg dark:border-[var(--border)] dark:bg-[var(--bg2)]"

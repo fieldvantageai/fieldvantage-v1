@@ -1,0 +1,24 @@
+begin;
+
+-- 1) Limpa todas as tabelas do schema public
+do $$
+declare
+  r record;
+begin
+  for r in
+    select tablename
+    from pg_tables
+    where schemaname = 'public'
+  loop
+    execute format('truncate table public.%I restart identity cascade;', r.tablename);
+  end loop;
+end $$;
+
+-- 2) Limpa somente dados de arquivos do Storage (sem tabelas internas)
+truncate table storage.objects restart identity cascade;
+truncate table storage.buckets restart identity cascade;
+
+-- 3) Remove usuários de autenticação (identities/sessions caem por cascade)
+delete from auth.users;
+
+commit;

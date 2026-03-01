@@ -2,7 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AlertTriangle, Camera, Mail, MapPin, MessageSquare, Phone, Shield, Trash2, UserRound } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
@@ -18,7 +18,7 @@ import {
   newEmployeeSchema,
   type NewEmployeeFormValues,
 } from "@/features/employees/forms/newEmployee/formSchema";
-import { useEmployeeRoles } from "@/features/employees/roles";
+import { filterRolesForEditor, useEmployeeRoles } from "@/features/employees/roles";
 import type { EmployeeWithAvatar } from "@/features/employees/service";
 import { useClientT } from "@/lib/i18n/useClientT";
 
@@ -37,6 +37,11 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [branches, setBranches] = useState<Array<{ id: string; name: string }>>([]);
+  const [userBranchIds, setUserBranchIds] = useState<string[]>([]);
+  const [isUserHq, setIsUserHq] = useState(true);
+  const [editorRole, setEditorRole] = useState<string>("member");
+  const [isSelf, setIsSelf] = useState(false);
 
   const {
     register,
@@ -62,11 +67,47 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
       notes: employee.notes ?? "",
       role: employee.role,
       status: employee.status,
+      branchIds: employee.branch_ids ?? (employee.branch_id ? [employee.branch_id] : []),
     },
   });
 
+  useEffect(() => {
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const [branchesRes, meRes] = await Promise.all([
+          fetch("/api/branches"),
+          fetch("/api/employees/me", { cache: "no-store" })
+        ]);
+        if (branchesRes.ok) {
+          const payload = (await branchesRes.json()) as {
+            data?: Array<{ id: string; name: string }>;
+          };
+          if (isMounted) setBranches(payload.data ?? []);
+        }
+        if (meRes.ok) {
+          const payload = (await meRes.json()) as {
+            data?: { id?: string; role?: string; branch_ids?: string[]; is_hq?: boolean };
+          };
+          if (isMounted) {
+            setUserBranchIds(payload.data?.branch_ids ?? []);
+            setIsUserHq(payload.data?.is_hq ?? true);
+            setEditorRole(payload.data?.role ?? "member");
+            setIsSelf(payload.data?.id === employee.id);
+          }
+        }
+      } catch {
+        // silent
+      }
+    };
+    void loadData();
+    return () => { isMounted = false; };
+  }, []);
+
   const isActive = watch("status") === "active";
   const avatarUrl = watch("avatarUrl");
+  const selectedBranchIds = watch("branchIds") ?? [];
+  const visibleRoles = filterRolesForEditor(editorRole, isUserHq);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(
     employee.avatar_signed_url ?? null
   );
@@ -286,12 +327,67 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
           description={t("sections.accessSubtitle")}
         >
           <div className="space-y-4">
-            <Select
-              label={t("fields.role")}
-              error={errors.role?.message}
-              options={roles.map((role) => ({ value: role.id, label: role.label }))}
-              {...register("role")}
-            />
+            {visibleRoles.length > 0 ? (
+              <Select
+                label={t("fields.role")}
+                error={errors.role?.message}
+                options={visibleRoles.map((role) => ({ value: role.id, label: role.label }))}
+                disabled={isSelf}
+                {...register("role")}
+              />
+            ) : (
+              <div>
+                <p className="mb-1.5 text-sm font-medium text-slate-700 dark:text-[var(--text)]">
+                  {t("fields.role")}
+                </p>
+                <div className="rounded-xl border border-slate-200/70 bg-slate-100 px-3 py-2.5 text-sm text-slate-500 dark:border-[var(--border)] dark:bg-[var(--surface2)]">
+                  {roles.find((r) => r.id === watch("role"))?.label ?? watch("role")}
+                </div>
+              </div>
+            )}
+            {isSelf && visibleRoles.length > 0 && (
+              <p className="text-xs text-slate-500">
+                Nao e possivel alterar o proprio perfil de acesso.
+              </p>
+            )}
+
+            {branches.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-slate-700 dark:text-[var(--text)]">
+                  Filial(is)
+                </p>
+                <div className="rounded-xl border border-slate-200/70 bg-slate-50/50 p-3 dark:border-[var(--border)] dark:bg-[var(--surface2)]">
+                  {(isUserHq ? branches : branches.filter((b) => userBranchIds.includes(b.id))).map(
+                    (branch) => {
+                      const checked = selectedBranchIds.includes(branch.id);
+                      return (
+                        <label
+                          key={branch.id}
+                          className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-[var(--text)] dark:hover:bg-[var(--surface)]"
+                        >
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+                            checked={checked}
+                            onChange={(e) => {
+                              const next = e.target.checked
+                                ? [...selectedBranchIds, branch.id]
+                                : selectedBranchIds.filter((id) => id !== branch.id);
+                              setValue("branchIds", next, { shouldDirty: true });
+                            }}
+                          />
+                          {branch.name}
+                        </label>
+                      );
+                    }
+                  )}
+                  {!isUserHq && userBranchIds.length === 0 && (
+                    <p className="text-xs text-slate-500 px-2">Sem filiais disponíveis.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200/70 bg-slate-50/50 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50">
               <input
                 type="checkbox"

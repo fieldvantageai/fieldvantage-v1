@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const { data: inviteData, error: inviteError } = await supabaseAdmin
       .from("invites")
       .select(
-        "id, company_id, employee_id, status, expires_at, role, email, employee:employee_id(id, user_id, email, role)"
+        "id, company_id, employee_id, status, expires_at, role, email, branch_id, branch_ids, employee:employee_id(id, user_id, email, role)"
       )
       .eq("token_hash", tokenHash)
       .maybeSingle<{
@@ -43,6 +43,8 @@ export async function POST(request: Request) {
         expires_at: string;
         role: string | null;
         email: string | null;
+        branch_id: string | null;
+        branch_ids: string[] | null;
         employee: {
           id: string;
           user_id: string | null;
@@ -108,6 +110,31 @@ export async function POST(request: Request) {
           ? "admin"
           : "member";
 
+    // Determina as filiais efetivas do convite
+    const effectiveBranchIds: string[] =
+      inviteData.branch_ids && inviteData.branch_ids.length > 0
+        ? inviteData.branch_ids
+        : inviteData.branch_id
+          ? [inviteData.branch_id]
+          : [];
+    const primaryBranchId = effectiveBranchIds[0] ?? null;
+
+    const upsertMembershipBranches = async (membershipId: string) => {
+      if (effectiveBranchIds.length === 0) return;
+      await supabaseAdmin
+        .from("membership_branches")
+        .delete()
+        .eq("membership_id", membershipId);
+      await supabaseAdmin
+        .from("membership_branches")
+        .insert(
+          effectiveBranchIds.map((bid) => ({
+            membership_id: membershipId,
+            branch_id: bid
+          }))
+        );
+    };
+
     if (user) {
       const sessionEmail = user.email?.toLowerCase() ?? "";
       if (sessionEmail && sessionEmail !== resolvedEmail) {
@@ -138,17 +165,24 @@ export async function POST(request: Request) {
         );
       }
 
-      await supabaseAdmin
+      const { data: upsertedMembership } = await supabaseAdmin
         .from("company_memberships")
         .upsert(
           {
             company_id: inviteData.company_id,
             user_id: user.id,
             role: normalizedRole,
-            status: "active"
+            status: "active",
+            branch_id: primaryBranchId
           },
           { onConflict: "company_id,user_id" }
-        );
+        )
+        .select("id")
+        .maybeSingle();
+
+      if (upsertedMembership?.id) {
+        await upsertMembershipBranches(upsertedMembership.id);
+      }
 
       await supabaseAdmin.from("user_profiles").upsert({
         user_id: user.id,
@@ -285,17 +319,24 @@ export async function POST(request: Request) {
       .eq("entity_id", inviteData.id)
       .neq("user_id", newUserId);
 
-    await supabaseAdmin
+    const { data: upsertedMembershipNew } = await supabaseAdmin
       .from("company_memberships")
       .upsert(
         {
           company_id: inviteData.company_id,
           user_id: newUserId,
           role: normalizedRole,
-          status: "active"
+          status: "active",
+          branch_id: primaryBranchId
         },
         { onConflict: "company_id,user_id" }
-      );
+      )
+      .select("id")
+      .maybeSingle();
+
+    if (upsertedMembershipNew?.id) {
+      await upsertMembershipBranches(upsertedMembershipNew.id);
+    }
 
     await supabaseAdmin.from("user_profiles").upsert({
       user_id: newUserId,

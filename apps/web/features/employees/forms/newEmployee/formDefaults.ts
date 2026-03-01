@@ -15,5 +15,6 @@ export const newEmployeeDefaults: NewEmployeeFormValues = {
   country: "USA",
   notes: "",
   role: "employee",
-  status: "active"
+  status: "active",
+  branchIds: []
 };

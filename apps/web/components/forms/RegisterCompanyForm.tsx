@@ -15,6 +15,7 @@ import {
 } from "@/features/auth/registerCompany/formSchema";
 import { registerCompanyDefaults } from "@/features/auth/registerCompany/formDefaults";
 import { useClientT } from "@/lib/i18n/useClientT";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type StepKey =
   | "role"
@@ -170,8 +171,19 @@ export default function RegisterCompanyForm() {
         throw new Error(data?.error ?? t("register.messages.error"));
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      // Sign in client-side so the session cookies are properly stored in the browser
+      const supabase = createSupabaseBrowserClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password
+      });
+
+      if (signInError) {
+        throw new Error("Conta criada, mas falha ao autenticar. Tente fazer login.");
+      }
+
+      // Hard redirect ensures middleware reads the fresh session cookies on first request
+      window.location.assign("/dashboard");
     } catch (error) {
       setToast({
         message:

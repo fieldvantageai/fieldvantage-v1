@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { registerCompanySchema } from "@/features/auth/registerCompany/formSchema";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(request: Request) {
@@ -82,31 +81,35 @@ export async function POST(request: Request) {
       );
     }
 
-    await supabaseAdmin.from("company_memberships").insert({
-      company_id: company.id,
-      user_id: userId,
-      role: "owner",
-      status: "active"
-    });
+    const { error: membershipError } = await supabaseAdmin
+      .from("company_memberships")
+      .insert({
+        company_id: company.id,
+        user_id: userId,
+        role: "owner",
+        status: "active"
+      });
 
-    await supabaseAdmin.from("user_profiles").upsert({
-      user_id: userId,
-      last_active_company_id: company.id
-    });
-
-    const supabase = await createSupabaseServerClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: input.email,
-      password: input.password
-    });
-
-    if (signInError) {
+    if (membershipError) {
+      await supabaseAdmin.from("employees").delete().eq("user_id", userId);
+      await supabaseAdmin.from("companies").delete().eq("id", company.id);
+      await supabaseAdmin.auth.admin.deleteUser(userId);
       return NextResponse.json(
-        { error: "Falha ao autenticar." },
+        { error: membershipError.message },
         { status: 400 }
       );
     }
 
+    const { error: profileError } = await supabaseAdmin
+      .from("user_profiles")
+      .upsert({ user_id: userId, last_active_company_id: company.id });
+
+    if (profileError) {
+      console.error("[register-company] user_profiles upsert failed:", profileError.message);
+      // Non-fatal: membership was created, proceed
+    }
+
+    // Return only userId — client signs in using the original form values
     return NextResponse.json({ data: { userId } }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

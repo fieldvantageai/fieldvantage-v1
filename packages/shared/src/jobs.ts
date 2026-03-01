@@ -16,6 +16,7 @@ export type Job = BaseEntity & {
   customer_id: string | null;
   customer_name?: string | null;
   customer_address_id?: string | null;
+  branch_id?: string | null;
   title?: string | null;
   status: JobStatus;
   scheduled_for: string;
@@ -74,6 +75,7 @@ export const newJobSchema = yup.object({
     .mixed<JobStatus>()
     .oneOf(["scheduled", "in_progress", "done", "canceled"])
     .required("Status obrigatorio."),
+  branchId: yup.string().nullable().optional(),
   assignedMembershipIds: yup.array().of(yup.string().required()).default([]),
   allowInactive: yup.boolean().default(false),
   isRecurring: yup.boolean().default(false),

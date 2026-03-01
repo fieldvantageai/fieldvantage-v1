@@ -27,7 +27,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getServerLocale();
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         {/* Must be the first script in <head> to prevent theme flash */}

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import { useEffect } from "react";
 import CustomerAvatarUpload from "../customers/CustomerAvatarUpload";
 import CustomerFormSection from "../customers/CustomerFormSection";
 import { Button } from "@/components/ui/Button";
@@ -19,7 +20,7 @@ import {
   type NewEmployeeFormValues,
 } from "@/features/employees/forms/newEmployee/formSchema";
 import { newEmployeeDefaults } from "@/features/employees/forms/newEmployee/formDefaults";
-import { useEmployeeRoles } from "@/features/employees/roles";
+import { filterRolesForEditor, useEmployeeRoles } from "@/features/employees/roles";
 import { useClientT } from "@/lib/i18n/useClientT";
 
 export default function NewEmployeeForm() {
@@ -31,6 +32,10 @@ export default function NewEmployeeForm() {
     message: string;
     variant: "success" | "error" | "info";
   } | null>(null);
+  const [branches, setBranches] = useState<Array<{ id: string; name: string }>>([]);
+  const [userBranchIds, setUserBranchIds] = useState<string[]>([]);
+  const [isUserHq, setIsUserHq] = useState(true);
+  const [editorRole, setEditorRole] = useState<string>("owner");
 
   const {
     register,
@@ -45,6 +50,45 @@ export default function NewEmployeeForm() {
 
   const isActive = watch("status") === "active";
   const avatarUrl = watch("avatarUrl");
+  const selectedBranchIds = watch("branchIds") ?? [];
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const [branchesRes, meRes] = await Promise.all([
+          fetch("/api/branches"),
+          fetch("/api/employees/me", { cache: "no-store" })
+        ]);
+        if (branchesRes.ok) {
+          const payload = (await branchesRes.json()) as {
+            data?: Array<{ id: string; name: string }>;
+          };
+          if (isMounted) setBranches(payload.data ?? []);
+        }
+        if (meRes.ok) {
+          const payload = (await meRes.json()) as {
+            data?: { role?: string; branch_ids?: string[]; is_hq?: boolean };
+          };
+          const bids = payload.data?.branch_ids ?? [];
+          const hq = payload.data?.is_hq ?? true;
+          if (isMounted) {
+            setUserBranchIds(bids);
+            setIsUserHq(hq);
+            setEditorRole(payload.data?.role ?? "owner");
+            // Pré-seleciona as filiais do admin como padrão
+            if (bids.length > 0) {
+              setValue("branchIds", bids, { shouldDirty: false });
+            }
+          }
+        }
+      } catch {
+        // silent
+      }
+    };
+    loadData();
+    return () => { isMounted = false; };
+  }, [setValue]);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (values: NewEmployeeFormValues) => {
@@ -242,9 +286,50 @@ export default function NewEmployeeForm() {
           <Select
             label={t("fields.role")}
             error={errors.role?.message}
-            options={roles.map((role) => ({ value: role.id, label: role.label }))}
+            options={filterRolesForEditor(editorRole, isUserHq).map((role) => ({
+              value: role.id,
+              label: role.label
+            }))}
             {...register("role")}
           />
+
+          {branches.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700 dark:text-[var(--text)]">
+                Filial(is)
+              </p>
+              <div className="rounded-xl border border-slate-200/70 bg-slate-50/50 p-3 dark:border-[var(--border)] dark:bg-[var(--surface2)]">
+                {/* Filiais disponíveis: HQ vê todas; branch admin vê apenas as suas */}
+                {(isUserHq ? branches : branches.filter((b) => userBranchIds.includes(b.id))).map(
+                  (branch) => {
+                    const checked = selectedBranchIds.includes(branch.id);
+                    return (
+                      <label
+                        key={branch.id}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-[var(--text)] dark:hover:bg-[var(--surface)]"
+                      >
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+                          checked={checked}
+                          onChange={(e) => {
+                            const next = e.target.checked
+                              ? [...selectedBranchIds, branch.id]
+                              : selectedBranchIds.filter((id) => id !== branch.id);
+                            setValue("branchIds", next, { shouldDirty: true });
+                          }}
+                        />
+                        {branch.name}
+                      </label>
+                    );
+                  }
+                )}
+                {!isUserHq && userBranchIds.length === 0 && (
+                  <p className="text-xs text-slate-500 px-2">Sem filiais disponíveis.</p>
+                )}
+              </div>
+            </div>
+          )}
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200/70 bg-slate-50/50 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50">
             <input
               type="checkbox"

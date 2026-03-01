@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getActiveCompanyId } from "@/lib/company/getActiveCompanyContext";
+import { getActiveCompanyContext, getActiveCompanyId } from "@/lib/company/getActiveCompanyContext";
 import type { Job, JobStatus } from "@fieldvantage/shared";
 
 type JobAssignmentRow = {
@@ -20,19 +20,31 @@ const splitScheduledFor = (value: string) => {
 
 export async function listJobs() {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getActiveCompanyId();
-  if (!companyId) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
     return [];
   }
+  const { companyId, branchIds, isHq } = context;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id)"
+      "id, company_id, branch_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id)"
     )
     .eq("company_id", companyId)
     .order("scheduled_date", { ascending: false })
     .order("scheduled_time", { ascending: false });
+
+  // Branch user: filtra pelos branchIds (multi-filial); RLS garante isso também
+  if (!isHq && branchIds.length > 0) {
+    if (branchIds.length === 1) {
+      query = query.eq("branch_id", branchIds[0]);
+    } else {
+      query = query.in("branch_id", branchIds);
+    }
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -45,6 +57,7 @@ export async function listJobs() {
     return {
       id: row.id,
       company_id: row.company_id,
+      branch_id: (row as { branch_id?: string | null }).branch_id ?? null,
       customer_id: row.customer_id,
       customer_name: row.customer_name,
       customer_address_id: row.customer_address_id,
@@ -114,6 +127,7 @@ export type CreateJobInput = {
   customer_name: string;
   customer_id?: string | null;
   customer_address_id?: string | null;
+  branch_id?: string | null;
   assigned_membership_ids?: string[];
   allow_inactive_assignments?: boolean;
   is_recurring?: boolean;
@@ -123,16 +137,23 @@ export type CreateJobInput = {
 
 export async function createJob(input: CreateJobInput) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getActiveCompanyId();
-  if (!companyId) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
     throw new Error("Empresa nao encontrada.");
   }
+  const { companyId, branchIds, isHq } = context;
+
+  // Branch admin: herda filial única automaticamente se não informada
+  const resolvedBranchId =
+    input.branch_id ??
+    (!isHq && branchIds.length === 1 ? branchIds[0] : null);
 
   const schedule = splitScheduledFor(input.scheduled_for);
   const { data, error } = await supabase
     .from("jobs")
     .insert({
       company_id: companyId,
+      branch_id: resolvedBranchId,
       customer_id: input.customer_id ?? null,
       customer_name: input.customer_name ?? null,
       customer_address_id: input.customer_address_id ?? null,
@@ -164,6 +185,7 @@ export async function createJob(input: CreateJobInput) {
   return {
     id: data.id,
     company_id: data.company_id,
+    branch_id: (data as { branch_id?: string | null }).branch_id ?? null,
     customer_id: data.customer_id,
     customer_name: data.customer_name,
     customer_address_id: data.customer_address_id,
@@ -184,10 +206,11 @@ export type UpdateJobInput = Partial<CreateJobInput>;
 
 export async function updateJob(id: string, input: UpdateJobInput) {
   const supabase = await createSupabaseServerClient();
-  const companyId = await getActiveCompanyId();
-  if (!companyId) {
+  const context = await getActiveCompanyContext();
+  if (!context) {
     throw new Error("Empresa nao encontrada.");
   }
+  const { companyId } = context;
 
   const schedule = input.scheduled_for
     ? splitScheduledFor(input.scheduled_for)
@@ -201,6 +224,7 @@ export async function updateJob(id: string, input: UpdateJobInput) {
       customer_name: input.customer_name ?? undefined,
       customer_id: input.customer_id ?? undefined,
       customer_address_id: input.customer_address_id ?? undefined,
+      branch_id: input.branch_id !== undefined ? input.branch_id : undefined,
       scheduled_date: schedule?.scheduled_date ?? undefined,
       scheduled_time: schedule?.scheduled_time ?? undefined,
       estimated_end_at: input.estimated_end_at ?? undefined,
@@ -229,6 +253,7 @@ export async function updateJob(id: string, input: UpdateJobInput) {
   return {
     id: data.id,
     company_id: data.company_id,
+    branch_id: (data as { branch_id?: string | null }).branch_id ?? null,
     customer_id: data.customer_id,
     customer_name: data.customer_name,
     customer_address_id: data.customer_address_id,

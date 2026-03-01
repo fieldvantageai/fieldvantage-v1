@@ -18,7 +18,7 @@ import EmployeeInvitePanel from "@/components/employees/EmployeeInvitePanel";
 import StatusBadge from "@/components/orders/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { getEmployeeById, listEmployeeJobs } from "@/features/employees/service";
-import { getEmployeeRoleLabel } from "@/features/employees/roleLabels";
+import { getEmployeeRoleScopeLabel } from "@/features/employees/roleLabels";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -117,7 +117,11 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
             <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
               <span className="flex items-center gap-1">
                 <Shield className="h-3.5 w-3.5" />
-                {getEmployeeRoleLabel(employee.role)}
+                {getEmployeeRoleScopeLabel(
+                  employee.role,
+                  (employee as { branch_names?: string[] }).branch_names ?? [],
+                  ((employee as { branch_ids?: string[] }).branch_ids?.length ?? 0) === 0
+                )}
               </span>
               {employee.email ? (
                 <span className="flex items-center gap-1">

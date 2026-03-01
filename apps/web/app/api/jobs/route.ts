@@ -101,6 +101,14 @@ export async function GET(request: Request) {
   if (isCollaborator && membership?.id) {
     jobsQuery = jobsQuery.eq("job_assignments.membership_id", membership.id);
   }
+  // Branch admin/owner: filtra apenas jobs das suas filiais (multi-filial)
+  if (!context.isHq && context.branchIds.length > 0 && !isCollaborator) {
+    if (context.branchIds.length === 1) {
+      jobsQuery = jobsQuery.eq("branch_id", context.branchIds[0]);
+    } else {
+      jobsQuery = jobsQuery.in("branch_id", context.branchIds);
+    }
+  }
   if (isCollaborator && unassigned) {
     return NextResponse.json({ data: [], total: 0 }, { status: 200 });
   }
@@ -288,6 +296,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Branch guard multi-filial: branch admin só pode criar jobs para suas filiais
+    const inputBranchId = (input as { branchId?: string | null }).branchId ?? null;
+    if (!context.isHq && context.branchIds.length > 0) {
+      if (inputBranchId && !context.branchIds.includes(inputBranchId)) {
+        return NextResponse.json(
+          { error: "Voce so pode criar ordens para suas filiais." },
+          { status: 403 }
+        );
+      }
+    }
+    // Herda filial automaticamente para admin de filial única
+    const resolvedBranchId =
+      inputBranchId ?? (context.branchIds.length === 1 ? context.branchIds[0] : null);
+
     const job = await createJob({
       title: input.title,
       status: input.status,
@@ -296,6 +318,7 @@ export async function POST(request: Request) {
       customer_name: input.customerName,
       customer_id: input.customerId || null,
       customer_address_id: input.customerAddressId || null,
+      branch_id: resolvedBranchId,
       assigned_membership_ids: input.assignedMembershipIds ?? [],
       allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,

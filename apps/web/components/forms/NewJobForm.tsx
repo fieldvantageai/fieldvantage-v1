@@ -49,6 +49,8 @@ export default function NewJobForm() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customerAddresses, setCustomerAddresses] = useState<CustomerAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [branches, setBranches] = useState<Array<{ id: string; name: string }>>([]);
+  const [userBranchId, setUserBranchId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const [showSelector, setShowSelector] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
@@ -77,26 +79,42 @@ export default function NewJobForm() {
     register("recurrence");
     register("notes");
     register("allowInactive");
+    register("branchId");
   }, [register]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [employeesResponse, customersResponse] = await Promise.all([
-          fetch("/api/employees"),
-          fetch("/api/customers")
-        ]);
+        const [employeesResponse, customersResponse, branchesResponse, meResponse] =
+          await Promise.all([
+            fetch("/api/employees"),
+            fetch("/api/customers"),
+            fetch("/api/branches"),
+            fetch("/api/employees/me", { cache: "no-store" })
+          ]);
         if (employeesResponse.ok) {
-          const payload = (await employeesResponse.json()) as {
-            data?: Employee[];
-          };
+          const payload = (await employeesResponse.json()) as { data?: Employee[] };
           setEmployees(payload.data ?? []);
         }
         if (customersResponse.ok) {
-          const payload = (await customersResponse.json()) as {
-            data?: Customer[];
-          };
+          const payload = (await customersResponse.json()) as { data?: Customer[] };
           setCustomers(payload.data ?? []);
+        }
+        if (branchesResponse.ok) {
+          const payload = (await branchesResponse.json()) as {
+            data?: Array<{ id: string; name: string }>;
+          };
+          setBranches(payload.data ?? []);
+        }
+        if (meResponse.ok) {
+          const payload = (await meResponse.json()) as {
+            data?: { branch_id?: string | null };
+          };
+          const bid = payload.data?.branch_id ?? null;
+          setUserBranchId(bid);
+          if (bid) {
+            setValue("branchId", bid, { shouldDirty: false });
+          }
         }
       } catch {
         setEmployees([]);
@@ -104,7 +122,7 @@ export default function NewJobForm() {
       }
     };
     loadData();
-  }, []);
+  }, [setValue]);
 
   useEffect(() => {
     const customerName = searchParams.get("customerName");
@@ -122,6 +140,7 @@ export default function NewJobForm() {
   const selectedCustomerAddressId = watch("customerAddressId");
   const selectedStatus = watch("status");
   const isRecurring = watch("isRecurring");
+  const selectedBranchId = watch("branchId");
 
   const recurrenceSummary = (recurrence?: unknown) =>
     formatRecurrenceSummary(recurrence as JobRecurrence | null, t);
@@ -327,6 +346,24 @@ export default function NewJobForm() {
             !selectedCustomerId || isLoadingAddresses || customerAddresses.length === 0
           }
         />
+
+        {branches.length > 0 && (
+          <Select
+            label="Filial"
+            value={selectedBranchId ?? ""}
+            options={[
+              { value: "", label: userBranchId ? "— Minha filial —" : "Sem filial específica" },
+              ...branches.map((branch) => ({
+                value: branch.id,
+                label: branch.name
+              }))
+            ]}
+            onChange={(event) => {
+              setValue("branchId", event.target.value || null, { shouldDirty: true });
+            }}
+            disabled={Boolean(userBranchId)}
+          />
+        )}
       </FormSection>
 
       <FormSection

@@ -97,16 +97,24 @@ export default function DashboardClient({
   }, [secondsSinceUpdate, t]);
 
   useEffect(() => {
+    let unmounted = false;
+
     const fetchSnapshot = async () => {
       if (document.visibilityState === "hidden") {
         return;
       }
-      const response = await fetch("/api/dashboard", { cache: "no-store" });
-      if (response.ok) {
+      try {
+        const response = await fetch("/api/dashboard", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
         const payload = (await response.json()) as { data?: DashboardSnapshot };
-        if (payload.data) {
+        if (!unmounted && payload.data) {
           setSnapshot(payload.data);
         }
+      } catch {
+        // Network hiccups/extensions can make fetch fail transiently.
+        // Keep current snapshot and retry on next poll/visibility change.
       }
     };
 
@@ -121,6 +129,7 @@ export default function DashboardClient({
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      unmounted = true;
       if (pollRef.current) {
         window.clearInterval(pollRef.current);
       }
