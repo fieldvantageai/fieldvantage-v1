@@ -36,7 +36,7 @@ function buildContext(row: MembershipRpcRow): ActiveCompanyContext {
         ? [row.branch_id]
         : [];
 
-  const isHq = resolvedBranchIds.length === 0;
+  const isHq = resolvedBranchIds.length === 0 && row.role === "owner";
   const branchId = resolvedBranchIds[0] ?? null;
 
   return {

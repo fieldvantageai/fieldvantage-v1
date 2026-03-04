@@ -200,7 +200,7 @@ export default function NewEmployeeForm() {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
-            label={t("fields.emailOptional")}
+            label={t("fields.emailRequired")}
             placeholder={t("placeholders.email")}
             type="email"
             error={errors.email?.message}

@@ -35,14 +35,10 @@ export async function listJobs() {
     .order("scheduled_date", { ascending: false })
     .order("scheduled_time", { ascending: false });
 
-  // Branch user: filtra pelos branchIds (multi-filial); RLS garante isso também
-  if (!isHq && branchIds.length > 0) {
-    if (branchIds.length === 1) {
-      query = query.eq("branch_id", branchIds[0]);
-    } else {
-      query = query.in("branch_id", branchIds);
-    }
-  }
+  // Para member, RLS já filtra por atribuição — sem filtro adicional por filial.
+  // Para admin não-HQ, Opção B: RLS permite filial permitida OU atribuído (não filtramos no app).
+  // HQ (isHq) também não precisa de filtro — vê tudo.
+  // Não aplicamos filtro de branchIds aqui; o RLS é a fonte de verdade.
 
   const { data, error } = await query;
 
@@ -85,7 +81,7 @@ export async function getJobById(id: string) {
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id, allow_inactive)"
+      "id, company_id, branch_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at, job_assignments(membership_id, allow_inactive)"
     )
     .eq("company_id", companyId)
     .eq("id", id)
@@ -102,6 +98,7 @@ export async function getJobById(id: string) {
   return {
     id: data.id,
     company_id: data.company_id,
+    branch_id: (data as { branch_id?: string | null }).branch_id ?? null,
     customer_id: data.customer_id,
     customer_name: data.customer_name,
     customer_address_id: data.customer_address_id,
@@ -167,7 +164,7 @@ export async function createJob(input: CreateJobInput) {
       recurrence: input.recurrence ?? null
     })
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
+      "id, company_id, branch_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
     )
     .single();
 
@@ -235,7 +232,7 @@ export async function updateJob(id: string, input: UpdateJobInput) {
     .eq("company_id", companyId)
     .eq("id", id)
     .select(
-      "id, company_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
+      "id, company_id, branch_id, customer_id, customer_name, customer_address_id, title, scheduled_date, scheduled_time, estimated_end_at, status, notes, is_recurring, recurrence, created_at, updated_at"
     )
     .maybeSingle();
 

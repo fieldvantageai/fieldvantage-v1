@@ -123,6 +123,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const normalizeOptional = (value?: string | null) =>
       value && value.trim().length > 0 ? value : null;
+
+    const normalizedEmail = input.email?.trim().toLowerCase();
+    if (!normalizedEmail) {
+      return NextResponse.json({ error: "Email obrigatorio." }, { status: 400 });
+    }
+
     const fullName = `${input.firstName} ${input.lastName}`.trim();
     const updated = await updateEmployee(
       id,
@@ -131,7 +137,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       last_name: input.lastName,
       full_name: fullName,
       avatar_url: normalizeOptional(input.avatarUrl),
-      email: normalizeOptional(input.email),
+      email: normalizedEmail,
       phone: normalizeOptional(input.phone),
       job_title: normalizeOptional(input.jobTitle),
       notes: normalizeOptional(input.notes),

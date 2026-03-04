@@ -37,6 +37,9 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
+  const [pendingSubmitValues, setPendingSubmitValues] = useState<NewEmployeeFormValues | null>(null);
+  const initialEmail = employee.email?.trim().toLowerCase() ?? "";
   const [branches, setBranches] = useState<Array<{ id: string; name: string }>>([]);
   const [userBranchIds, setUserBranchIds] = useState<string[]>([]);
   const [isUserHq, setIsUserHq] = useState(true);
@@ -112,7 +115,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
     employee.avatar_signed_url ?? null
   );
 
-  const onSubmit = async (values: NewEmployeeFormValues) => {
+  const doSubmit = async (values: NewEmployeeFormValues) => {
     setToast(null);
     try {
       const response = await fetch(`/api/employees/${employee.id}`, {
@@ -132,6 +135,24 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
         message: error instanceof Error ? error.message : t("messages.updateFallback"),
         variant: "error",
       });
+    }
+  };
+
+  const onSubmit = async (values: NewEmployeeFormValues) => {
+    const newEmail = values.email?.trim().toLowerCase() ?? "";
+    if (newEmail !== initialEmail) {
+      setPendingSubmitValues(values);
+      setShowEmailConfirm(true);
+      return;
+    }
+    await doSubmit(values);
+  };
+
+  const onConfirmEmailChange = async () => {
+    setShowEmailConfirm(false);
+    if (pendingSubmitValues) {
+      await doSubmit(pendingSubmitValues);
+      setPendingSubmitValues(null);
     }
   };
 
@@ -244,7 +265,7 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label={t("fields.emailOptional")}
+              label={t("fields.emailRequired")}
               placeholder={t("placeholders.email")}
               type="email"
               error={errors.email?.message}
@@ -437,6 +458,46 @@ export default function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
           </div>
         </div>
       </form>
+
+      {/* Modal de confirmação de alteração de e-mail */}
+      {showEmailConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center">
+          <div className="w-full max-w-sm rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl dark:bg-[var(--surface)]">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                <AlertTriangle className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-[var(--text)]">
+                  {t("messages.emailChangeConfirm")}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  {t("messages.emailChangeWarning")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row-reverse">
+              <button
+                type="button"
+                onClick={() => void onConfirmEmailChange()}
+                className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600"
+              >
+                {tCommon("actions.confirm")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEmailConfirm(false);
+                  setPendingSubmitValues(null);
+                }}
+                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-[var(--border)] dark:text-[var(--text)]"
+              >
+                {tCommon("actions.cancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Modal de confirmação de exclusão */}
       {showDeleteConfirm ? (

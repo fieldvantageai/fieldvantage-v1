@@ -85,6 +85,19 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
+    // Guard de escopo de filial: admin não-HQ só pode atribuir filiais do seu escopo
+    const requestedBranchId = input.branchId ?? null;
+    const isHq = context.isHq ?? !context.branchId;
+    if (!isHq && requestedBranchId) {
+      const allowedBranchIds: string[] = (context as { branchIds?: string[] }).branchIds ?? (context.branchId ? [context.branchId] : []);
+      if (!allowedBranchIds.includes(requestedBranchId)) {
+        return NextResponse.json(
+          { error: "Filial nao permitida para este usuario." },
+          { status: 403 }
+        );
+      }
+    }
+
     const updated = await updateJob(id, {
       title: input.title,
       status: input.status,
@@ -93,6 +106,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       customer_name: input.customerName,
       customer_id: input.customerId || null,
       customer_address_id: input.customerAddressId || null,
+      branch_id: requestedBranchId,
       assigned_membership_ids: input.assignedMembershipIds ?? [],
       allow_inactive_assignments: allowInactive,
       is_recurring: input.isRecurring ?? false,

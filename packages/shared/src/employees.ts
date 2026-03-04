@@ -44,8 +44,7 @@ const optionalText = () =>
 const requiredEmail = () =>
   yup
     .string()
-    .transform((value) => (value?.trim() === "" ? null : value))
-    .nullable()
+    .trim()
     .email("Informe um email valido.")
     .required("Email obrigatorio.");
 

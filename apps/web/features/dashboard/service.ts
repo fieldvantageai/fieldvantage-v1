@@ -1,5 +1,7 @@
 import { listEmployees } from "@/features/employees/service";
 import { listJobs } from "@/features/jobs/service";
+import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Job, JobStatus } from "@fieldvantage/shared";
 
 type DashboardOrderItem = {
@@ -65,10 +67,44 @@ const sortByScheduled = (a: Job, b: Job) =>
   new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime();
 
 export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
-  const [jobs, employees] = await Promise.all([listJobs(), listEmployees()]);
+  const [[jobs, employees], context] = await Promise.all([
+    Promise.all([listJobs(), listEmployees()]),
+    getActiveCompanyContext()
+  ]);
   const employeesByMembershipId = new Map(
     employees.map((employee) => [employee.membership_id, employee])
   );
+
+  // Para colaboradores (member), filtra apenas ordens atribuídas ao próprio usuário.
+  // Isso alinha o dashboard com a tela de lista de ordens (GET /api/jobs).
+  let visibleJobs = jobs;
+  const needsAssignmentFilter =
+    context?.role === "member" ||
+    (context?.role === "admin" && !context.isHq && context.branchIds.length === 0);
+
+  if (needsAssignmentFilter) {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+    const { data: membershipRow } = user
+      ? await supabase
+          .from("company_memberships")
+          .select("id")
+          .eq("company_id", context.companyId)
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .maybeSingle()
+      : { data: null };
+    const membershipId = membershipRow?.id ?? null;
+    if (membershipId) {
+      visibleJobs = jobs.filter(
+        (job) => job.assigned_membership_ids?.includes(membershipId)
+      );
+    } else {
+      visibleJobs = [];
+    }
+  }
 
   const now = new Date();
   const startOfDay = new Date(now);
@@ -76,19 +112,19 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  const jobsToday = jobs.filter((job) =>
+  const jobsToday = visibleJobs.filter((job) =>
     isBetween(new Date(job.scheduled_for), startOfDay, endOfDay)
   );
-  const inProgressNow = jobs.filter((job) => job.status === "in_progress");
-  const overdueJobs = jobs.filter((job) => {
+  const inProgressNow = visibleJobs.filter((job) => job.status === "in_progress");
+  const overdueJobs = visibleJobs.filter((job) => {
     const scheduled = new Date(job.scheduled_for);
     return scheduled < now && job.status === "in_progress";
   });
-  const shouldStartJobs = jobs.filter((job) => {
+  const shouldStartJobs = visibleJobs.filter((job) => {
     const scheduled = new Date(job.scheduled_for);
     return scheduled < now && job.status === "scheduled";
   });
-  const unassignedJobs = jobs.filter((job) => !job.assigned_membership_ids?.length);
+  const unassignedJobs = visibleJobs.filter((job) => !job.assigned_membership_ids?.length);
 
   const completedToday = jobsToday.filter((job) => job.status === "done").length;
   const inProgressToday = jobsToday.filter(
@@ -122,7 +158,7 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     .sort(sortByScheduled)
     .slice(0, 5)
     .map(mapJobItem);
-  const upcomingExecutions = jobs
+  const upcomingExecutions = visibleJobs
     .filter(
       (job) => new Date(job.scheduled_for) > now && job.status === "scheduled"
     )
@@ -155,7 +191,7 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     jobs: CalendarDayJob[];
   };
   const jobsByDateMap = new Map<string, DayAccumulator>();
-  jobs.forEach((job) => {
+  visibleJobs.forEach((job) => {
     const key = toDateKey(new Date(job.scheduled_for));
     const existing: DayAccumulator = jobsByDateMap.get(key) ?? {
       count: 0, hasOverdue: false, hasActive: false, jobs: []

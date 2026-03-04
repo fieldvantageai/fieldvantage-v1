@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Briefcase,
+  Building2,
   Calendar,
   CheckCircle2,
   Clock,
@@ -120,7 +121,8 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
                 {getEmployeeRoleScopeLabel(
                   employee.role,
                   (employee as { branch_names?: string[] }).branch_names ?? [],
-                  ((employee as { branch_ids?: string[] }).branch_ids?.length ?? 0) === 0
+                  ((employee as { branch_ids?: string[] }).branch_ids?.length ?? 0) === 0 &&
+                    employee.role === "owner"
                 )}
               </span>
               {employee.email ? (
@@ -226,6 +228,47 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
           </ul>
         </div>
       </div>
+
+      {/* ── Filiais ── */}
+      {(() => {
+        const branchNames: string[] = (employee as { branch_names?: string[] }).branch_names ?? [];
+        const branchIds: string[] = (employee as { branch_ids?: string[] }).branch_ids ?? [];
+        const isOwner = employee.role === "owner";
+        return (
+          <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <Building2 className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  {t("detail.branches.title")}
+                </p>
+                <p className="text-xs text-slate-500">{t("detail.branches.subtitle")}</p>
+              </div>
+            </div>
+            <div className="p-5">
+              {branchIds.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  {isOwner ? t("detail.branches.hq") : t("detail.branches.noFilial")}
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {branchNames.map((name, idx) => (
+                    <span
+                      key={branchIds[idx] ?? idx}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"
+                    >
+                      <Building2 className="h-3 w-3" />
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Invite panel ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 shadow-sm">

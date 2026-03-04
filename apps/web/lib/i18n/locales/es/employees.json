@@ -33,6 +33,12 @@
       "contact": "Contacto",
       "phoneFallback": "Telefono no informado"
     },
+    "branches": {
+      "title": "Sucursales",
+      "subtitle": "Sucursales a las que este colaborador esta asignado.",
+      "hq": "Empresa completa (sin sucursal específica)",
+      "noFilial": "Sin sucursal asignada"
+    },
     "jobs": {
       "title": "Trabajos asignados",
       "subtitle": "Trabajos en los que este empleado esta asignado.",
@@ -64,7 +70,8 @@
       "copy": "Copiar link de invitacion",
       "copySuccess": "Link de invitacion copiado.",
       "copyError": "No se pudo copiar el link.",
-      "linkUnavailable": "Por seguridad, el link anterior no se muestra. Genera un nuevo link."
+      "linkUnavailable": "Por seguridad, el link anterior no se muestra. Genera un nuevo link.",
+      "acceptedMessage": "Este colaborador ya aceptó la invitación y tiene acceso activo al sistema."
     }
   },
   "list": {
@@ -107,6 +114,7 @@
     "accessSubtitle": "Perfil de acceso y estado en la plataforma."
   },
   "status": {
+    "pending": "Pendiente",
     "activeHint": "El empleado puede acceder al sistema.",
     "inactiveHint": "El empleado no tiene acceso al sistema."
   },
@@ -117,6 +125,7 @@
     "avatar": "Foto del empleado",
     "email": "Email",
     "emailOptional": "Email (opcional — necesario para enviar invitacion)",
+    "emailRequired": "Email (obligatorio — utilizado para iniciar sesión)",
     "phone": "Telefono",
     "jobTitle": "Cargo",
     "addressLine1": "Direccion",
@@ -167,6 +176,8 @@
     "deleteWarning": "Esta accion no se puede deshacer.",
     "deleteError": "No se pudo eliminar el empleado.",
     "deleteFallback": "Error inesperado al eliminar el empleado.",
-    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?",
+    "emailChangeConfirm": "Cambiar el email afectará el inicio de sesión de este colaborador. ¿Desea continuar?",
+    "emailChangeWarning": "El colaborador deberá usar el nuevo email para acceder al sistema."
   }
 }

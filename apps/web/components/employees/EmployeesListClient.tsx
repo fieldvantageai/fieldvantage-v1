@@ -40,6 +40,7 @@ type EmployeeWithCounts = Employee & {
   completed_jobs_count?: number;
   branch_ids?: string[];
   branch_names?: string[];
+  invitation_status?: "pending" | "accepted" | null;
 };
 
 type EmployeesListClientProps = {
@@ -101,22 +102,24 @@ function EmployeeActions({
             <Pencil className="h-4 w-4 text-slate-400" />
             {t("actions.edit")}
           </button>
-          <button
-            type="button"
-            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen(false);
-              onStatusChange(employee.id, employee.status === "active" ? "inactive" : "active");
-            }}
-          >
-            {employee.status === "active" ? (
-              <ZapOff className="h-4 w-4 text-amber-500" />
-            ) : (
-              <Zap className="h-4 w-4 text-emerald-500" />
-            )}
-            {t("actions.toggleStatus")}
-          </button>
+          {employee.invitation_status !== "pending" ? (
+            <button
+              type="button"
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(false);
+                onStatusChange(employee.id, employee.status === "active" ? "inactive" : "active");
+              }}
+            >
+              {employee.status === "active" ? (
+                <ZapOff className="h-4 w-4 text-amber-500" />
+              ) : (
+                <Zap className="h-4 w-4 text-emerald-500" />
+              )}
+              {t("actions.toggleStatus")}
+            </button>
+          ) : null}
           {canDelete ? (
             <>
               <div className="my-1 h-px bg-slate-100" />
@@ -306,17 +309,23 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
 
                   {/* Status badge — desktop only */}
                   <div className="hidden sm:block">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        employee.status === "active"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {employee.status === "active"
-                        ? tCommon("status.active")
-                        : tCommon("status.inactive")}
-                    </span>
+                    {employee.invitation_status === "pending" ? (
+                      <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold bg-amber-50 text-amber-700">
+                        {t("status.pending")}
+                      </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          employee.status === "active"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-slate-100 text-slate-500"
+                        }`}
+                      >
+                        {employee.status === "active"
+                          ? tCommon("status.active")
+                          : tCommon("status.inactive")}
+                      </span>
+                    )}
                   </div>
 
                   {/* Actions */}

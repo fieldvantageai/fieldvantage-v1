@@ -166,41 +166,51 @@ export default function EmployeeInvitePanel({
           ) : null}
         </div>
 
-        {/* Action buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={handleRegenerate}
-            className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
-            {t("detail.invite.regenerate")}
-          </button>
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={handleRevoke}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
-          >
-            <X className="h-3.5 w-3.5 text-slate-400" />
-            {t("detail.invite.revoke")}
-          </button>
-          {email ? (
+        {/* Action buttons — contextual per status */}
+        {status !== "accepted" ? (
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={handleResendEmail}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+              disabled={isLoading}
+              onClick={handleRegenerate}
+              className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
             >
-              <Mail className="h-3.5 w-3.5 text-slate-400" />
-              {t("detail.invite.resend")}
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+              {t("detail.invite.regenerate")}
             </button>
-          ) : null}
-        </div>
+            {status === "pending" ? (
+              <>
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={handleRevoke}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                >
+                  <X className="h-3.5 w-3.5 text-slate-400" />
+                  {t("detail.invite.revoke")}
+                </button>
+                {email ? (
+                  <button
+                    type="button"
+                    onClick={handleResendEmail}
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    <Mail className="h-3.5 w-3.5 text-slate-400" />
+                    {t("detail.invite.resend")}
+                  </button>
+                ) : null}
+              </>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
-      {/* Invite link */}
-      {inviteLink ? (
+      {/* Invite link / accepted message */}
+      {status === "accepted" ? (
+        <p className="rounded-xl border border-emerald-200/70 bg-emerald-50/60 px-4 py-3 text-xs text-emerald-700">
+          {t("detail.invite.acceptedMessage")}
+        </p>
+      ) : inviteLink ? (
         <div className="rounded-xl border border-slate-200/70 bg-slate-50/60 p-3">
           <p className="mb-1.5 text-xs font-medium text-slate-500">{t("detail.invite.linkLabel")}</p>
           <div className="flex items-center gap-2">

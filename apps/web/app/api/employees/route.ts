@@ -60,7 +60,10 @@ export async function POST(request: Request) {
     const fullName = `${input.firstName} ${input.lastName}`.trim();
 
     const supabase = await createSupabaseServerClient();
-    const normalizedEmail = normalizeOptional(input.email);
+    const normalizedEmail = input.email?.trim().toLowerCase() ?? null;
+    if (!normalizedEmail) {
+      return NextResponse.json({ error: "Email obrigatorio." }, { status: 400 });
+    }
     const existingEmployee = normalizedEmail
       ? (
           await supabase
@@ -69,6 +72,7 @@ export async function POST(request: Request) {
               "id, company_id, first_name, last_name, full_name, email, phone, role, is_active, invitation_status, user_id"
             )
             .ilike("email", normalizedEmail)
+            .eq("company_id", context.companyId)
             .maybeSingle()
         ).data
       : null;

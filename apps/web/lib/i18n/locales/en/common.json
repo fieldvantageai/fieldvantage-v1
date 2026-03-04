@@ -16,7 +16,8 @@
     "expand": "Expand menu",
     "apply": "Apply",
     "logout": "Sign out",
-    "search": "Search"
+    "search": "Search",
+    "confirm": "Confirm"
   },
   "roles": {
     "owner": "Owner",

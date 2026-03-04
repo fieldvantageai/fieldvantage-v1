@@ -33,6 +33,12 @@
       "contact": "Contato",
       "phoneFallback": "Telefone não informado"
     },
+    "branches": {
+      "title": "Filiais",
+      "subtitle": "Filiais às quais este colaborador está vinculado.",
+      "hq": "Empresa toda (sem filial específica)",
+      "noFilial": "Nenhuma filial atribuída"
+    },
     "jobs": {
       "title": "Ordens alocadas",
       "subtitle": "Ordens em que este colaborador está alocado.",
@@ -64,7 +70,8 @@
       "copy": "Copiar link do convite",
       "copySuccess": "Link do convite copiado.",
       "copyError": "Não foi possível copiar o link.",
-      "linkUnavailable": "Link gerado anteriormente não fica disponível por segurança. Gere um novo link."
+      "linkUnavailable": "Link gerado anteriormente não fica disponível por segurança. Gere um novo link.",
+      "acceptedMessage": "Este colaborador já aceitou o convite e tem acesso ativo ao sistema."
     }
   },
   "list": {
@@ -107,6 +114,7 @@
     "accessSubtitle": "Perfil de acesso e status na plataforma."
   },
   "status": {
+    "pending": "Pendente",
     "activeHint": "O colaborador pode acessar o sistema.",
     "inactiveHint": "O colaborador não tem acesso ao sistema."
   },
@@ -117,6 +125,7 @@
     "avatar": "Foto do colaborador",
     "email": "Email",
     "emailOptional": "Email (opcional — necessário para convite)",
+    "emailRequired": "Email (obrigatório — usado para login)",
     "phone": "Telefone",
     "jobTitle": "Cargo",
     "addressLine1": "Endereço",
@@ -167,6 +176,8 @@
     "deleteWarning": "Esta ação não pode ser desfeita.",
     "deleteError": "Falha ao remover colaborador.",
     "deleteFallback": "Erro inesperado ao remover colaborador.",
-    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?",
+    "emailChangeConfirm": "Alterar o e-mail irá impactar o login deste colaborador. Deseja continuar?",
+    "emailChangeWarning": "O colaborador precisará usar o novo e-mail para acessar o sistema."
   }
 }

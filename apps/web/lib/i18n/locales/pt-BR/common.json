@@ -16,7 +16,8 @@
     "expand": "Expandir menu",
     "apply": "Aplicar",
     "logout": "Sair",
-    "search": "Buscar"
+    "search": "Buscar",
+    "confirm": "Confirmar"
   },
   "roles": {
     "owner": "Proprietário",

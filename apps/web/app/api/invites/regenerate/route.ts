@@ -40,6 +40,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Sem permissao." }, { status: 403 });
     }
 
+    // Busca o convite pendente atual para preservar branch_id/branch_ids e role originais
+    const { data: previousInvite } = await supabaseAdmin
+      .from("invites")
+      .select("branch_id, branch_ids, role")
+      .eq("employee_id", employee.id)
+      .eq("company_id", context.companyId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle() as { data: { branch_id: string | null; branch_ids: string[] | null; role: string | null } | null };
+
+    // Reconstrói branch_ids de forma segura (legado: só branch_id preenchido)
+    const preservedBranchIds: string[] =
+      previousInvite?.branch_ids && previousInvite.branch_ids.length > 0
+        ? previousInvite.branch_ids
+        : previousInvite?.branch_id
+          ? [previousInvite.branch_id]
+          : [];
+    const preservedBranchId = preservedBranchIds[0] ?? null;
+    const preservedRole = previousInvite?.role ?? employee.role ?? null;
+
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -61,7 +82,9 @@ export async function POST(request: Request) {
         created_by: user.id,
         email: employee.email ?? null,
         full_name: employee.full_name ?? null,
-        role: employee.role ?? null
+        role: preservedRole,
+        branch_id: preservedBranchId,
+        branch_ids: preservedBranchIds.length > 0 ? preservedBranchIds : null
       })
       .select("id, status, expires_at")
       .single();

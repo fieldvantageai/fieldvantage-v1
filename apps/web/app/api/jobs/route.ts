@@ -101,14 +101,9 @@ export async function GET(request: Request) {
   if (isCollaborator && membership?.id) {
     jobsQuery = jobsQuery.eq("job_assignments.membership_id", membership.id);
   }
-  // Branch admin/owner: filtra apenas jobs das suas filiais (multi-filial)
-  if (!context.isHq && context.branchIds.length > 0 && !isCollaborator) {
-    if (context.branchIds.length === 1) {
-      jobsQuery = jobsQuery.eq("branch_id", context.branchIds[0]);
-    } else {
-      jobsQuery = jobsQuery.in("branch_id", context.branchIds);
-    }
-  }
+  // Opção B: para admin não-HQ, não filtramos por branchIds no app.
+  // O RLS garante: admin vê ordens das suas filiais + ordens atribuídas a si (qualquer filial).
+  // Para member (isCollaborator), o filtro !inner + eq membership_id já restringe.
   if (isCollaborator && unassigned) {
     return NextResponse.json({ data: [], total: 0 }, { status: 200 });
   }

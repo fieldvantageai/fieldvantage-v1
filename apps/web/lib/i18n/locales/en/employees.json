@@ -33,6 +33,12 @@
       "contact": "Contact",
       "phoneFallback": "Phone not provided"
     },
+    "branches": {
+      "title": "Branches",
+      "subtitle": "Branches this employee is assigned to.",
+      "hq": "Company-wide (no specific branch)",
+      "noFilial": "No branch assigned"
+    },
     "jobs": {
       "title": "Assigned jobs",
       "subtitle": "Jobs this employee is assigned to.",
@@ -64,7 +70,8 @@
       "copy": "Copy invite link",
       "copySuccess": "Invite link copied.",
       "copyError": "Could not copy the link.",
-      "linkUnavailable": "For security, the previous link is not shown. Generate a new link."
+      "linkUnavailable": "For security, the previous link is not shown. Generate a new link.",
+      "acceptedMessage": "This collaborator has accepted the invite and has active access to the system."
     }
   },
   "list": {
@@ -107,6 +114,7 @@
     "accessSubtitle": "Access profile and platform status."
   },
   "status": {
+    "pending": "Pending",
     "activeHint": "Employee can access the system.",
     "inactiveHint": "Employee has no access to the system."
   },
@@ -117,6 +125,7 @@
     "avatar": "Employee photo",
     "email": "Email",
     "emailOptional": "Email (optional — required to send invite)",
+    "emailRequired": "Email (required — used for login)",
     "phone": "Phone",
     "jobTitle": "Job title",
     "addressLine1": "Address line 1",
@@ -167,6 +176,8 @@
     "deleteWarning": "This action cannot be undone.",
     "deleteError": "Failed to remove employee.",
     "deleteFallback": "Unexpected error while removing employee.",
-    "cancelConfirm": "There is filled data. Do you want to cancel?"
+    "cancelConfirm": "There is filled data. Do you want to cancel?",
+    "emailChangeConfirm": "Changing the email will affect this collaborator's login. Do you want to continue?",
+    "emailChangeWarning": "The collaborator will need to use the new email to access the system."
   }
 }
