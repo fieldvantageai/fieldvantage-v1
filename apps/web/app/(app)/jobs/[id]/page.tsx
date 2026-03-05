@@ -6,6 +6,7 @@ import {
   Check,
   Clock,
   ClipboardList,
+  ImageIcon,
   Mail,
   MapPin,
   Pencil,
@@ -20,7 +21,9 @@ import {
 
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
+import JobAttachmentsSection from "@/components/orders/JobAttachmentsSection";
 import OrderHistoryTimeline from "@/components/orders/OrderHistoryTimeline";
+import OrderStatusControl from "@/components/orders/OrderStatusControl";
 import StatusBadge from "@/components/orders/StatusBadge";
 import OpenInMapsButton from "@/components/common/OpenInMapsButton";
 import { getCustomerById } from "@/features/customers/service";
@@ -42,12 +45,30 @@ export default async function JobDetailPage({ params }: PageProps) {
   const supabase = await createSupabaseServerClient();
   const context = await getActiveCompanyContext();
   const isCollaborator = context?.role === "member";
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
   const job = await getJobById(id);
 
   if (!job) {
     notFound();
   }
   const assignedMembershipIds = job.assigned_membership_ids ?? [];
+
+  // Se o usuário é colaborador, verificar se está atribuído a esta ordem para permitir alteração de status
+  let canChangeStatus = !isCollaborator; // admin/owner sempre podem
+  if (isCollaborator && user) {
+    const { data: myMembership } = await supabase
+      .from("company_memberships")
+      .select("id")
+      .eq("company_id", context?.companyId ?? "")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .maybeSingle();
+    if (myMembership && assignedMembershipIds.includes(myMembership.id)) {
+      canChangeStatus = true;
+    }
+  }
   const assignedEmployees =
     assignedMembershipIds.length > 0
       ? (
@@ -143,7 +164,11 @@ export default async function JobDetailPage({ params }: PageProps) {
             <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
               {job.title ?? t("table.titleFallback")}
             </h1>
-            <StatusBadge status={job.status} />
+            {canChangeStatus ? (
+              <OrderStatusControl orderId={job.id} status={job.status} />
+            ) : (
+              <StatusBadge status={job.status} />
+            )}
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <User className="h-4 w-4 text-slate-400" />
@@ -189,7 +214,11 @@ export default async function JobDetailPage({ params }: PageProps) {
             </p>
             <div className="mt-3 flex items-center gap-2">
               <span className={`h-2.5 w-2.5 rounded-full ${statusDot}`} />
-              <StatusBadge status={job.status} />
+              {canChangeStatus ? (
+                <OrderStatusControl orderId={job.id} status={job.status} />
+              ) : (
+                <StatusBadge status={job.status} />
+              )}
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-5 shadow-sm">
@@ -382,6 +411,18 @@ export default async function JobDetailPage({ params }: PageProps) {
           </Section>
         );
       })()}
+
+      <Section
+        title={
+          <div className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4 text-slate-400" />
+            <span>{t("detail.attachments.title")}</span>
+          </div>
+        }
+        description={t("detail.attachments.subtitle")}
+      >
+        <JobAttachmentsSection jobId={job.id} />
+      </Section>
 
       <div id="history" className="border-t border-slate-200/70 pt-6 mt-6">
         <Section

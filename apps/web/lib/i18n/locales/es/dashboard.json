@@ -8,7 +8,12 @@
     "inProgressNow": "En progreso ahora",
     "completedToday": "Completados hoy",
     "overdue": "Atrasados",
-    "unassigned": "Sin asignacion"
+    "unassigned": "Sin asignacion",
+    "myJobsToday": "Mis trabajos hoy",
+    "myCompleted": "Completados hoy",
+    "nextOrder": "Proximo trabajo",
+    "nextOrderNone": "Ninguno",
+    "nextOrderToday": "Hoy"
   },
   "companySetup": {
     "title": "Completa el registro de la empresa",
@@ -23,11 +28,13 @@
     "viewAll": "Ver todos los trabajos",
     "emptyTitle": "No hay trabajos hoy",
     "emptySubtitle": "Crea el primer trabajo del dia para tu equipo.",
+    "emptySubtitleMember": "No tienes trabajos programados para hoy.",
     "createJob": "Crear trabajo"
   },
   "live": {
     "title": "Ejecuciones en vivo",
     "subtitle": "Ordenes en progreso ahora.",
+    "subtitleMember": "Tus ordenes en progreso ahora.",
     "emptyTitle": "No hay ejecuciones activas ahora",
     "emptySubtitle": "Las ejecuciones activas apareceran aqui cuando existan.",
     "noAssignees": "Sin empleados asignados",
@@ -52,6 +59,9 @@
   "riskStrip": {
     "empty": "Todo bajo control por ahora."
   },
+  "member": {
+    "shouldStartReminder": "Tienes {count} trabajo(s) que deberia(n) haber iniciado"
+  },
   "progress": {
     "plannedLabel": "Planificadas hoy:",
     "completedLabel": "Completadas hoy:",
@@ -72,6 +82,23 @@
     "inviteEmployee": "Invitar empleado",
     "addCustomer": "Agregar cliente"
   },
+  "team": {
+    "title": "Equipo",
+    "activeEmployees": "Empleados activos",
+    "pendingInvites": "Invitaciones pendientes"
+  },
+  "branchSummary": {
+    "title": "Resumen por sucursal",
+    "today": "Hoy",
+    "inProgress": "En ejecucion",
+    "overdue": "Atrasados",
+    "noBranch": "Sin sucursal",
+    "empty": "Sin sucursales registradas."
+  },
+  "upcoming": {
+    "title": "Proximas ejecuciones",
+    "empty": "No hay trabajos programados."
+  },
   "calendar": {
     "noOrders": "Sin ordenes en este dia.",
     "viewAll": "Ver todas",
@@ -81,9 +108,5 @@
     "legendOverdue": "Atrasada",
     "legendActive": "Programada / En curso",
     "legendInactive": "Sin ordenes activas"
-  },
-  "upcoming": {
-    "title": "Proximas ejecuciones",
-    "empty": "No hay trabajos programados."
   }
 }

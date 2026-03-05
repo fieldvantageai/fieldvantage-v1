@@ -1,7 +1,12 @@
+import { listBranches } from "@/features/branches/service";
 import { listEmployees } from "@/features/employees/service";
 import { listJobs } from "@/features/jobs/service";
-import { getActiveCompanyContext } from "@/lib/company/getActiveCompanyContext";
+import {
+  getActiveCompanyContext,
+  type ActiveCompanyRole
+} from "@/lib/company/getActiveCompanyContext";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Job, JobStatus } from "@fieldvantage/shared";
 
 type DashboardOrderItem = {
@@ -34,8 +39,26 @@ export type CalendarDay = {
   jobs: CalendarDayJob[];
 };
 
+export type BranchSummaryItem = {
+  branch_id: string | null;
+  branch_name: string;
+  jobs_today: number;
+  in_progress_now: number;
+  overdue: number;
+};
+
+export type TeamSummary = {
+  active_employees: number;
+  pending_invites: number;
+};
+
 export type DashboardSnapshot = {
   generated_at: string;
+  role_context: {
+    role: ActiveCompanyRole;
+    isHq: boolean;
+    branchIds: string[];
+  };
   metrics: {
     jobs_today: number;
     in_progress_now: number;
@@ -45,6 +68,8 @@ export type DashboardSnapshot = {
     completed_today: number;
     in_progress_today: number;
     remaining_today: number;
+    next_scheduled_for: string | null;
+    own_should_start_count: number;
   };
   lists: {
     live_executions: DashboardOrderItem[];
@@ -57,9 +82,11 @@ export type DashboardSnapshot = {
     unassigned: DashboardAttentionItem[];
   };
   jobs_by_date: CalendarDay[];
+  team_summary: TeamSummary | null;
+  branch_summary: BranchSummaryItem[] | null;
 };
 
-const toDateKey = (date: Date) => date.toISOString().split("T")[0];
+const toDateKey = (scheduledFor: string) => scheduledFor.split("T")[0];
 
 const isBetween = (date: Date, start: Date, end: Date) => date >= start && date < end;
 
@@ -71,6 +98,11 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     Promise.all([listJobs(), listEmployees()]),
     getActiveCompanyContext()
   ]);
+
+  const role = context?.role ?? "member";
+  const isHq = context?.isHq ?? false;
+  const branchIds = context?.branchIds ?? [];
+
   const employeesByMembershipId = new Map(
     employees.map((employee) => [employee.membership_id, employee])
   );
@@ -78,9 +110,10 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
   // Para colaboradores (member), filtra apenas ordens atribuídas ao próprio usuário.
   // Isso alinha o dashboard com a tela de lista de ordens (GET /api/jobs).
   let visibleJobs = jobs;
+  let membershipId: string | null = null;
   const needsAssignmentFilter =
-    context?.role === "member" ||
-    (context?.role === "admin" && !context.isHq && context.branchIds.length === 0);
+    role === "member" ||
+    (role === "admin" && !isHq && branchIds.length === 0);
 
   if (needsAssignmentFilter) {
     const supabase = await createSupabaseServerClient();
@@ -91,15 +124,15 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
       ? await supabase
           .from("company_memberships")
           .select("id")
-          .eq("company_id", context.companyId)
+          .eq("company_id", context!.companyId)
           .eq("user_id", user.id)
           .eq("status", "active")
           .maybeSingle()
       : { data: null };
-    const membershipId = membershipRow?.id ?? null;
+    membershipId = membershipRow?.id ?? null;
     if (membershipId) {
       visibleJobs = jobs.filter(
-        (job) => job.assigned_membership_ids?.includes(membershipId)
+        (job) => job.assigned_membership_ids?.includes(membershipId!)
       );
     } else {
       visibleJobs = [];
@@ -132,6 +165,16 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
   ).length;
   const plannedToday = jobsToday.length;
   const remainingToday = Math.max(plannedToday - completedToday - inProgressToday, 0);
+
+  // Member-specific: next scheduled order and own should-start count
+  let nextScheduledFor: string | null = null;
+  const ownShouldStartCount = role === "member" ? shouldStartJobs.length : 0;
+  if (role === "member") {
+    const upcoming = visibleJobs
+      .filter((job) => new Date(job.scheduled_for) > now && job.status === "scheduled")
+      .sort(sortByScheduled);
+    nextScheduledFor = upcoming[0]?.scheduled_for ?? null;
+  }
 
   const mapJobItem = (job: Job): DashboardOrderItem => {
     const assignedNames =
@@ -192,7 +235,7 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
   };
   const jobsByDateMap = new Map<string, DayAccumulator>();
   visibleJobs.forEach((job) => {
-    const key = toDateKey(new Date(job.scheduled_for));
+    const key = toDateKey(job.scheduled_for);
     const existing: DayAccumulator = jobsByDateMap.get(key) ?? {
       count: 0, hasOverdue: false, hasActive: false, jobs: []
     };
@@ -210,8 +253,98 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
     jobsByDateMap.set(key, existing);
   });
 
+  // Team summary (admin/owner only)
+  let teamSummary: TeamSummary | null = null;
+  if (context && (role === "owner" || role === "admin")) {
+    const activeCount = employees.filter(
+      (e) => (e as { invitation_status?: string }).invitation_status !== "pending"
+    ).length;
+    const pendingCount = employees.filter(
+      (e) => (e as { invitation_status?: string }).invitation_status === "pending"
+    ).length;
+    teamSummary = { active_employees: activeCount, pending_invites: pendingCount };
+  }
+
+  // Branch summary (owner always if branches exist; admin with 2+ branches)
+  let branchSummary: BranchSummaryItem[] | null = null;
+  if (context && (role === "owner" || (role === "admin" && branchIds.length >= 2))) {
+    const allBranches = await listBranches();
+    if (allBranches.length > 0) {
+      const branchNameMap = new Map(allBranches.map((b) => [b.id, b.name]));
+      const allJobs = role === "owner" || isHq ? jobs : visibleJobs;
+
+      const summaryMap = new Map<string | null, BranchSummaryItem>();
+      for (const branch of allBranches) {
+        summaryMap.set(branch.id, {
+          branch_id: branch.id,
+          branch_name: branch.name,
+          jobs_today: 0,
+          in_progress_now: 0,
+          overdue: 0,
+        });
+      }
+
+      let hasNoBranch = false;
+      for (const job of allJobs) {
+        const bid = job.branch_id ?? null;
+        if (!summaryMap.has(bid)) {
+          if (bid === null) {
+            hasNoBranch = true;
+            summaryMap.set(null, {
+              branch_id: null,
+              branch_name: "__no_branch__",
+              jobs_today: 0,
+              in_progress_now: 0,
+              overdue: 0,
+            });
+          } else {
+            continue;
+          }
+        }
+        const entry = summaryMap.get(bid)!;
+        const scheduledDate = new Date(job.scheduled_for);
+        if (isBetween(scheduledDate, startOfDay, endOfDay)) entry.jobs_today++;
+        if (job.status === "in_progress") entry.in_progress_now++;
+        if (job.status === "in_progress" && scheduledDate < now) entry.overdue++;
+      }
+
+      if (!hasNoBranch) {
+        const noBranchJobs = allJobs.filter((j) => !j.branch_id);
+        if (noBranchJobs.length > 0) {
+          const noBranchEntry: BranchSummaryItem = {
+            branch_id: null,
+            branch_name: "__no_branch__",
+            jobs_today: 0,
+            in_progress_now: 0,
+            overdue: 0,
+          };
+          for (const job of noBranchJobs) {
+            const scheduledDate = new Date(job.scheduled_for);
+            if (isBetween(scheduledDate, startOfDay, endOfDay)) noBranchEntry.jobs_today++;
+            if (job.status === "in_progress") noBranchEntry.in_progress_now++;
+            if (job.status === "in_progress" && scheduledDate < now) noBranchEntry.overdue++;
+          }
+          if (noBranchEntry.jobs_today > 0 || noBranchEntry.in_progress_now > 0 || noBranchEntry.overdue > 0) {
+            summaryMap.set(null, noBranchEntry);
+          }
+        }
+      }
+
+      const items = Array.from(summaryMap.values());
+      items.sort((a, b) => {
+        if (a.overdue > 0 && b.overdue === 0) return -1;
+        if (a.overdue === 0 && b.overdue > 0) return 1;
+        if (a.branch_id === null) return 1;
+        if (b.branch_id === null) return -1;
+        return a.branch_name.localeCompare(b.branch_name);
+      });
+      branchSummary = items;
+    }
+  }
+
   return {
     generated_at: now.toISOString(),
+    role_context: { role, isHq, branchIds },
     metrics: {
       jobs_today: jobsToday.length,
       in_progress_now: inProgressNow.length,
@@ -220,7 +353,9 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
       planned_today: plannedToday,
       completed_today: completedToday,
       in_progress_today: inProgressToday,
-      remaining_today: remainingToday
+      remaining_today: remainingToday,
+      next_scheduled_for: nextScheduledFor,
+      own_should_start_count: ownShouldStartCount
     },
     lists: {
       live_executions: liveExecutions,
@@ -236,6 +371,8 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
       jobs: acc.jobs.sort(
         (a, b) => new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime()
       ),
-    }))
+    })),
+    team_summary: teamSummary,
+    branch_summary: branchSummary
   };
 }

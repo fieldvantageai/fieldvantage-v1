@@ -1,6 +1,6 @@
 # FieldVantage — Documentação do Produto
 
-> Versão do documento: Março 2026  
+> Versão do documento: Março 2026 — V1.0  
 > Destinado a: clientes, parceiros e investidores
 
 ---
@@ -12,7 +12,7 @@
 3. [Funcionalidades por Tela](#3-funcionalidades-por-tela)
    - 3.1 [Registro e Onboarding](#31-registro-e-onboarding)
    - 3.2 [Dashboard — Painel Operacional](#32-dashboard--painel-operacional)
-   - 3.3 [Ordens de Serviço](#33-ordens-de-serviço)
+   - 3.3 [Ordens de Serviço](#33-ordens-de-serviço) (inclui Fotos e Anexos)
    - 3.4 [Clientes](#34-clientes)
    - 3.5 [Colaboradores](#35-colaboradores)
    - 3.6 [Filiais](#36-filiais)
@@ -319,12 +319,18 @@ Cada mudança de status é registrada no histórico da ordem com o nome e e-mail
 #### 3.3.6 Detalhe da ordem
 
 Exibe:
-- Status atual com badge visual
+- Status atual com badge visual e **botão de Alterar Status inline** (sem precisar voltar para a lista)
 - Data/hora de início e previsão de término
 - Dados completos do cliente e endereço com link de direções (Google Maps / Apple Maps / Waze)
 - Equipe alocada com nome e e-mail de cada membro
-- Notas da ordem
+- Notas da ordem (nota da ordem, nota do cliente, nota do endereço)
+- **Seção de Fotos e Anexos** — grid de thumbnails com lightbox e gestão de arquivos (ver 3.3.8)
 - Histórico de mudanças de status com responsável e horário
+
+**Alterar Status na tela de detalhe:**
+- O badge de status é clicável para colaboradores atribuídos à ordem e para administradores/proprietários
+- Abre o mesmo modal de atualização disponível na lista: select de novo status, data/hora da alteração e nota opcional
+- Ao salvar, a página é atualizada automaticamente e o novo status aparece refletido em tempo real
 
 #### 3.3.7 Regras de visibilidade das ordens
 
@@ -334,7 +340,41 @@ Exibe:
 | Ordem de filial X | Proprietário, Admin HQ, Admin da filial X |
 | Ordem de filial X sem atribuição | Proprietário, Admin HQ, Admin da filial X (colaboradores não veem) |
 | Ordem atribuída ao usuário | O próprio colaborador, independente da filial |
-| Admin com filiais A+B, ordem de filial C atribuída a ele | O próprio admin (Opção B — visível por atribuição) |
+| Admin com filiais A+B, ordem de filial C atribuída a ele | O próprio admin (visível por atribuição) |
+
+#### 3.3.8 Fotos e Anexos
+
+Cada ordem de serviço pode ter até **20 arquivos anexados** (fotos ou documentos), permitindo documentar visualmente a execução do serviço — antes, durante e depois.
+
+**Tipos de arquivo aceitos:**
+- Imagens: JPEG, PNG, WebP, GIF
+- Documentos: PDF
+- Tamanho máximo por arquivo: **10 MB**
+
+**Funcionalidades do grid de thumbnails:**
+- Grade responsiva: 2 colunas em mobile, 4 colunas em desktop
+- Overlay no rodapé de cada thumbnail com a **data de inserção** formatada no idioma do usuário
+- Se o anexo tiver nota, ela é exibida truncada (1 linha) abaixo da data no thumbnail
+- Botão de exclusão visível ao passar o cursor (ou sempre visível em dispositivos touch)
+
+**Lightbox (visualização em tela cheia):**
+- Clique no thumbnail abre a imagem em tela cheia com fundo escurecido
+- Navegação entre imagens com setas (esquerda/direita) ou teclas de teclado `←` `→`
+- Tecla `Esc` fecha o lightbox
+- Exibe abaixo da imagem: **data de inserção** e **campo de nota editável**
+
+**Campo de nota por anexo:**
+- Qualquer membro com acesso à ordem pode adicionar ou editar a nota de um anexo
+- Ativado clicando no texto da nota (ou no link "Adicionar nota" se ainda vazia)
+- Edição inline com textarea e botões Salvar / Cancelar
+- Atalho de teclado: `Enter` salva, `Esc` cancela
+- A nota é salva via API (PATCH) sem recarregar a página
+
+**Modal de confirmação de exclusão:**
+- Ao clicar no ícone de exclusão de um thumbnail, abre um modal no padrão do app (não o `confirm()` nativo do browser)
+- Exibe título, descrição do impacto ("arquivo removido permanentemente") e botões **Cancelar** / **Excluir** com spinner
+- Layout mobile-friendly: desliza da parte inferior em telas pequenas, centralizado em desktop
+- Após confirmar, o arquivo é removido do storage e da base de dados; o thumbnail desaparece da grade sem recarregar a página
 
 ---
 
@@ -629,6 +669,7 @@ companies
 | `user_notifications` | Notificações in-app por usuário |
 | `job_events` | Log imutável de eventos das ordens |
 | `order_status_events` | Histórico de mudanças de status com responsável |
+| `job_attachments` | Arquivos anexados a ordens (fotos, documentos e notas) |
 | `user_profiles` | Preferências do usuário (empresa ativa, app de navegação) |
 
 ### 4.3 Isolamento multi-tenant
@@ -705,7 +746,7 @@ Esta abordagem garante que, mesmo em casos de bug no frontend, nenhuma operaçã
 | Linguagem | TypeScript (end-to-end) |
 | Banco de dados | PostgreSQL via Supabase |
 | Autenticação | Supabase Auth (JWT + cookies HttpOnly) |
-| Storage | Supabase Storage (avatares, logos) |
+| Storage | Supabase Storage (avatares, logos, anexos de ordens) |
 | Realtime | Supabase Realtime (mensagens, notificações) |
 | Monorepo | pnpm workspaces |
 | Deploy | Vercel |
@@ -748,4 +789,4 @@ A interface foi desenvolvida com abordagem **mobile-first**:
 
 ---
 
-*Documentação gerada em Março de 2026. Para informações adicionais, entre em contato com a equipe FieldVantage.*
+*Documentação gerada em Março de 2026 — FieldVantage V1.0. Para informações adicionais, entre em contato com a equipe FieldVantage.*

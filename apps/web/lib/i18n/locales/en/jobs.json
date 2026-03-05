@@ -138,6 +138,30 @@
       "jobLabel": "Job note",
       "customerLabel": "Customer note",
       "addressLabel": "Address note"
+    },
+    "attachments": {
+      "title": "Photos & Attachments",
+      "subtitle": "Files attached to this job.",
+      "addPhoto": "Add photo",
+      "emptyTitle": "No attachments",
+      "emptyDescription": "Add photos or documents to this job.",
+      "uploading": "Uploading...",
+      "deleteConfirm": "Remove this attachment?",
+      "deleteSuccess": "Attachment removed.",
+      "uploadError": "Failed to upload file.",
+      "deleteError": "Failed to remove attachment.",
+      "close": "Close",
+      "previous": "Previous",
+      "next": "Next",
+      "deleteTitle": "Delete attachment",
+      "deleteDescription": "This action cannot be undone. The file will be permanently removed.",
+      "confirmDelete": "Delete",
+      "deleting": "Deleting...",
+      "cancel": "Cancel",
+      "notePlaceholder": "Add a note...",
+      "addNote": "Add note",
+      "saveNote": "Save",
+      "addedAt": "Added on"
     }
   },
   "status": {

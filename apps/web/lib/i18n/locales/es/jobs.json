@@ -138,6 +138,30 @@
       "jobLabel": "Nota del trabajo",
       "customerLabel": "Nota del cliente",
       "addressLabel": "Nota de la direccion"
+    },
+    "attachments": {
+      "title": "Fotos y Anexos",
+      "subtitle": "Archivos adjuntos a esta orden.",
+      "addPhoto": "Agregar foto",
+      "emptyTitle": "Sin anexos",
+      "emptyDescription": "Agrega fotos o documentos a esta orden.",
+      "uploading": "Subiendo...",
+      "deleteConfirm": "¿Eliminar este anexo?",
+      "deleteSuccess": "Anexo eliminado.",
+      "uploadError": "Error al subir archivo.",
+      "deleteError": "Error al eliminar anexo.",
+      "close": "Cerrar",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "deleteTitle": "Eliminar anexo",
+      "deleteDescription": "Esta acción no se puede deshacer. El archivo será eliminado permanentemente.",
+      "confirmDelete": "Eliminar",
+      "deleting": "Eliminando...",
+      "cancel": "Cancelar",
+      "notePlaceholder": "Agregar una nota...",
+      "addNote": "Agregar nota",
+      "saveNote": "Guardar",
+      "addedAt": "Agregado el"
     }
   },
   "status": {

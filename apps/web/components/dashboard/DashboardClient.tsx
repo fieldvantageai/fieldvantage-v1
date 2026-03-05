@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
+  Building2,
   Calendar as CalendarIcon,
+  CheckCircle2,
   ChevronDown,
   ClipboardList,
   Clock,
@@ -16,6 +18,7 @@ import {
   UserX
 } from "lucide-react";
 
+import type { ActiveCompanyRole } from "@/lib/company/getActiveCompanyContext";
 import type { DashboardSnapshot } from "@/features/dashboard/service";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
@@ -26,7 +29,7 @@ import RiskControlPanel from "./RiskControlPanel";
 type DashboardClientProps = {
   initialSnapshot: DashboardSnapshot;
   locale: string;
-  isMember: boolean;
+  role: ActiveCompanyRole;
 };
 
 const toDateParam = (date: Date) => date.toISOString().split("T")[0];
@@ -34,8 +37,11 @@ const toDateParam = (date: Date) => date.toISOString().split("T")[0];
 export default function DashboardClient({
   initialSnapshot,
   locale,
-  isMember
+  role
 }: DashboardClientProps) {
+  const isMember = role === "member";
+  const isOwner = role === "owner";
+
   const { t } = useClientT("dashboard");
   const { t: tJobs } = useClientT("jobs");
   const { t: tCommon } = useClientT("common");
@@ -113,7 +119,6 @@ export default function DashboardClient({
           setSnapshot(payload.data);
         }
       } catch {
-        // Network hiccups/extensions can make fetch fail transiently.
         // Keep current snapshot and retry on next poll/visibility change.
       }
     };
@@ -137,7 +142,63 @@ export default function DashboardClient({
     };
   }, []);
 
-  const cards = [
+  // --- Cards vary by role ---
+  const memberCards = [
+    {
+      label: t("cards.myJobsToday"),
+      value: snapshot.metrics.jobs_today,
+      icon: ClipboardList,
+      href: `/jobs?from=${toDateParam(new Date())}&to=${toDateParam(new Date())}`,
+      card: "bg-white/95 border-slate-200/70 dark:bg-[var(--surface)] dark:border-[var(--border)]",
+      iconBg: "bg-slate-100 dark:bg-white/10",
+      iconColor: "text-slate-500 dark:text-slate-400",
+      valueColor: "text-slate-900 dark:text-[var(--text)]"
+    },
+    {
+      label: t("cards.inProgressNow"),
+      value: snapshot.metrics.in_progress_now,
+      icon: TrendingUp,
+      href: "/jobs?status=in_progress",
+      card: "bg-blue-50/60 border-blue-200/70 dark:bg-blue-900/20 dark:border-blue-800/30",
+      iconBg: "bg-blue-100 dark:bg-blue-900/40",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      valueColor: "text-blue-800 dark:text-blue-300"
+    },
+    {
+      label: t("cards.myCompleted"),
+      value: snapshot.metrics.completed_today,
+      icon: CheckCircle2,
+      href: `/jobs?from=${toDateParam(new Date())}&to=${toDateParam(new Date())}&status=done`,
+      card: "bg-emerald-50/60 border-emerald-200/70 dark:bg-emerald-900/20 dark:border-emerald-800/30",
+      iconBg: "bg-emerald-100 dark:bg-emerald-900/40",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      valueColor: "text-emerald-800 dark:text-emerald-300"
+    },
+    {
+      label: t("cards.nextOrder"),
+      subValue: (() => {
+        const nsf = snapshot.metrics.next_scheduled_for;
+        if (!nsf) return undefined;
+        const nextDate = nsf.split("T")[0];
+        const todayDate = new Date().toLocaleDateString("en-CA");
+        if (nextDate === todayDate) return t("cards.nextOrderToday");
+        return new Date(nextDate + "T12:00").toLocaleDateString(locale, {
+          weekday: "short", day: "numeric", month: "short"
+        });
+      })(),
+      value: snapshot.metrics.next_scheduled_for
+        ? snapshot.metrics.next_scheduled_for.split("T")[1]?.slice(0, 5) ?? ""
+        : t("cards.nextOrderNone"),
+      icon: Clock,
+      href: "/jobs?status=scheduled",
+      card: "bg-violet-50/60 border-violet-200/70 dark:bg-violet-900/20 dark:border-violet-800/30",
+      iconBg: "bg-violet-100 dark:bg-violet-900/40",
+      iconColor: "text-violet-600 dark:text-violet-400",
+      valueColor: "text-violet-800 dark:text-violet-300"
+    }
+  ];
+
+  const managerCards = [
     {
       label: t("cards.jobsToday"),
       value: snapshot.metrics.jobs_today,
@@ -182,6 +243,8 @@ export default function DashboardClient({
     }
   ];
 
+  const cards = isMember ? memberCards : managerCards;
+
   const calendarDayMap = useMemo(() => {
     const map = new Map<string, typeof snapshot.jobs_by_date[0]>();
     snapshot.jobs_by_date.forEach((entry) => map.set(entry.date, entry));
@@ -206,7 +269,6 @@ export default function DashboardClient({
       month: "long",
       year: "numeric",
     });
-    // Normalize any capitalised connector words (e.g. "Fevereiro De 2026" → "Fevereiro de 2026")
     return raw.replace(/\b(De|Del|Of)\b/g, (m) => m.toLowerCase());
   })();
 
@@ -238,49 +300,59 @@ export default function DashboardClient({
       .join("");
   };
 
-  const riskChips = [
-    {
-      key: "overdue",
-      label: t("attention.overdue"),
-      count: snapshot.attention.overdue.length,
-      href: `/jobs?to=${toDateParam(
-        new Date(new Date().setDate(new Date().getDate() - 1))
-      )}&status=in_progress`,
-      icon: AlertTriangle,
-      chipCls: "border-amber-200/80 bg-amber-50 hover:bg-amber-100",
-      iconCls: "text-amber-500",
-      countCls: "bg-amber-100 text-amber-700"
-    },
-    {
-      key: "shouldStart",
-      label: t("attention.shouldStart"),
-      count: snapshot.attention.should_start.length,
-      href: "/jobs?status=scheduled",
-      icon: Clock,
-      chipCls: "border-orange-200/80 bg-orange-50 hover:bg-orange-100",
-      iconCls: "text-orange-500",
-      countCls: "bg-orange-100 text-orange-700"
-    },
-    {
-      key: "unassigned",
-      label: t("attention.unassigned"),
-      count: snapshot.attention.unassigned.length,
-      href: "/jobs?unassigned=1",
-      icon: UserMinus,
-      chipCls: "border-red-200/80 bg-red-50 hover:bg-red-100",
-      iconCls: "text-red-500",
-      countCls: "bg-red-100 text-red-700"
-    }
-  ];
+  // Risk chips / panel — only for admin/owner
+  const riskChips = isMember
+    ? []
+    : [
+        {
+          key: "overdue" as const,
+          label: t("attention.overdue"),
+          count: snapshot.attention.overdue.length,
+          href: `/jobs?to=${toDateParam(
+            new Date(new Date().setDate(new Date().getDate() - 1))
+          )}&status=in_progress`,
+          icon: AlertTriangle,
+          chipCls: "border-amber-200/80 bg-amber-50 hover:bg-amber-100",
+          iconCls: "text-amber-500",
+          countCls: "bg-amber-100 text-amber-700"
+        },
+        {
+          key: "shouldStart" as const,
+          label: t("attention.shouldStart"),
+          count: snapshot.attention.should_start.length,
+          href: "/jobs?status=scheduled",
+          icon: Clock,
+          chipCls: "border-orange-200/80 bg-orange-50 hover:bg-orange-100",
+          iconCls: "text-orange-500",
+          countCls: "bg-orange-100 text-orange-700"
+        },
+        {
+          key: "unassigned" as const,
+          label: t("attention.unassigned"),
+          count: snapshot.attention.unassigned.length,
+          href: "/jobs?unassigned=1",
+          icon: UserMinus,
+          chipCls: "border-red-200/80 bg-red-50 hover:bg-red-100",
+          iconCls: "text-red-500",
+          countCls: "bg-red-100 text-red-700"
+        }
+      ];
   const visibleRiskChips = riskChips.filter((chip) => chip.count > 0);
   const riskSum = riskChips.reduce((total, chip) => total + chip.count, 0);
-  const canExpandRiskPanel = riskSum > 0;
+  const canExpandRiskPanel = !isMember && riskSum > 0;
 
   useEffect(() => {
     if (!canExpandRiskPanel) {
       setRiskPanelOpen(false);
     }
   }, [canExpandRiskPanel]);
+
+  // Branch summary
+  const branchSummary = snapshot.branch_summary;
+  const showBranchSummary = !isMember && branchSummary && branchSummary.length > 0;
+
+  // Team summary
+  const teamSummary = snapshot.team_summary;
 
   return (
     <div className="space-y-8">
@@ -296,6 +368,7 @@ export default function DashboardClient({
       </header>
 
       <div className={`relative space-y-8 ${isSwitchingCompany ? "pointer-events-none" : ""}`}>
+        {/* KPI Cards */}
         <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {isSwitchingCompany
           ? Array.from({ length: 4 }).map((_, index) => (
@@ -329,11 +402,17 @@ export default function DashboardClient({
                   <p className={`mt-2 text-2xl font-bold sm:mt-3 sm:text-3xl ${item.valueColor}`}>
                     {item.value}
                   </p>
+                  {"subValue" in item && item.subValue && (
+                    <p className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500 sm:text-xs">
+                      {item.subValue}
+                    </p>
+                  )}
                 </Link>
               );
             })}
         </div>
 
+        {/* Progress bar */}
         <div className="rounded-2xl border border-slate-200/70 bg-white/95 px-5 py-3">
         {isSwitchingCompany ? (
           <div className="space-y-2">
@@ -405,125 +484,195 @@ export default function DashboardClient({
         })()}
         </div>
 
-        <div
-        className={`rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 transition ${
-          canExpandRiskPanel && !isSwitchingCompany
-            ? "cursor-pointer hover:bg-slate-50/70"
-            : ""
-        }`}
-        role={canExpandRiskPanel && !isSwitchingCompany ? "button" : undefined}
-        tabIndex={canExpandRiskPanel && !isSwitchingCompany ? 0 : -1}
-        aria-expanded={
-          canExpandRiskPanel && !isSwitchingCompany ? riskPanelOpen : undefined
-        }
-        onClick={() => {
-          if (canExpandRiskPanel && !isSwitchingCompany) {
-            setRiskPanelOpen((prev) => !prev);
-          }
-        }}
-        onKeyDown={(event) => {
-          if (!canExpandRiskPanel || isSwitchingCompany) {
-            return;
-          }
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setRiskPanelOpen((prev) => !prev);
-          }
-        }}
-      >
-        <div className="flex items-center justify-between gap-3">
-          {isSwitchingCompany ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
-              <div className="h-6 w-32 animate-pulse rounded-full bg-slate-100" />
-              <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
+        {/* Member: should-start reminder banner */}
+        {isMember && snapshot.metrics.own_should_start_count > 0 && !isSwitchingCompany ? (
+          <div className="flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/80 px-4 py-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+            <p className="text-sm font-medium text-amber-800">
+              {t("member.shouldStartReminder").replace(
+                "{count}",
+                String(snapshot.metrics.own_should_start_count)
+              )}
+            </p>
+          </div>
+        ) : null}
+
+        {/* Branch summary (owner / admin with 2+ branches) */}
+        {showBranchSummary && !isSwitchingCompany ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-slate-400" />
+              <h2 className="text-sm font-semibold text-slate-700">
+                {t("branchSummary.title")}
+              </h2>
             </div>
-          ) : canExpandRiskPanel ? (
-            <div className="flex flex-wrap items-center gap-2">
-              {visibleRiskChips.map((chip) => {
-                const Icon = chip.icon;
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {branchSummary!.map((branch) => {
+                const name =
+                  branch.branch_name === "__no_branch__"
+                    ? t("branchSummary.noBranch")
+                    : branch.branch_name;
+                const hasOverdue = branch.overdue > 0;
                 return (
-                  <Link
-                    key={chip.key}
-                    href={chip.href}
-                    onClick={(event) => event.stopPropagation()}
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold text-slate-700 transition ${chip.chipCls}`}
+                  <div
+                    key={branch.branch_id ?? "__no_branch__"}
+                    className={`rounded-2xl border px-4 py-3 ${
+                      hasOverdue
+                        ? "border-red-200/70 bg-red-50/40"
+                        : "border-slate-200/70 bg-white/95"
+                    }`}
                   >
-                    <Icon className={`h-3.5 w-3.5 ${chip.iconCls}`} />
-                    <span>{chip.label}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${chip.countCls}`}>
-                      {chip.count}
-                    </span>
-                  </Link>
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {name}
+                    </p>
+                    <div className="mt-2 flex items-center gap-4 text-xs">
+                      <span className="text-slate-500">
+                        {t("branchSummary.today")}{" "}
+                        <span className="font-semibold text-slate-700">{branch.jobs_today}</span>
+                      </span>
+                      <span className="text-slate-500">
+                        {t("branchSummary.inProgress")}{" "}
+                        <span className="font-semibold text-blue-600">{branch.in_progress_now}</span>
+                      </span>
+                      <span className={hasOverdue ? "text-red-600 font-semibold" : "text-slate-500"}>
+                        {t("branchSummary.overdue")}{" "}
+                        <span className={`font-semibold ${hasOverdue ? "text-red-700" : "text-slate-700"}`}>
+                          {branch.overdue}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          ) : (
-            <p className="text-sm text-slate-500">{t("riskStrip.empty")}</p>
-          )}
-          {canExpandRiskPanel && !isSwitchingCompany ? (
-            <ChevronDown
-              className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
-                riskPanelOpen ? "rotate-180" : ""
-              }`}
-            />
-          ) : null}
-        </div>
-        </div>
-
-        {canExpandRiskPanel ? (
-        <div
-          className={`overflow-hidden transition-all duration-200 ${
-            riskPanelOpen
-              ? "max-h-[1200px] opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="mt-4 space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">
-              {t("risk.title")}
-            </h2>
-            <RiskControlPanel
-              categories={[
-                {
-                  key: "overdue",
-                  title: t("attention.overdue"),
-                  count: snapshot.attention.overdue.length,
-                  items: snapshot.attention.overdue.map((item) => ({
-                    id: item.id,
-                    title: item.title ?? tJobs("table.titleFallback"),
-                    customer: item.customer_name ?? tJobs("detail.customerFallback"),
-                    href: `/jobs/${item.id}`
-                  }))
-                },
-                {
-                  key: "shouldStart",
-                  title: t("attention.shouldStart"),
-                  count: snapshot.attention.should_start.length,
-                  items: snapshot.attention.should_start.map((item) => ({
-                    id: item.id,
-                    title: item.title ?? tJobs("table.titleFallback"),
-                    customer: item.customer_name ?? tJobs("detail.customerFallback"),
-                    href: `/jobs/${item.id}`
-                  }))
-                },
-                {
-                  key: "unassigned",
-                  title: t("attention.unassigned"),
-                  count: snapshot.attention.unassigned.length,
-                  items: snapshot.attention.unassigned.map((item) => ({
-                    id: item.id,
-                    title: item.title ?? tJobs("table.titleFallback"),
-                    customer: item.customer_name ?? tJobs("detail.customerFallback"),
-                    href: `/jobs/${item.id}`
-                  }))
-                }
-              ]}
-            />
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
+        {/* Risk strip + panel (admin/owner only) */}
+        {!isMember ? (
+          <>
+            <div
+              className={`rounded-2xl border border-slate-200/70 bg-white/95 px-4 py-2 transition ${
+                canExpandRiskPanel && !isSwitchingCompany
+                  ? "cursor-pointer hover:bg-slate-50/70"
+                  : ""
+              }`}
+              role={canExpandRiskPanel && !isSwitchingCompany ? "button" : undefined}
+              tabIndex={canExpandRiskPanel && !isSwitchingCompany ? 0 : -1}
+              aria-expanded={
+                canExpandRiskPanel && !isSwitchingCompany ? riskPanelOpen : undefined
+              }
+              onClick={() => {
+                if (canExpandRiskPanel && !isSwitchingCompany) {
+                  setRiskPanelOpen((prev) => !prev);
+                }
+              }}
+              onKeyDown={(event) => {
+                if (!canExpandRiskPanel || isSwitchingCompany) {
+                  return;
+                }
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setRiskPanelOpen((prev) => !prev);
+                }
+              }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                {isSwitchingCompany ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
+                    <div className="h-6 w-32 animate-pulse rounded-full bg-slate-100" />
+                    <div className="h-6 w-28 animate-pulse rounded-full bg-slate-100" />
+                  </div>
+                ) : canExpandRiskPanel ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {visibleRiskChips.map((chip) => {
+                      const Icon = chip.icon;
+                      return (
+                        <Link
+                          key={chip.key}
+                          href={chip.href}
+                          onClick={(event) => event.stopPropagation()}
+                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold text-slate-700 transition ${chip.chipCls}`}
+                        >
+                          <Icon className={`h-3.5 w-3.5 ${chip.iconCls}`} />
+                          <span>{chip.label}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${chip.countCls}`}>
+                            {chip.count}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">{t("riskStrip.empty")}</p>
+                )}
+                {canExpandRiskPanel && !isSwitchingCompany ? (
+                  <ChevronDown
+                    className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
+                      riskPanelOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                ) : null}
+              </div>
+            </div>
+
+            {canExpandRiskPanel ? (
+              <div
+                className={`overflow-hidden transition-all duration-200 ${
+                  riskPanelOpen
+                    ? "max-h-[1200px] opacity-100"
+                    : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
+                <div className="mt-4 space-y-4">
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    {t("risk.title")}
+                  </h2>
+                  <RiskControlPanel
+                    categories={[
+                      {
+                        key: "overdue",
+                        title: t("attention.overdue"),
+                        count: snapshot.attention.overdue.length,
+                        items: snapshot.attention.overdue.map((item) => ({
+                          id: item.id,
+                          title: item.title ?? tJobs("table.titleFallback"),
+                          customer: item.customer_name ?? tJobs("detail.customerFallback"),
+                          href: `/jobs/${item.id}`
+                        }))
+                      },
+                      {
+                        key: "shouldStart",
+                        title: t("attention.shouldStart"),
+                        count: snapshot.attention.should_start.length,
+                        items: snapshot.attention.should_start.map((item) => ({
+                          id: item.id,
+                          title: item.title ?? tJobs("table.titleFallback"),
+                          customer: item.customer_name ?? tJobs("detail.customerFallback"),
+                          href: `/jobs/${item.id}`
+                        }))
+                      },
+                      {
+                        key: "unassigned",
+                        title: t("attention.unassigned"),
+                        count: snapshot.attention.unassigned.length,
+                        items: snapshot.attention.unassigned.map((item) => ({
+                          id: item.id,
+                          title: item.title ?? tJobs("table.titleFallback"),
+                          customer: item.customer_name ?? tJobs("detail.customerFallback"),
+                          href: `/jobs/${item.id}`
+                        }))
+                      }
+                    ]}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </>
+        ) : null}
+
+        {/* Main content grid */}
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
         <div className="space-y-6">
           <Section
@@ -537,7 +686,7 @@ export default function DashboardClient({
                 ) : null}
               </span>
             }
-            description={t("live.subtitle")}
+            description={isMember ? t("live.subtitleMember") : t("live.subtitle")}
           >
             {isSwitchingCompany ? (
               <div className="space-y-3">
@@ -635,7 +784,7 @@ export default function DashboardClient({
                   {t("today.emptyTitle")}
                 </p>
                 <p className="mt-2 text-sm text-slate-500">
-                  {t("today.emptySubtitle")}
+                  {isMember ? t("today.emptySubtitleMember") : t("today.emptySubtitle")}
                 </p>
                 {isMember ? null : (
                   <div className="mt-4 flex justify-center">
@@ -690,6 +839,36 @@ export default function DashboardClient({
               </div>
             )}
           </Section>
+
+          {/* Team summary (admin/owner only) */}
+          {!isMember && teamSummary && !isSwitchingCompany ? (
+            <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="h-4 w-4 text-slate-400" />
+                <p className="text-sm font-semibold text-slate-700">{t("team.title")}</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500">{t("team.activeEmployees")}</span>
+                  <span className="font-semibold text-slate-800">{teamSummary.active_employees}</span>
+                </div>
+                {isOwner ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-500">{t("team.pendingInvites")}</span>
+                    {teamSummary.pending_invites > 0 ? (
+                      <Link href="/employees" className="inline-flex items-center gap-1.5">
+                        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-700">
+                          {teamSummary.pending_invites}
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-slate-800">0</span>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="space-y-6">
@@ -710,11 +889,9 @@ export default function DashboardClient({
             </div>
           ) : (
             <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm">
-              {/* Calendar header */}
               <div className="flex items-center justify-between px-5 pt-5">
                 <p className="text-sm font-semibold text-slate-900">{monthLabel}</p>
                 <div className="flex items-center gap-2">
-                  {/* Legend tooltip — click/tap to toggle (works on mobile) */}
                   <div className="relative">
                     <button
                       type="button"
@@ -727,7 +904,6 @@ export default function DashboardClient({
                     </button>
                     {legendOpen ? (
                       <>
-                        {/* Backdrop to close on outside tap (mobile-friendly) */}
                         <div
                           className="fixed inset-0 z-10"
                           aria-hidden="true"
@@ -759,14 +935,12 @@ export default function DashboardClient({
                 </div>
               </div>
 
-              {/* Day-of-week labels */}
               <div className="mt-4 grid grid-cols-7 gap-1 px-3 text-center text-xs text-slate-400">
                 {["S", "T", "Q", "Q", "S", "S", "D"].map((label, index) => (
                   <span key={`${label}-${index}`}>{label}</span>
                 ))}
               </div>
 
-              {/* Days grid */}
               <div className="mt-2 grid grid-cols-7 gap-1 px-3 pb-4 text-xs text-slate-600">
                 {calendarCells.map((day, index) => {
                   const isToday = day !== null &&
@@ -777,7 +951,6 @@ export default function DashboardClient({
                   const dayData = day ? calendarDayMap.get(dateKey) : undefined;
                   const isSelected = dateKey === selectedDateKey;
 
-                  // Dot color priority
                   let dotColor = "";
                   if (dayData) {
                     if (dayData.hasOverdue) dotColor = "bg-red-500";
@@ -785,7 +958,6 @@ export default function DashboardClient({
                     else dotColor = "bg-slate-300";
                   }
 
-                  // When today has overdue jobs, show a red ring on the blue circle
                   const todayRing = isToday && dayData?.hasOverdue ? "ring-2 ring-red-400 ring-offset-1" : "";
 
                   return (
@@ -819,7 +991,6 @@ export default function DashboardClient({
                 })}
               </div>
 
-              {/* Agenda View */}
               <div className="border-t border-slate-100">
                 <div className="flex items-center justify-between px-5 py-3">
                   <p className="text-xs font-semibold capitalize text-slate-500">
@@ -873,6 +1044,7 @@ export default function DashboardClient({
             </div>
           )}
 
+          {/* Quick actions (admin/owner only) */}
           {isMember ? null : (
             <Section title={t("quick.title")} description={t("quick.subtitle")}>
               <div className="flex flex-col gap-3">

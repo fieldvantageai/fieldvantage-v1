@@ -8,7 +8,12 @@
     "inProgressNow": "In progress now",
     "completedToday": "Completed today",
     "overdue": "Overdue",
-    "unassigned": "Unassigned"
+    "unassigned": "Unassigned",
+    "myJobsToday": "My jobs today",
+    "myCompleted": "Completed today",
+    "nextOrder": "Next job",
+    "nextOrderNone": "None",
+    "nextOrderToday": "Today"
   },
   "companySetup": {
     "title": "Complete company setup",
@@ -23,11 +28,13 @@
     "viewAll": "View all jobs",
     "emptyTitle": "No jobs today",
     "emptySubtitle": "Create the first job of the day for your team.",
+    "emptySubtitleMember": "You have no jobs scheduled for today.",
     "createJob": "Create job"
   },
   "live": {
     "title": "Live executions",
     "subtitle": "Orders currently in progress.",
+    "subtitleMember": "Your orders currently in progress.",
     "emptyTitle": "No active executions right now",
     "emptySubtitle": "Active executions will appear here when available.",
     "noAssignees": "No assigned employees",
@@ -52,6 +59,9 @@
   "riskStrip": {
     "empty": "All clear for now."
   },
+  "member": {
+    "shouldStartReminder": "You have {count} job(s) that should have started"
+  },
   "progress": {
     "plannedLabel": "Planned today:",
     "completedLabel": "Completed today:",
@@ -72,6 +82,23 @@
     "inviteEmployee": "Invite employee",
     "addCustomer": "Add customer"
   },
+  "team": {
+    "title": "Team",
+    "activeEmployees": "Active employees",
+    "pendingInvites": "Pending invites"
+  },
+  "branchSummary": {
+    "title": "Branch summary",
+    "today": "Today",
+    "inProgress": "Running",
+    "overdue": "Overdue",
+    "noBranch": "No branch",
+    "empty": "No branches registered."
+  },
+  "upcoming": {
+    "title": "Upcoming executions",
+    "empty": "No upcoming scheduled jobs."
+  },
   "calendar": {
     "noOrders": "No orders on this day.",
     "viewAll": "View all",
@@ -81,9 +108,5 @@
     "legendOverdue": "Overdue",
     "legendActive": "Scheduled / In progress",
     "legendInactive": "No active orders"
-  },
-  "upcoming": {
-    "title": "Upcoming executions",
-    "empty": "No upcoming scheduled jobs."
   }
 }

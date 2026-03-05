@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "dashboard");
   const context = await getActiveCompanyContext();
-  const isMember = context?.role === "member";
+  const role = context?.role ?? "member";
   const company = await getMyCompany();
 
   if (!company) {
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
     <DashboardClient
       initialSnapshot={snapshot}
       locale={locale}
-      isMember={isMember}
+      role={role}
     />
   );
 }
