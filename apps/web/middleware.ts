@@ -61,7 +61,11 @@ export async function middleware(request: NextRequest) {
 
   const isLocalMarketingHost =
     requestHostname === "localhost" || requestHostname === "127.0.0.1";
+  const isIpAddress = /^\d{1,3}(\.\d{1,3}){3}$/.test(requestHostname);
+  const isCapacitorApp = request.headers.get("user-agent")?.includes("CapacitorHttp") ?? false;
   const isAppDomain = requestHostname.startsWith("app.") ||
+    isIpAddress ||
+    isCapacitorApp ||
     (process.env.NEXT_PUBLIC_APP_HOST
       ? requestHostname === process.env.NEXT_PUBLIC_APP_HOST
       : false);

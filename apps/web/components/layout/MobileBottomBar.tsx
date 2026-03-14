@@ -30,7 +30,7 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 backdrop-blur-sm md:hidden dark:border-[var(--border)] dark:bg-[var(--bg2)]/95"
+      className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 backdrop-blur-sm pb-safe md:hidden dark:border-[var(--border)] dark:bg-[var(--bg2)]/95"
       aria-label="Mobile navigation"
     >
       <ul className="flex items-stretch">
@@ -69,8 +69,6 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
           );
         })}
       </ul>
-      {/* iOS safe area */}
-      <div className="h-safe-area-inset-bottom bg-white/95 dark:bg-[var(--bg2)]/95" />
     </nav>
   );
 }

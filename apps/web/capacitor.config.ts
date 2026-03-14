@@ -7,6 +7,7 @@ const SERVER_URLS: Record<string, string> = {
 
 const env = process.env.CAPACITOR_ENV ?? "production";
 const serverUrl = process.env.CAPACITOR_SERVER_URL ?? SERVER_URLS[env] ?? SERVER_URLS.production;
+const isLocalDev = serverUrl.startsWith("http://");
 
 const config: CapacitorConfig = {
   appId: "com.geklix.app",
@@ -14,7 +15,7 @@ const config: CapacitorConfig = {
   webDir: "public",
   server: {
     url: serverUrl,
-    cleartext: false,
+    cleartext: isLocalDev,
   },
   plugins: {
     SplashScreen: {
@@ -25,7 +26,7 @@ const config: CapacitorConfig = {
     },
   },
   android: {
-    allowMixedContent: false,
+    allowMixedContent: isLocalDev,
   },
   ios: {
     scheme: "Geklix",

@@ -494,13 +494,10 @@ export default function AppShell({ children }: AppShellProps) {
               <div className="flex min-w-0 items-center gap-3">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2 lg:hidden"
+                  className="flex items-center lg:hidden"
                   aria-label={t("nav.dashboard")}
                 >
-                  <ThemedLogo iconOnly className="h-8 w-8 rounded-xl object-contain" />
-                  <span className="text-sm font-bold text-slate-900 dark:text-[var(--text)]">
-                    Geklix
-                  </span>
+                  <ThemedLogo className="h-7 w-auto object-contain" />
                 </Link>
                 <div className="hidden items-center lg:flex">
                   <div className="w-full min-w-[200px] max-w-sm">
@@ -788,7 +785,7 @@ export default function AppShell({ children }: AppShellProps) {
           </header>
 
           {/* ── Main Content ─────────────────────────────────────── */}
-          <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 sm:px-6 md:pb-8 lg:px-10 lg:py-8">
+          <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-28 mb-safe sm:px-6 md:pb-8 lg:px-10 lg:py-8">
             <main className="space-y-6">
               {toast ? (
                 <ToastBanner

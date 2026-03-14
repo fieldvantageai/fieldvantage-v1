@@ -24,6 +24,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: "#22c55e",
+  viewportFit: "cover",
 };
 
 /* Anti-FOUC: applies data-theme before React hydrates, preventing a flash
