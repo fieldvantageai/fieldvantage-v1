@@ -489,7 +489,7 @@ export default function AppShell({ children }: AppShellProps) {
         <div className="flex min-h-screen flex-1 flex-col">
           {/* ── Top Bar ─────────────────────────────────────────────── */}
           <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/90">
-            <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <div className="flex w-full items-center justify-between gap-2 px-3 py-2 sm:gap-4 sm:px-6 sm:py-3">
               {/* Left: Logo on mobile / Search on desktop */}
               <div className="flex min-w-0 items-center gap-3">
                 <Link
@@ -528,7 +528,7 @@ export default function AppShell({ children }: AppShellProps) {
                 {inviteUnreadCount > 0 ? (
                   <Link
                     href="/invites"
-                    className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
+                    className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 lg:inline-flex dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
                     aria-label={t("nav.invites")}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -558,7 +558,7 @@ export default function AppShell({ children }: AppShellProps) {
                 {/* Messages */}
                 <Link
                   href="/messages"
-                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
+                  className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:text-brand-600 lg:inline-flex dark:border-[var(--border)] dark:bg-[var(--surface)] dark:text-[var(--text-muted)] dark:hover:text-brand-400"
                   aria-label={t("nav.messages")}
                 >
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -578,11 +578,12 @@ export default function AppShell({ children }: AppShellProps) {
                   ) : null}
                 </Link>
 
-                {/* Theme toggle */}
-                <ThemeToggle />
+                <span className="hidden lg:inline-flex">
+                  <ThemeToggle />
+                </span>
 
                 <div
-                  className="mx-1 h-6 w-px bg-slate-200/80 dark:bg-[var(--border)]"
+                  className="mx-1 hidden h-6 w-px bg-slate-200/80 lg:block dark:bg-[var(--border)]"
                   aria-hidden="true"
                 />
 
@@ -619,7 +620,7 @@ export default function AppShell({ children }: AppShellProps) {
                           {companyInitials || companyInitial}
                         </span>
                       )}
-                      <span className="truncate text-sm font-semibold text-slate-800 dark:text-[var(--text)]">
+                      <span className="hidden truncate text-sm font-semibold text-slate-800 sm:inline dark:text-[var(--text)]">
                         {isLoadingCompany ? t("status.loading") : companyLabel}
                       </span>
                       {isSwitchingCompany ? (
@@ -628,7 +629,7 @@ export default function AppShell({ children }: AppShellProps) {
                     </span>
                     {canOpenWorkspaceMenu ? (
                       <ChevronDown
-                        className={`h-4 w-4 text-slate-400 transition dark:text-[var(--text-muted)] ${
+                        className={`hidden h-4 w-4 text-slate-400 transition sm:block dark:text-[var(--text-muted)] ${
                           openMenu === "workspace" ? "rotate-180" : ""
                         }`}
                       />
@@ -643,22 +644,22 @@ export default function AppShell({ children }: AppShellProps) {
                         prev === "account" ? null : "account"
                       )
                     }
-                    className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white p-1 pr-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:hover:bg-[var(--surface2)]"
+                    className="flex items-center gap-1 rounded-full border border-slate-200/80 bg-white p-1 pr-1.5 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:gap-1.5 sm:pr-2 dark:border-[var(--border)] dark:bg-[var(--surface)] dark:hover:bg-[var(--surface2)]"
                     aria-label={t("nav.profile")}
                   >
                     {userAvatarUrl ? (
                       <img
                         src={userAvatarUrl}
                         alt={userName ?? t("status.loading")}
-                        className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200/60 dark:ring-[var(--border)]"
+                        className="h-6 w-6 rounded-full object-cover ring-1 ring-slate-200/60 sm:h-7 sm:w-7 dark:ring-[var(--border)]"
                       />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600 dark:bg-[var(--surface2)] dark:text-[var(--text-muted)]">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600 sm:h-7 sm:w-7 sm:text-xs dark:bg-[var(--surface2)] dark:text-[var(--text-muted)]">
                         {userInitials}
                       </span>
                     )}
                     <ChevronDown
-                      className={`h-3.5 w-3.5 text-slate-400 transition dark:text-[var(--text-muted)] ${
+                      className={`hidden h-3.5 w-3.5 text-slate-400 transition sm:block dark:text-[var(--text-muted)] ${
                         openMenu === "account" ? "rotate-180" : ""
                       }`}
                     />
