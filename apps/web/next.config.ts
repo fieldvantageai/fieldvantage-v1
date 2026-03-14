@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
     NEXT_PUBLIC_BUILD_DATE: new Date().toISOString(),
-    NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV ?? "development",
+    NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV ?? process.env.NODE_ENV ?? "development",
   },
   allowedDevOrigins: ["app.localhost"],
 };
