@@ -252,6 +252,8 @@ export type EmployeeListItem = Employee & {
   invitation_status?: "pending" | "accepted" | null;
 };
 
+export type EmployeeWithAvatar = EmployeeListItem;
+
 async function enrichWithSignedAvatars<T extends { avatar_url?: string | null }>(
   items: T[]
 ): Promise<(T & { avatar_signed_url: string | null })[]> {

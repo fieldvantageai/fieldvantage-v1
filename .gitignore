@@ -24,5 +24,15 @@ public/sw.js.map
 public/swe-worker-*.js
 public/workbox-*.js
 
+# Capacitor native build artifacts (keep android/ and ios/ in git for team builds)
+apps/web/android/app/build/
+apps/web/android/.gradle/
+apps/web/android/build/
+apps/web/android/local.properties
+apps/web/ios/App/Pods/
+apps/web/ios/App/build/
+*.keystore
+*.jks
+
 # Local secrets or backups
 Password.txt
