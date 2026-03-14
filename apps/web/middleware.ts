@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
   // ── Hostname-based domain routing ─────────────────────────────────────────
   // geklix.com / www.geklix.com → serve only marketing routes
   // localhost / 127.0.0.1      → serve only marketing routes in local env
-  // app.geklix.com / app.localhost / staging.geklix.com → serve the full SaaS app
+  // app.geklix.com / app.localhost / dev.geklix.com → serve the full SaaS app
   const requestHostHeader = request.headers.get("host") ?? "";
   const requestHostname = requestHostHeader.split(":")[0]?.toLowerCase() ?? "";
   const requestPort = request.nextUrl.port;

@@ -776,9 +776,8 @@ O sistema segue o padrão **App Router** do Next.js 15, com separação clara en
 
 | Ambiente | URL | Propósito |
 |---|---|---|
-| Desenvolvimento | `app.geklix.com` | Equipe interna e testadores |
-| Staging | `staging.geklix.com` | Clientes selecionados em validação controlada |
-| Produção | (a definir) | Lançamento público |
+| Desenvolvimento | `dev.geklix.com` | Equipe interna e testadores |
+| Produção | `app.geklix.com` | Lançamento público |
 
 Cada ambiente possui suas próprias variáveis de ambiente, banco de dados Supabase e projeto Vercel, garantindo isolamento completo.
 
