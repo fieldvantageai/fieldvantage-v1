@@ -17,13 +17,42 @@ import type { Customer, CustomerAddress, JobStatus } from "@fieldvantage/shared"
 
 const getCompanyId = async () => getActiveCompanyId();
 
-export async function listCustomers() {
+export type CustomerListItem = Customer & {
+  avatar_signed_url?: string | null;
+};
+
+export async function listCustomers(): Promise<CustomerListItem[]> {
   const supabase = await createSupabaseServerClient();
   const companyId = await getCompanyId();
   if (!companyId) {
     return [];
   }
-  return listCustomersData(supabase, companyId);
+  const customers = await listCustomersData(supabase, companyId);
+
+  // Gera signed URLs em batch para todos os clientes com avatar
+  const withAvatars = customers.filter((c) => c.avatar_url);
+  if (!withAvatars.length) {
+    return customers.map((c) => ({ ...c, avatar_signed_url: null }));
+  }
+
+  const signedUrlResults = await Promise.all(
+    withAvatars.map((c) =>
+      supabaseAdmin.storage
+        .from("customer-avatars")
+        .createSignedUrl(c.avatar_url!, 60 * 60)
+    )
+  );
+
+  const signedUrlMap = new Map<string, string>();
+  withAvatars.forEach((c, i) => {
+    const url = signedUrlResults[i]?.data?.signedUrl;
+    if (url) signedUrlMap.set(c.avatar_url!, url);
+  });
+
+  return customers.map((c) => ({
+    ...c,
+    avatar_signed_url: c.avatar_url ? (signedUrlMap.get(c.avatar_url) ?? null) : null,
+  }));
 }
 
 export type CustomerWithAddresses = Customer & {

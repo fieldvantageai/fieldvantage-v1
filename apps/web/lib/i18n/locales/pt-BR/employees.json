@@ -177,6 +177,8 @@
     "deleteError": "Falha ao remover colaborador.",
     "deleteFallback": "Erro inesperado ao remover colaborador.",
     "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?",
+    "cancelConfirmTitle": "Deseja descartar as alterações?",
+    "cancelConfirmDescription": "As informações preenchidas serão perdidas.",
     "emailChangeConfirm": "Alterar o e-mail irá impactar o login deste colaborador. Deseja continuar?",
     "emailChangeWarning": "O colaborador precisará usar o novo e-mail para acessar o sistema."
   }

@@ -177,6 +177,8 @@
     "deleteError": "No se pudo eliminar el empleado.",
     "deleteFallback": "Error inesperado al eliminar el empleado.",
     "cancelConfirm": "Hay datos ingresados. Desea cancelar?",
+    "cancelConfirmTitle": "¿Desea descartar los cambios?",
+    "cancelConfirmDescription": "La información ingresada se perderá.",
     "emailChangeConfirm": "Cambiar el email afectará el inicio de sesión de este colaborador. ¿Desea continuar?",
     "emailChangeWarning": "El colaborador deberá usar el nuevo email para acceder al sistema."
   }

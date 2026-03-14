@@ -274,6 +274,8 @@
     "deleteConfirm": "Do you want to remove this job?",
     "deleteError": "Failed to remove job.",
     "deleteFallback": "Unexpected error while removing job.",
-    "cancelConfirm": "There is filled data. Do you want to cancel?"
+    "cancelConfirm": "There is filled data. Do you want to cancel?",
+    "cancelConfirmTitle": "Discard changes?",
+    "cancelConfirmDescription": "Any information entered will be lost."
   }
 }

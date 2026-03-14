@@ -14,6 +14,15 @@ dist/
 .idea/
 .vscode/
 Prototipo/
+playwright-report/
+test-results/
+.playwright/
+
+# Serwist / Service Worker generated files
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/workbox-*.js
 
 # Local secrets or backups
 Password.txt

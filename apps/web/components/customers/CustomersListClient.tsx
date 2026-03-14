@@ -15,6 +15,8 @@ import {
 
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Customer } from "@/features/_shared/types";
+
+type CustomerListItem = Customer & { avatar_signed_url?: string | null };
 import { useClientT } from "@/lib/i18n/useClientT";
 
 /* ─── avatar color palette (deterministic by name) ─── */
@@ -133,7 +135,7 @@ function CustomerActions({ customer, onDeleteRequest }: CustomerActionsProps) {
 
 /* ─── main component ─── */
 type CustomersListClientProps = {
-  customers: Customer[];
+  customers: CustomerListItem[];
 };
 
 export default function CustomersListClient({ customers }: CustomersListClientProps) {
@@ -261,9 +263,9 @@ export default function CustomersListClient({ customers }: CustomersListClientPr
                     href={`/customers/${customer.id}`}
                     className="flex min-w-0 items-center gap-3"
                   >
-                    {customer.avatar_url ? (
+                    {customer.avatar_signed_url ? (
                       <img
-                        src={customer.avatar_url}
+                        src={customer.avatar_signed_url}
                         alt={customer.name}
                         className="h-9 w-9 shrink-0 rounded-full object-cover"
                       />

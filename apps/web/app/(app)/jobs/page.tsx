@@ -19,7 +19,7 @@ export default async function JobsPage() {
           <p className="text-sm text-slate-500">{t("subtitle")}</p>
         </div>
         <Link href="/jobs/new">
-          <Button className="hidden sm:inline-flex">{t("actions.new")}</Button>
+          <Button className="sm:inline-flex">{t("actions.new")}</Button>
         </Link>
       </header>
       <div className="space-y-4">

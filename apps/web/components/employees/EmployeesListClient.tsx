@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, MoreHorizontal, Pencil, Search, Trash2, UserX, X, ZapOff, Zap } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Search, ToggleLeft, ToggleRight, Trash2, UserX, X } from "lucide-react";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -41,6 +41,7 @@ type EmployeeWithCounts = Employee & {
   branch_ids?: string[];
   branch_names?: string[];
   invitation_status?: "pending" | "accepted" | null;
+  avatar_signed_url?: string | null;
 };
 
 type EmployeesListClientProps = {
@@ -91,7 +92,7 @@ function EmployeeActions({
             className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
             onClick={(e) => { e.stopPropagation(); setOpen(false); router.push(`/employees/${employee.id}`); }}
           >
-            <Eye className="h-4 w-4 text-slate-400" />
+            <Eye className="h-4 w-4 text-indigo-500" />
             {t("actions.viewDetails")}
           </button>
           <button
@@ -99,7 +100,7 @@ function EmployeeActions({
             className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
             onClick={(e) => { e.stopPropagation(); setOpen(false); router.push(`/employees/${employee.id}/edit`); }}
           >
-            <Pencil className="h-4 w-4 text-slate-400" />
+            <Pencil className="h-4 w-4 text-amber-500" />
             {t("actions.edit")}
           </button>
           {employee.invitation_status !== "pending" ? (
@@ -113,9 +114,9 @@ function EmployeeActions({
               }}
             >
               {employee.status === "active" ? (
-                <ZapOff className="h-4 w-4 text-amber-500" />
+                <ToggleRight className="h-4 w-4 text-emerald-500" />
               ) : (
-                <Zap className="h-4 w-4 text-emerald-500" />
+                <ToggleLeft className="h-4 w-4 text-amber-500" />
               )}
               {t("actions.toggleStatus")}
             </button>
@@ -285,11 +286,19 @@ export default function EmployeesListClient({ employees }: EmployeesListClientPr
                 >
                   {/* Avatar + Name + Role */}
                   <div className="flex min-w-0 items-center gap-3">
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${color.bg} ${color.text}`}
-                    >
-                      {initials}
-                    </span>
+                    {employee.avatar_signed_url ? (
+                      <img
+                        src={employee.avatar_signed_url}
+                        alt={name}
+                        className="h-9 w-9 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${color.bg} ${color.text}`}
+                      >
+                        {initials}
+                      </span>
+                    )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-slate-900">{name}</p>
                       <p className="truncate text-xs text-slate-500">

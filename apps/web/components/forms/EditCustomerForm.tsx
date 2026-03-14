@@ -10,6 +10,7 @@ import AddressRepeater from "../customers/AddressRepeater";
 import CustomerAvatarUpload from "../customers/CustomerAvatarUpload";
 import CustomerFormSection from "../customers/CustomerFormSection";
 import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Textarea } from "@/components/ui/Textarea";
@@ -35,6 +36,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const {
     register,
@@ -42,7 +44,7 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
     setValue,
     watch,
     control,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, isDirty }
   } = useForm<NewCustomerFormValues>({
     resolver: yupResolver(newCustomerSchema),
     defaultValues: {
@@ -268,12 +270,15 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
         />
 
         {/* Footer fixo */}
-        <div className="fixed bottom-16 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm md:bottom-0 dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
+        <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
           <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3">
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push(`/customers/${customer.id}`)}
+              onClick={() => {
+                if (!isDirty) { router.push(`/customers/${customer.id}`); return; }
+                setShowCancelConfirm(true);
+              }}
             >
               {tCommon("actions.back")}
             </Button>
@@ -339,6 +344,17 @@ export default function EditCustomerForm({ customer }: EditCustomerFormProps) {
           </div>
         </div>
       ) : null}
+
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title={t("messages.cancelConfirmTitle")}
+        description={t("messages.cancelConfirmDescription")}
+        confirmLabel={tCommon("actions.confirm")}
+        cancelLabel={tCommon("actions.back")}
+        variant="warning"
+        onConfirm={() => router.push(`/customers/${customer.id}`)}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </>
   );
 }

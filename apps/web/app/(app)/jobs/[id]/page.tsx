@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
+  ArrowLeft,
   Calendar,
   Check,
   Clock,
@@ -158,18 +159,18 @@ export default async function JobDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
+      <Link
+        href="/jobs"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        {t("title")}
+      </Link>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-              {job.title ?? t("table.titleFallback")}
-            </h1>
-            {canChangeStatus ? (
-              <OrderStatusControl orderId={job.id} status={job.status} />
-            ) : (
-              <StatusBadge status={job.status} />
-            )}
-          </div>
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+            {job.title ?? t("table.titleFallback")}
+          </h1>
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <User className="h-4 w-4 text-slate-400" />
             <span>

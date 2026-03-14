@@ -23,6 +23,11 @@ export default function MobileBottomBar({ userRole }: MobileBottomBarProps) {
   const { t } = useClientT("common");
   const navItems = getNavItems({ role: normalizeUserRole(userRole), t }) ?? [];
 
+  const isFormPage =
+    pathname.endsWith("/new") || pathname.endsWith("/edit");
+
+  if (isFormPage) return null;
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 backdrop-blur-sm md:hidden dark:border-[var(--border)] dark:bg-[var(--bg2)]/95"

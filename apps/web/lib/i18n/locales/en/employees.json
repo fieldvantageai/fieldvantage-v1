@@ -177,6 +177,8 @@
     "deleteError": "Failed to remove employee.",
     "deleteFallback": "Unexpected error while removing employee.",
     "cancelConfirm": "There is filled data. Do you want to cancel?",
+    "cancelConfirmTitle": "Discard changes?",
+    "cancelConfirmDescription": "Any information entered will be lost.",
     "emailChangeConfirm": "Changing the email will affect this collaborator's login. Do you want to continue?",
     "emailChangeWarning": "The collaborator will need to use the new email to access the system."
   }

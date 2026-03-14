@@ -159,6 +159,8 @@
     "deleteWarning": "This action cannot be undone. Linked orders will be kept.",
     "deleteError": "Failed to remove customer.",
     "deleteFallback": "Unexpected error while removing.",
-    "cancelConfirm": "There is filled data. Do you want to cancel?"
+    "cancelConfirm": "There is filled data. Do you want to cancel?",
+    "cancelConfirmTitle": "Discard changes?",
+    "cancelConfirmDescription": "Any information entered will be lost."
   }
 }

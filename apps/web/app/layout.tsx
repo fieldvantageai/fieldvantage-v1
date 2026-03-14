@@ -7,12 +7,23 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Geklix",
-  description: "Operações de campo com foco em produtividade."
+  description: "Operações de campo com foco em produtividade.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Geklix",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
-  initialScale: 1
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#22c55e",
 };
 
 /* Anti-FOUC: applies data-theme before React hydrates, preventing a flash
@@ -32,7 +43,8 @@ export default async function RootLayout({
         <meta charSet="utf-8" />
         {/* Must be the first script in <head> to prevent theme flash */}
         <script dangerouslySetInnerHTML={{ __html: FOUC_SCRIPT }} />
-        <link rel="icon" href="/brand/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/brand/fav-icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen overflow-x-hidden">
         <ThemeProvider>

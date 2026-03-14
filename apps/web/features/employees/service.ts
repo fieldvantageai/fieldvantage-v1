@@ -242,14 +242,45 @@ export async function listEmployees() {
   return result;
 }
 
-export type EmployeeWithAvatar = Employee & {
+export type EmployeeListItem = Employee & {
   avatar_signed_url?: string | null;
+  completed_jobs_count?: number;
   branch_id?: string | null;
   branch_ids?: string[];
   branch_names?: string[];
-  /** Role cru do banco (company_memberships.role). Usado para guards de promocao. */
   membership_raw_role?: string;
+  invitation_status?: "pending" | "accepted" | null;
 };
+
+async function enrichWithSignedAvatars<T extends { avatar_url?: string | null }>(
+  items: T[]
+): Promise<(T & { avatar_signed_url: string | null })[]> {
+  const withAvatar = items.filter((i) => i.avatar_url);
+  if (!withAvatar.length) {
+    return items.map((i) => ({ ...i, avatar_signed_url: null }));
+  }
+  const signedResults = await Promise.all(
+    withAvatar.map((i) =>
+      supabaseAdmin.storage
+        .from("customer-avatars")
+        .createSignedUrl(i.avatar_url!, 60 * 60)
+    )
+  );
+  const urlMap = new Map<string, string>();
+  withAvatar.forEach((i, idx) => {
+    const url = signedResults[idx]?.data?.signedUrl;
+    if (url) urlMap.set(i.avatar_url!, url);
+  });
+  return items.map((i) => ({
+    ...i,
+    avatar_signed_url: i.avatar_url ? (urlMap.get(i.avatar_url) ?? null) : null,
+  }));
+}
+
+export async function listEmployeesWithAvatars() {
+  const raw = await listEmployees();
+  return enrichWithSignedAvatars(raw);
+}
 
 export type EmployeeWithJobs = EmployeeWithAvatar & {
   jobs?: Array<{

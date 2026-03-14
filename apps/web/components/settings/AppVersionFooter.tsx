@@ -30,7 +30,7 @@ export default function AppVersionFooter() {
     <div className="mt-10 border-t border-slate-100 pt-6 pb-2">
       <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold text-slate-500">
-          FieldVantage{" "}
+          Geklix{" "}
           <span className="font-normal text-slate-400">v{version}</span>
         </p>
         <p className="text-xs text-slate-400">

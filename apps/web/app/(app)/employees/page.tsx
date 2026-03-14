@@ -2,14 +2,14 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
 import EmployeesListClient from "@/components/employees/EmployeesListClient";
-import { listEmployees } from "@/features/employees/service";
+import { listEmployeesWithAvatars } from "@/features/employees/service";
 import { getServerLocale } from "@/lib/i18n/localeServer";
 import { getT } from "@/lib/i18n/server";
 
 export default async function EmployeesPage() {
   const locale = await getServerLocale();
   const t = await getT(locale, "employees");
-  const employees = await listEmployees();
+  const employees = await listEmployeesWithAvatars();
 
   return (
     <div className="space-y-6">

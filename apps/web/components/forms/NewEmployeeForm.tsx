@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import CustomerAvatarUpload from "../customers/CustomerAvatarUpload";
 import CustomerFormSection from "../customers/CustomerFormSection";
 import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
@@ -51,6 +52,7 @@ export default function NewEmployeeForm() {
   const isActive = watch("status") === "active";
   const avatarUrl = watch("avatarUrl");
   const selectedBranchIds = watch("branchIds") ?? [];
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -351,15 +353,14 @@ export default function NewEmployeeForm() {
       </CustomerFormSection>
 
       {/* Footer fixo */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm md:bottom-0 dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
         <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3">
           <Button
             type="button"
             variant="ghost"
             onClick={() => {
-              if (!isDirty || window.confirm(t("messages.cancelConfirm"))) {
-                router.push("/employees");
-              }
+              if (!isDirty) { router.push("/employees"); return; }
+              setShowCancelConfirm(true);
             }}
           >
             {tCommon("actions.back")}
@@ -372,6 +373,17 @@ export default function NewEmployeeForm() {
           />
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title={t("messages.cancelConfirmTitle")}
+        description={t("messages.cancelConfirmDescription")}
+        confirmLabel={tCommon("actions.confirm")}
+        cancelLabel={tCommon("actions.back")}
+        variant="warning"
+        onConfirm={() => router.push("/employees")}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </form>
   );
 }

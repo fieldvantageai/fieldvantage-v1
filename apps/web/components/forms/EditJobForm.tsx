@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
@@ -60,6 +61,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [allowInactive, setAllowInactive] = useState(false);
 
   const toDateTimeLocalValue = (value?: string | null) => {
@@ -81,7 +83,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, isDirty }
   } = useForm<NewJobFormValues>({
     resolver: yupResolver(newJobSchema),
     defaultValues: {
@@ -288,7 +290,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         throw new Error(data?.error ?? data?.message ?? t("messages.updateError"));
       }
 
-      setToast({ message: t("messages.updated"), variant: "success" });
+      router.push(`/jobs/${job.id}`);
       router.refresh();
     } catch (error) {
       setToast({
@@ -677,12 +679,15 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         />
       </FormSection>
 
-      <div className="rounded-2xl border-t border-slate-200/70 bg-background/90 px-4 py-3 backdrop-blur-sm shadow-lg md:sticky md:bottom-0 md:z-20 md:rounded-none">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             variant="ghost"
-            onClick={() => router.push("/jobs")}
+            onClick={() => {
+              if (!isDirty) { router.push(`/jobs/${job.id}`); return; }
+              setShowCancelConfirm(true);
+            }}
             disabled={isSubmitting}
           >
             {tCommon("actions.back")}
@@ -754,6 +759,17 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           </div>
         </div>
       ) : null}
+
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title={t("messages.cancelConfirmTitle")}
+        description={t("messages.cancelConfirmDescription")}
+        confirmLabel={tCommon("actions.confirm")}
+        cancelLabel={tCommon("actions.back")}
+        variant="warning"
+        onConfirm={() => router.push(`/jobs/${job.id}`)}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </form>
   );
 }

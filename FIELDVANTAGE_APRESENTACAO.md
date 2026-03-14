@@ -1,5 +1,5 @@
 # FieldVantage
-## A plataforma que coloca sua operação de campo sob controle
+## A plataforma que coloca sua operação sob controle
 
 > Documento de apresentação — Março 2026  
 > Para clientes, parceiros e investidores
@@ -8,7 +8,7 @@
 
 ## O problema que resolvemos
 
-Empresas de serviços de campo — limpeza, manutenção, obras, jardinagem — crescem com muita operação e pouca organização. O dia a dia é gerenciado por WhatsApp, planilhas e memória. Resultado:
+Qualquer organização com equipes operacionais — de uma empresa de limpeza a uma fábrica, de um restaurante a uma rede de lojas — cresce com muita operação e pouca organização. O dia a dia é gerenciado por WhatsApp, planilhas e memória. Resultado:
 
 - Ordens perdidas ou duplicadas
 - Equipes que não sabem o que fazer nem onde
@@ -22,7 +22,7 @@ Empresas de serviços de campo — limpeza, manutenção, obras, jardinagem — 
 
 ## O que é o FieldVantage
 
-O FieldVantage é uma plataforma de gestão de operações de campo, desenvolvida para empresas que prestam serviços externos. Do agendamento à conclusão, cada serviço é acompanhado em tempo real — com visibilidade total para o gestor e clareza absoluta para a equipe.
+O FieldVantage é uma plataforma de gestão de operações de equipes — para qualquer organização que precise controlar quem executa o quê, quando e onde. Seja uma empresa de serviços externos, um restaurante, uma fábrica, um hotel ou um escritório corporativo, o FieldVantage centraliza ordens de serviço, equipes e filiais em um único lugar. Do agendamento à conclusão, cada tarefa é acompanhada em tempo real — com visibilidade total para o gestor e clareza absoluta para a equipe.
 
 > Funciona no navegador, em qualquer dispositivo. Sem instalação.
 
@@ -37,6 +37,17 @@ O FieldVantage é uma plataforma de gestão de operações de campo, desenvolvid
 | **Construção e reformas** | Organiza equipes por obra, registra avanços com fotos e anotações |
 | **Paisagismo e jardinagem** | Gerencia rotas semanais, equipes volantes em múltiplos clientes |
 | **Serviços de propriedade** | Controla inspeções periódicas e histórico por cliente |
+| **Restaurantes e food service** | Controla higienizações periódicas, manutenção de equipamentos e inspeções sanitárias |
+| **Fábricas e indústria** | Ordens de manutenção preventiva e corretiva de máquinas, inspeções de segurança |
+| **Hotéis e hospedagem** | Gestão de limpeza de quartos, manutenção de instalações, controle de governança |
+| **Escritórios e facilities** | Manutenção interna, limpeza programada, controle de chamados físicos |
+| **Redes de varejo e franquias** | Vistorias e auditorias periódicas em cada loja, padronização entre unidades |
+| **Condomínios** | Serviços de manutenção, zeladoria, controle de prestadores terceirizados |
+| **Transportadoras e logística** | Inspeção de frota, ordens de manutenção de veículos por unidade |
+| **Prefeituras e serviços públicos** | Equipes de zeladoria urbana, manutenção de parques e iluminação pública |
+| **Eventos e produção** | Gestão de equipes de montagem e desmontagem por local e evento |
+
+> O FieldVantage não é exclusivo para serviços de campo. Qualquer operação com equipes, tarefas e unidades se beneficia da plataforma.
 
 ---
 
@@ -283,7 +294,7 @@ O FieldVantage foi construído sobre a infraestrutura das plataformas mais confi
 | Versus a concorrência | FieldVantage |
 |---|---|
 | Sistemas complexos com curva de aprendizado longa | Interface simples, onboarding em minutos |
-| Preço alto com funcionalidades que nunca serão usadas | Foco no essencial para operações de campo |
+| Preço alto com funcionalidades que nunca serão usadas | Foco no essencial para operações com equipes |
 | Sem suporte a múltiplas filiais nos planos básicos | Multi-filial disponível desde o início |
 | Aplicativo nativo obrigatório | Funciona direto no navegador, em qualquer dispositivo |
 | Dados misturados entre empresas | Isolamento total por empresa, por design |
@@ -300,8 +311,9 @@ As próximas funcionalidades planejadas para as versões seguintes:
 - **Integração com WhatsApp** — notificação automática ao cliente sobre status da ordem
 - **Portal do cliente** — acesso externo para o cliente acompanhar o andamento dos seus serviços
 - **Faturamento e orçamentos** — geração de propostas e cobranças integradas à ordem
+- **Live tracking de equipes** — mapa em tempo real com localização de cada colaborador, indicação de status (em trânsito / em execução) e histórico de percurso do dia
 
 ---
 
-*FieldVantage — Sua operação de campo, sob controle.*  
-*Documento de apresentação — Março 2026 — V1.0*
+*FieldVantage — Sua operação, sob controle.*  
+*Documento de apresentação — Março 2026 — V1.1*

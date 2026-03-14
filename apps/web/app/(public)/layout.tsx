@@ -10,23 +10,13 @@ export default function PublicLayout({
       <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/95 backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5">
-            {/* Light logo (hidden in dark mode) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/logo-light.svg"
+              src="/brand/logo.png"
               alt="Geklix"
               width={120}
               height={32}
-              className="block h-8 w-auto object-contain dark:hidden"
-            />
-            {/* Dark logo (shown in dark mode) */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo-dark.svg"
-              alt="Geklix"
-              width={120}
-              height={32}
-              className="hidden h-8 w-auto object-contain dark:block"
+              className="h-8 w-auto object-contain"
             />
           </Link>
           <Link

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { SaveAnimatedButton } from "@/components/ui/SaveAnimatedButton";
 import { Select } from "@/components/ui/Select";
@@ -55,6 +56,7 @@ export default function NewJobForm() {
   const [showSelector, setShowSelector] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [allowInactive, setAllowInactive] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -635,15 +637,14 @@ export default function NewJobForm() {
         />
       </FormSection>
 
-      <div className="rounded-2xl border-t border-slate-200/70 bg-background/90 px-4 py-3 backdrop-blur-sm shadow-lg md:sticky md:bottom-0 md:z-20 md:rounded-none">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/60 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm dark:border-[var(--border)] dark:bg-[var(--bg2)]/95">
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             variant="ghost"
             onClick={() => {
-              if (!isDirty || window.confirm(t("messages.cancelConfirm"))) {
-                router.push("/jobs");
-              }
+              if (!isDirty) { router.push("/jobs"); return; }
+              setShowCancelConfirm(true);
             }}
             className="inline-flex items-center gap-2 text-slate-600"
             disabled={isSubmitting}
@@ -674,6 +675,17 @@ export default function NewJobForm() {
           setValue("isRecurring", true, { shouldDirty: true });
           setShowRecurrence(false);
         }}
+      />
+
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title={t("messages.cancelConfirmTitle")}
+        description={t("messages.cancelConfirmDescription")}
+        confirmLabel={tCommon("actions.confirm")}
+        cancelLabel={tCommon("actions.back")}
+        variant="warning"
+        onConfirm={() => router.push("/jobs")}
+        onCancel={() => setShowCancelConfirm(false)}
       />
     </form>
   );

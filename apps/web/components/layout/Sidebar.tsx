@@ -57,13 +57,10 @@ export default function Sidebar({
           <Link
             href="/dashboard"
             onClick={onNavigate}
-            className="flex min-w-0 items-center gap-2.5"
+            className="flex min-w-0 items-center"
             aria-label={t("nav.dashboard")}
           >
-            <ThemedLogo iconOnly className="h-8 w-8 shrink-0 rounded-xl object-contain" />
-            <span className="truncate text-[15px] font-bold tracking-tight text-slate-900 dark:text-[var(--text)]">
-              Geklix
-            </span>
+            <ThemedLogo className="h-8 w-auto object-contain" />
           </Link>
         ) : (
           <Link

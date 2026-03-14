@@ -1,6 +1,6 @@
 # FieldVantage — Documentação do Produto
 
-> Versão do documento: Março 2026 — V1.0  
+> Versão do documento: Março 2026 — V1.1  
 > Destinado a: clientes, parceiros e investidores
 
 ---
@@ -22,6 +22,7 @@
 4. [Modelo de Dados](#4-modelo-de-dados)
 5. [Segurança e Controle de Acesso](#5-segurança-e-controle-de-acesso)
 6. [Infraestrutura e Tecnologia](#6-infraestrutura-e-tecnologia)
+7. [Roadmap](#7-roadmap)
 
 ---
 
@@ -29,7 +30,7 @@
 
 ### O que é o FieldVantage
 
-O FieldVantage é uma plataforma SaaS de gestão de operações de campo voltada para empresas que prestam serviços externos — limpeza, manutenção predial, obras, jardinagem e similares. O objetivo central é centralizar ordens de serviço, equipes e clientes em uma experiência simples, rápida e confiável para o dia a dia.
+O FieldVantage é uma plataforma SaaS de gestão de operações de equipes — para qualquer organização que precise controlar quem executa o quê, quando e onde. Embora tenha nascido voltado para empresas de serviços externos (limpeza, manutenção, obras, jardinagem), sua arquitetura de ordens de serviço, equipes e filiais atende igualmente restaurantes, fábricas, hotéis, redes de varejo, condomínios e qualquer operação que dependa de equipes coordenadas. O objetivo central é centralizar tarefas, equipes e clientes em uma experiência simples, rápida e confiável para o dia a dia.
 
 ### Para quem foi construído
 
@@ -40,6 +41,17 @@ O FieldVantage é uma plataforma SaaS de gestão de operações de campo voltada
 | Construção e reformas | Gestão de equipes por obra, acompanhamento de status |
 | Paisagismo e jardinagem | Rotas semanais, equipes volantes em múltiplos clientes |
 | Serviços de propriedade | Inspeções periódicas, relatórios por cliente |
+| Restaurantes e food service | Higienizações periódicas, manutenção de equipamentos, inspeções sanitárias |
+| Fábricas e indústria | Manutenção preventiva e corretiva de máquinas, inspeções de segurança |
+| Hotéis e hospedagem | Limpeza de quartos, manutenção de instalações, controle de governança |
+| Escritórios e facilities | Manutenção interna, limpeza programada, chamados físicos |
+| Redes de varejo e franquias | Vistorias e auditorias periódicas em cada loja, padronização entre unidades |
+| Condomínios | Manutenção, zeladoria, controle de prestadores terceirizados |
+| Transportadoras e logística | Inspeção de frota, manutenção de veículos por unidade |
+| Prefeituras e serviços públicos | Zeladoria urbana, manutenção de parques e iluminação pública |
+| Eventos e produção | Equipes de montagem e desmontagem por local e evento |
+
+> O FieldVantage não é exclusivo para serviços de campo. Qualquer operação com equipes, tarefas e unidades se beneficia da plataforma.
 
 ### Proposta de valor
 
@@ -789,4 +801,20 @@ A interface foi desenvolvida com abordagem **mobile-first**:
 
 ---
 
-*Documentação gerada em Março de 2026 — FieldVantage V1.0. Para informações adicionais, entre em contato com a equipe FieldVantage.*
+## 7. Roadmap
+
+Funcionalidades planejadas para as próximas versões:
+
+| Funcionalidade | Descrição |
+|---|---|
+| **Relatórios e exportações** | PDF de ordens, relatório de produtividade por colaborador, histórico por filial |
+| **App móvel nativo** | iOS e Android com suporte offline |
+| **Assinatura digital** | Confirmação de serviço executado pelo cliente diretamente no celular |
+| **Integração com WhatsApp** | Notificação automática ao cliente sobre status da ordem |
+| **Portal do cliente** | Acesso externo para o cliente acompanhar o andamento dos seus serviços |
+| **Faturamento e orçamentos** | Geração de propostas e cobranças integradas à ordem |
+| **Live tracking de equipes** | Mapa em tempo real com localização de cada colaborador, indicação de status (em trânsito / em execução) e histórico de percurso do dia |
+
+---
+
+*Documentação gerada em Março de 2026 — FieldVantage V1.1. Para informações adicionais, entre em contato com a equipe FieldVantage.*

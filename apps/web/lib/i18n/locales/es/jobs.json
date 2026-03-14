@@ -274,6 +274,8 @@
     "deleteConfirm": "Desea eliminar este trabajo?",
     "deleteError": "No se pudo eliminar el trabajo.",
     "deleteFallback": "Error inesperado al eliminar el trabajo.",
-    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?",
+    "cancelConfirmTitle": "¿Desea descartar los cambios?",
+    "cancelConfirmDescription": "La información ingresada se perderá."
   }
 }

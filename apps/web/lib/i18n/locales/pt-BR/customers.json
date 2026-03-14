@@ -159,6 +159,8 @@
     "deleteWarning": "Esta ação não pode ser desfeita. As ordens vinculadas serão mantidas.",
     "deleteError": "Falha ao remover cliente.",
     "deleteFallback": "Erro inesperado ao remover.",
-    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?",
+    "cancelConfirmTitle": "Deseja descartar as alterações?",
+    "cancelConfirmDescription": "As informações preenchidas serão perdidas."
   }
 }

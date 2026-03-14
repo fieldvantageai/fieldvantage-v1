@@ -159,6 +159,8 @@
     "deleteWarning": "Esta accion no se puede deshacer. Los pedidos vinculados se mantendran.",
     "deleteError": "No se pudo eliminar el cliente.",
     "deleteFallback": "Error inesperado al eliminar.",
-    "cancelConfirm": "Hay datos ingresados. Desea cancelar?"
+    "cancelConfirm": "Hay datos ingresados. Desea cancelar?",
+    "cancelConfirmTitle": "¿Desea descartar los cambios?",
+    "cancelConfirmDescription": "La información ingresada se perderá."
   }
 }

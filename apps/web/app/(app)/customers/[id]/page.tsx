@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
+  ArrowLeft,
   Briefcase,
   Building2,
   Calendar,
@@ -77,6 +78,15 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
+
+      {/* ── Back link ── */}
+      <Link
+        href="/customers"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        {t("title")}
+      </Link>
 
       {/* ── Header ── */}
       <header className="flex flex-wrap items-start justify-between gap-4">

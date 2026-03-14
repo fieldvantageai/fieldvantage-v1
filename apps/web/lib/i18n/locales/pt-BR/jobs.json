@@ -274,6 +274,8 @@
     "deleteConfirm": "Deseja remover esta ordem?",
     "deleteError": "Falha ao remover ordem.",
     "deleteFallback": "Erro inesperado ao remover ordem.",
-    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?"
+    "cancelConfirm": "Existem dados preenchidos. Deseja cancelar a inclusão?",
+    "cancelConfirmTitle": "Deseja descartar as alterações?",
+    "cancelConfirmDescription": "As informações preenchidas serão perdidas."
   }
 }

@@ -2,8 +2,6 @@
 
 import { useRef, useState } from "react";
 
-import { Button } from "@/components/ui/Button";
-
 type CustomerAvatarUploadProps = {
   value?: string | null;
   previewUrl?: string | null;
@@ -13,6 +11,7 @@ type CustomerAvatarUploadProps = {
   }>;
   onRemove: () => void;
   label: string;
+  hint?: string;
 };
 
 export default function CustomerAvatarUpload({
@@ -20,10 +19,12 @@ export default function CustomerAvatarUpload({
   previewUrl,
   onUpload,
   onRemove,
-  label
+  label,
+  hint = "PNG, JPG ou WebP · máx. 5 MB"
 }: CustomerAvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const hasPreview = Boolean(previewUrl || value);
 
   const handleSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,9 +32,12 @@ export default function CustomerAvatarUpload({
     if (!file) {
       return;
     }
+    setUploadError(null);
     setIsUploading(true);
     try {
       await onUpload(file);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erro ao enviar a imagem.");
     } finally {
       setIsUploading(false);
       if (inputRef.current) {
@@ -68,7 +72,7 @@ export default function CustomerAvatarUpload({
           <button
             type="button"
             className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
-            onClick={() => inputRef.current?.click()}
+            onClick={() => { setUploadError(null); inputRef.current?.click(); }}
             aria-label="Editar foto"
             disabled={isUploading}
           >
@@ -97,11 +101,15 @@ export default function CustomerAvatarUpload({
           </button>
         </div>
         <div className="flex-1 space-y-1">
-          <p className="text-sm font-semibold text-slate-900">{label}</p>
-          <p className="text-xs text-slate-500">
-            {isUploading ? "Enviando..." : "Escolha uma imagem para o cliente."}
-          </p>
-          {hasPreview ? (
+          <p className="text-sm font-semibold text-slate-900 dark:text-[var(--text)]">{label}</p>
+          {uploadError ? (
+            <p className="text-xs font-medium text-rose-500">{uploadError}</p>
+          ) : (
+            <p className="text-xs text-slate-500">
+              {isUploading ? "Enviando..." : hint}
+            </p>
+          )}
+          {hasPreview && !isUploading ? (
             <button
               type="button"
               className="text-xs font-semibold text-rose-500 hover:text-rose-600"
@@ -115,7 +123,7 @@ export default function CustomerAvatarUpload({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/webp"
         className="hidden"
         onChange={handleSelect}
       />
